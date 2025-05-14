@@ -172,3 +172,8 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+files.txt
+lap_times.csv
+main_bg.mp4
+main_overlay.mp4
+video_only.mp4
