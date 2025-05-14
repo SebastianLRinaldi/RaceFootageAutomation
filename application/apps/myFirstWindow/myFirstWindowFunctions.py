@@ -18,21 +18,6 @@ class FirstPageLogic:
         self.durations = []
         self.current_lap_index = 0
 
-    # def on_position_changed(self, pos_ms):
-    #     timestamp = pos_ms / 1000  # float, keep the ms
-    #     time_str = f"{timestamp:06.3f}"  # match precision
-    #     self.ui.ElapsVideoTimer.setText(time_str)
-
-    #     # Race timer
-    #     if self.race_start_ms is not None and pos_ms >= self.race_start_ms:
-    #         race_time = (pos_ms - self.race_start_ms) / 1000
-    #         race_str = f"{race_time:06.3f}"
-    #         self.ui.RaceTimerLabel.setText(race_str)
-    #     else:
-    #         self.ui.RaceTimerLabel.setText("00.000")
-
-
-
     def update_table_lap_time(self):
         if self.current_lap_index < len(self.lap_times):
             lap_time = self.durations[self.current_lap_index]
@@ -44,8 +29,6 @@ class FirstPageLogic:
             else:
                 # Handle case where lap time is None (e.g., display 'N/A' or leave it blank)
                 self.ui.table.setItem(self.current_lap_index, 0, QTableWidgetItem("N/A"))
-
-
 
     def on_position_changed(self, pos_ms):
         # Update elapsed video timer
@@ -161,7 +144,6 @@ class FirstPageLogic:
         self.lap_times = end_times
         self.current_lap_index = 0
         self.lap_start_ms = None
-
 
 
     def manual_set_offset(self):
