@@ -7,18 +7,9 @@ from application.FrontEnd.C_Grouper.widgetGroupFrameworks import WidgetGroup
 class TabHolder(QTabWidget):
     def __init__(
         self,
-        widgetRow: int = -1,
-        widgetCol: int = -1,
-        widgetRowSpan: int = -1,
-        widgetColSpan: int = -1,
         title: str = "",
     ):
         super().__init__()
-        self._parent = None
-        self.widgetRow = widgetRow
-        self.widgetCol = widgetCol
-        self.widgetRowSpan = widgetRowSpan
-        self.widgetColSpan = widgetColSpan
         self.title = title
         self.setTabShape(QTabWidget.TabShape.Triangular)
         self.setMovable(True)

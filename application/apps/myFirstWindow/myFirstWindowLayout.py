@@ -28,48 +28,6 @@ class My_First_Page(AppLayoutManager):
         super().__init__()
         self.setWindowTitle("Dual Video Player with Timer & Table")
 
-        # # === Main (center) video ===
-        # self.bgPlayer = QMediaPlayer()
-        # self.bgVideoItem = QGraphicsVideoItem()
-        # self.bgScene = QGraphicsScene()
-        # self.bgScene.addItem(self.bgVideoItem)
-        # self.bgView = QGraphicsView(self.bgScene)
-        # self.bgView.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        # self.bgView.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        # self.bgView.setFrameShape(QGraphicsView.Shape.NoFrame)
-        # self.bgPlayer.setVideoOutput(self.bgVideoItem)
-        # # === Rear (left) video ===
-        # self.overlayPlayer = QMediaPlayer()
-        # self.overlayItem = QGraphicsVideoItem()
-        # self.overlayItem.setZValue(1)
-        # self.overlayItem.setScale(0.4)
-        # self.bgScene.addItem(self.overlayItem)
-        # self.overlayPlayer.setVideoOutput(self.overlayItem)
-
-        
-        # # === Main (center) video ===
-        # self.bgPlayer = QMediaPlayer()
-        # self.bgVideoItem = QGraphicsVideoItem()
-        # self.bgScene = QGraphicsScene()
-        # self.bgScene.addItem(self.bgVideoItem)
-        # self.bgView = QGraphicsView(self.bgScene)
-        # self.bgView.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        # self.bgView.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        # self.bgView.setFrameShape(QGraphicsView.Shape.NoFrame)
-        # self.bgView.setMinimumSize(853, 480)
-        # self.bgPlayer.setVideoOutput(self.bgVideoItem)
-        # # === Rear (left) video ===
-        # self.overlayPlayer = QMediaPlayer()
-        # self.overlayItem = QGraphicsVideoItem()
-        # self.overlayScene = QGraphicsScene()
-        # self.overlayScene.addItem(self.overlayItem)
-        # self.overlayView = QGraphicsView(self.overlayScene)
-        # self.overlayView.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        # self.overlayView.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        # self.overlayView.setFrameShape(QGraphicsView.Shape.NoFrame)
-        # self.overlayPlayer.setVideoOutput(self.overlayItem)
-
-
         # Create the QVideoWidget
         self.bgVideoWidget = QVideoWidget(self)
         self.overlayVideoWidget = QVideoWidget(self)
@@ -99,44 +57,9 @@ class My_First_Page(AppLayoutManager):
         self.bgVideoWidget.setMinimumSize(225, 120)
         self.overlayVideoWidget.setMinimumSize(225, 120)
 
-        # # Check if videos are available and playing
-        # if not self.bgPlayer.isAvailable():
-        #     print("Background video not available.")
-        # if not self.overlayPlayer.isAvailable():
-        #     print("Overlay video not available.")
-
-        # # === Start playback ===
-        # self.bgPlayer.play()
-        # self.overlayPlayer.play()
-
-
-        # self.bgPlayer.errorChanged.connect(self.handle_error)
-        # self.overlayPlayer.errorChanged.connect(self.handle_error)
-
-
-
-
-
-        
-        # # === Load media ===
-        # file1 = 'main_bg.mp4'   # Background video
-        # file2 = 'main_overlay.mp4'   # Overlay video
-        # self.bgPlayer.setSource(QUrl.fromLocalFile(file1))
-        # self.overlayPlayer.setSource(QUrl.fromLocalFile(file2))
-        # self.bgAudio = QAudioOutput()
-        # self.overlayAudio = QAudioOutput()
-        # self.bgPlayer.setAudioOutput(self.bgAudio)
-        # self.overlayPlayer.setAudioOutput(self.overlayAudio)
-
-        # self.bgPlayer.play()
-        # self.overlayPlayer.play()
-
-
         # High-resolution timer for more accurate position tracking
         self.elapsedTimer = QElapsedTimer()
         self.elapsedTimer.start()
-
-
 
         # === Timer (top right) ===
         self.ElapsVideoTimer = QLabel("00:00")
@@ -144,11 +67,8 @@ class My_First_Page(AppLayoutManager):
         self.ElapsVideoTimer.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # === Table (bottom right) ===
-        self.table = QTableWidget(5, 3)
-        self.table.setHorizontalHeaderLabels(['Col 1', 'Col 2', 'Col 3'])
-        for i in range(5):
-            for j in range(3):
-                self.table.setItem(i, j, QTableWidgetItem(f"Item {i},{j}"))
+        self.table = QTableWidget(1, 1)
+        self.table.setHorizontalHeaderLabels(['EpicX18 G9'])
         
 
         # Playback Controls
@@ -168,34 +88,68 @@ class My_First_Page(AppLayoutManager):
         self.overlayTimeline = QSlider(Qt.Orientation.Horizontal)
         self.overlayTimeline.setRange(0, 1000)
 
-        mediaElements = WidgetGroup(title="Media Elements")
-        trackAnaylsis = WidgetGroup(title="Track Anaylsis")
+        
+
+        mediaViews = WidgetGroup(title="Media Viewers")
         timeKeeperGroup = WidgetGroup(title="Lap Timer")
         playbackControls = WidgetGroup(title="Playback Controls")
         offsetControls = WidgetGroup(title="Offset Controls")
         timelineControls = WidgetGroup(title="Timeline Controls")
 
-
         spliter = MasterSpliterGroup(Qt.Orientation.Vertical)
-        mediaToControlsSpliter = MasterSpliterGroup()
+        mediaViewsSpliter = MasterSpliterGroup()
+
+        mediaControls = WidgetGroup(title="Sync Video and Play Media")
+        raceTimeGroup = WidgetGroup(title="Lap Time Setup Controls")
+        
+
+
+
+
+        self.raceStartTimeInput = QLineEdit()
+        self.overlayOffsetTimeInput = QLineEdit()
+
+        setRaceTimeSubmitGroup = WidgetGroup(title="Set Race Time Submit")
+        setOverlayOffsetSubmitGroup = WidgetGroup(title="Overlay Offset Time Submit")
+        setTimesGroup = WidgetGroup(title="Set Time Controls")
+
+
+
+        
+        # Track Times Placement
+        self.markRaceStartTime = QPushButton("Start Race Timer")
+        self.grabLapTimeDuration = QPushButton("Grab lap Times From A Racer")
+        self.setRaceStartTimeBtn = QPushButton("Submit Race Start Time")
+        self.setOverlayOffsetTimeBtn = QPushButton("Submit Overlay Offset Time")
+        
+        self.RaceTimerLabel = QLabel("00:00")
+        self.RaceTimerLabel.setStyleSheet("color: white; background-color: rgba(0,0,0,128); font-size: 16px;")
+        self.RaceTimerLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
+        self.LapTimerLabel = QLabel("00:00")
+        self.LapTimerLabel.setStyleSheet("color: white; background-color: rgba(0,0,0,128); font-size: 16px;")
+        self.LapTimerLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        controls = TabHolder()
         
 
 
         self.add_widgets_to_window(
-
-                mediaElements.add_widgets_to_group(
-
-                    mediaToControlsSpliter.add_widgets_to_spliter(
-                        self.overlayVideoWidget,
-                        self.bgVideoWidget,
-                        
-                        timeKeeperGroup.add_widgets_to_group(
-                            self.table,
-                        ),
+            mediaViews.add_widgets_to_group(
+                mediaViewsSpliter.add_widgets_to_spliter(
+                    self.overlayVideoWidget,
+                    self.bgVideoWidget,
+                    
+                    timeKeeperGroup.add_widgets_to_group(
+                        self.RaceTimerLabel,
+                        self.LapTimerLabel,
+                        self.table,
                     ),
                 ),
-
-                trackAnaylsis.add_widgets_to_group(
+            ),
+            
+            controls.add_groups_as_tabs(
+                mediaControls.add_widgets_to_group(
                     playbackControls.add_widgets_to_group(
                         self.skipBackBtn,
                         self.skipFwdBtn,
@@ -217,38 +171,34 @@ class My_First_Page(AppLayoutManager):
                             setlayout="H"
                             ),
                         ),
-                    )
-            
+                    ),
+
+
+                raceTimeGroup.add_widgets_to_group(
+                    self.grabLapTimeDuration,
+                    self.markRaceStartTime,
+                ),
+
+                setTimesGroup.add_widgets_to_group(
+                    setRaceTimeSubmitGroup.add_widgets_to_group(
+                        self.setRaceStartTimeBtn,
+                        self.raceStartTimeInput,
+                        setlayout="H"
+                        ),
+                    setOverlayOffsetSubmitGroup.add_widgets_to_group(
+                        self.setOverlayOffsetTimeBtn,
+                        self.overlayOffsetTimeInput,
+                        setlayout="H"
+                    ),
+                    
+                )
+
+            )
         )
 
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
         print(self.size())
-    #     size = self.bgView.size()
-    #     self.bgVideoItem.setSize(QSizeF(size.width(), size.height()))
-    #     self.bgView.fitInView(self.bgVideoItem, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
 
-
-
-    # def resizeEvent(self, event):
-    #     super().resizeEvent(event)
-
-    #     # Resize and fit background video
-    #     size = self.bgView.size()
-    #     self.bgVideoItem.setSize(QSizeF(size.width(), size.height()))
-    #     self.bgView.fitInView(self.bgVideoItem, Qt.AspectRatioMode.KeepAspectRatioByExpanding)
-
-    #     # # x = 10
-    #     # # y = 10
-    #     # # self.overlayItem.setPos(x, y)
-
-    #     # raw_rect = self.overlayItem.nativeSize()  # way more reliable than boundingRect
-    #     # scale = self.overlayItem.scale()
-    #     # overlay_width = raw_rect.width() * scale
-    #     # overlay_height = raw_rect.height() * scale
-
-    #     # x = 10
-    #     # y = 10
-    #     # self.overlayItem.setPos(x, y)
         
