@@ -18,11 +18,6 @@ class FirstPageLogic:
         self.durations = []
         self.current_lap_index = 0
 
-<<<<<<< HEAD
-
-    def update_table_lap_time(self):
-        if self.current_lap_index <= len(self.lap_times):
-=======
     # def on_position_changed(self, pos_ms):
     #     timestamp = pos_ms / 1000  # float, keep the ms
     #     time_str = f"{timestamp:06.3f}"  # match precision
@@ -40,7 +35,6 @@ class FirstPageLogic:
 
     def update_table_lap_time(self):
         if self.current_lap_index < len(self.lap_times):
->>>>>>> 85f446f542ec87c997177ef9743762516a48d26b
             lap_time = self.durations[self.current_lap_index]
             self.ui.table.insertRow(self.ui.table.rowCount())
             if lap_time is not None:
@@ -68,20 +62,12 @@ class FirstPageLogic:
                 self.lap_start_ms = race_time_ms
 
             # Check if we passed the current lap's end
-<<<<<<< HEAD
             if (race_time_ms is not None and
                     self.current_lap_index < len(self.lap_times) and
                     race_time_ms >= self.lap_times[self.current_lap_index]):
                 self.update_table_lap_time()
                 self.current_lap_index += 1
                 self.lap_start_ms = race_time_ms # Reset lap timer
-=======
-            if (self.current_lap_index < len(self.lap_times) and
-                    race_time_ms >= self.lap_times[self.current_lap_index]):
-                self.current_lap_index += 1
-                self.update_table_lap_time()
-                self.lap_start_ms = race_time_ms  # Reset lap timer
->>>>>>> 85f446f542ec87c997177ef9743762516a48d26b
 
             # Update lap timer
             lap_time = (race_time_ms - self.lap_start_ms) / 1000
@@ -150,13 +136,10 @@ class FirstPageLogic:
         self.ui.overlayPlayer.setPosition(max(0, new_pos + self.offset_ms))
 
     def set_race_start_time(self):
-<<<<<<< HEAD
 
         if not self.durations:
             self.set_lap_durations()
         
-=======
->>>>>>> 85f446f542ec87c997177ef9743762516a48d26b
         self.race_start_ms = self.ui.bgPlayer.position()
         print(f"Race starts at {self.race_start_ms} ms")
 
@@ -189,12 +172,9 @@ class FirstPageLogic:
 
 
     def manual_set_race_start_time(self):
-<<<<<<< HEAD
         if not self.durations:
             self.set_lap_durations()
         
-=======
->>>>>>> 85f446f542ec87c997177ef9743762516a48d26b
         ms = int(self.ui.raceStartTimeInput.text())
         self.race_start_ms = ms
         print(f"Race starts at {self.race_start_ms} ms")
