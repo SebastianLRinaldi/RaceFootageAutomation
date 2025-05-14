@@ -148,7 +148,6 @@ def get_racer_times(filename, racer_name):
         return times
 
 # 2. Time Delta Analysis
-# 2. Time Delta Analysis
 def format_deltas(times):
     if not times:
         return
@@ -278,4 +277,4 @@ def analyze_lap_times(filename, racer_name):
         statistical_analysis(times)
 
 # Running the analysis
-analyze_lap_times('lap_times.csv', 'Tumelo GT9')
+analyze_lap_times('lap_times.csv', 'EpicX18 GT9')

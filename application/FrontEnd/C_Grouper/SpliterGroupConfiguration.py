@@ -6,12 +6,9 @@ class MasterSpliterGroup(QSplitter):
     def __init__(self, orientation=Qt.Orientation.Horizontal):
         super().__init__(orientation)
         
-        
-        
         self.setOpaqueResize(True)  # Enable smooth resizing
         self.setChildrenCollapsible(True)  
         self.setHandleWidth(10)  # Set handle width for better visibility
-        
         
         # Style the handles
         self.setStyleSheet("""
@@ -22,7 +19,6 @@ class MasterSpliterGroup(QSplitter):
             }
         """)
         
-            
     def add_widgets_to_spliter(self, *widgets):
         if not all(isinstance(widget, QWidget) for widget in widgets):
             raise TypeError("All items must be instances of QWidget.")
