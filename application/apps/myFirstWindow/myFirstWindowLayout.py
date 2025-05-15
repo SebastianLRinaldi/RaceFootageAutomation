@@ -22,65 +22,76 @@ from application.FrontEnd.C_Grouper.widgetGroupFrameworks import *
 
 from application.FrontEnd.D_WindowFolder.windowConfigureation import *
 
+from .widgets.raceTimerViews import RaceTimerView
+from .widgets.mediaViews import MediaView
+from .widgets.mediaControls import MediaControls
+from .widgets.secondViewOffsetControls import SecondViewOffsetControls
+from .widgets.racingTimeSetControls import RacingTimeSetControls
 
-class My_First_Page(AppLayoutManager):
+class My_First_Page(LayoutManager):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Dual Video Player with Timer & Table")
 
-        # Create the QVideoWidget
-        self.bgVideoWidget = QVideoWidget(self)
-        self.overlayVideoWidget = QVideoWidget(self)
+        # # Create the QVideoWidget
+        # self.bgVideoWidget = QVideoWidget(self)
+        # self.overlayVideoWidget = QVideoWidget(self)
 
-        # Create the players
-        self.bgPlayer = QMediaPlayer()
-        self.overlayPlayer = QMediaPlayer()
+        # # Create the players
+        # self.bgPlayer = QMediaPlayer()
+        # self.overlayPlayer = QMediaPlayer()
 
-        # Set video output to the QVideoWidget
-        self.bgPlayer.setVideoOutput(self.bgVideoWidget)
-        self.overlayPlayer.setVideoOutput(self.overlayVideoWidget)
+        # # Set video output to the QVideoWidget
+        # self.bgPlayer.setVideoOutput(self.bgVideoWidget)
+        # self.overlayPlayer.setVideoOutput(self.overlayVideoWidget)
 
-        # === Load media ===
-        file1 = 'main_bg.mp4'   # Background video
-        file2 = 'main_overlay.mp4'   # Overlay video
-        self.bgPlayer.setSource(QUrl.fromLocalFile(file1))
-        self.overlayPlayer.setSource(QUrl.fromLocalFile(file2))
+        # # === Load media ===
+        # file1 = 'main_bg.mp4'   # Background video
+        # file2 = 'main_overlay.mp4'   # Overlay video
+        # self.bgPlayer.setSource(QUrl.fromLocalFile(file1))
+        # self.overlayPlayer.setSource(QUrl.fromLocalFile(file2))
 
-        # Set up audio outputs if necessary
-        self.bgAudio = QAudioOutput()
-        self.overlayAudio = QAudioOutput()
-        self.bgPlayer.setAudioOutput(self.bgAudio)
-        self.overlayPlayer.setAudioOutput(self.overlayAudio)
+        # # Set up audio outputs if necessary
+        # self.bgAudio = QAudioOutput()
+        # self.overlayAudio = QAudioOutput()
+        # self.bgPlayer.setAudioOutput(self.bgAudio)
+        # self.overlayPlayer.setAudioOutput(self.overlayAudio)
 
 
-        # Set minimum size for video widgets
-        self.bgVideoWidget.setMinimumSize(225, 120)
-        self.overlayVideoWidget.setMinimumSize(225, 120)
+        # # Set minimum size for video widgets
+        # self.bgVideoWidget.setMinimumSize(225, 120)
+        # self.overlayVideoWidget.setMinimumSize(225, 120)
 
-        # High-resolution timer for more accurate position tracking
-        self.elapsedTimer = QElapsedTimer()
-        self.elapsedTimer.start()
+        # # High-resolution timer for more accurate position tracking
+        # self.elapsedTimer = QElapsedTimer()
+        # self.elapsedTimer.start()
+
+
+        self.myMediaView = MediaView()
+        self.myMediaControls = MediaControls()
+        self.myTimerKeeperView = RaceTimerView()
+        self.mySecondViewOffsetControls = SecondViewOffsetControls()
+        self.myRacingTimeSetControls = RacingTimeSetControls()
+        
 
         # === Timer (top right) ===
         self.ElapsVideoTimer = QLabel("00:00")
         self.ElapsVideoTimer.setStyleSheet("color: white; background-color: rgba(0,0,0,128); font-size: 16px;")
         self.ElapsVideoTimer.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
-        # === Table (bottom right) ===
-        self.table = QTableWidget(1, 1)
-        self.table.setHorizontalHeaderLabels(['EpicX18 G9'])
+        # # === Table (bottom right) ===
+        # self.table = QTableWidget(1, 1)
+        # self.table.setHorizontalHeaderLabels(['EpicX18 G9'])
         
 
-        # Playback Controls
-        self.playBtn = QPushButton("Play/Pause")
-        self.skipFwdBtn = QPushButton(">> 5s")
-        self.skipBackBtn = QPushButton("<< 5s")
-        self.stepFwdBtn = QPushButton("Frame →")
-        self.stepBackBtn = QPushButton("← Frame")
+        # # Playback Controls
+        # self.playBtn = QPushButton("Play/Pause")
+        # self.skipFwdBtn = QPushButton(">> 5s")
+        # self.skipBackBtn = QPushButton("<< 5s")
+        # self.stepFwdBtn = QPushButton("Frame →")
+        # self.stepBackBtn = QPushButton("← Frame")
 
-        # Offset Controls
-        self.offsetFwdBtn = QPushButton("Overlay +0.1s")
-        self.offsetBackBtn = QPushButton("Overlay -0.1s")
+
 
         # Timelines
         self.mainTimeline = QSlider(Qt.Orientation.Horizontal)
@@ -106,93 +117,64 @@ class My_First_Page(AppLayoutManager):
 
 
 
-        self.raceStartTimeInput = QLineEdit()
-        self.overlayOffsetTimeInput = QLineEdit()
 
-        setRaceTimeSubmitGroup = WidgetGroup(title="Set Race Time Submit")
-        setOverlayOffsetSubmitGroup = WidgetGroup(title="Overlay Offset Time Submit")
+
+
+        
+        # setOverlayOffsetSubmitGroup = WidgetGroup(title="Overlay Offset Time Submit")
+        # self.overlayOffsetTimeInput = QLineEdit()
+        # self.setOverlayOffsetTimeBtn = QPushButton("Submit Overlay Offset Time")
+        # self.offsetFwdBtn = QPushButton("Overlay +0.1s")
+        # self.offsetBackBtn = QPushButton("Overlay -0.1s")
+
+
+        
+
+
+        
         setTimesGroup = WidgetGroup(title="Set Time Controls")
 
 
+        # self.markRaceStartTime = QPushButton("Start Race Timer")
+        # self.grabLapTimeDuration = QPushButton("Grab lap Times From A Racer")
+        # setRaceTimeSubmitGroup = WidgetGroup(title="Set Race Time Submit")
+        # self.raceStartTimeInput = QLineEdit()
+        # self.setRaceStartTimeBtn = QPushButton("Submit Race Start Time")
 
         
-        # Track Times Placement
-        self.markRaceStartTime = QPushButton("Start Race Timer")
-        self.grabLapTimeDuration = QPushButton("Grab lap Times From A Racer")
-        self.setRaceStartTimeBtn = QPushButton("Submit Race Start Time")
-        self.setOverlayOffsetTimeBtn = QPushButton("Submit Overlay Offset Time")
+        # self.RaceTimerLabel = QLabel("00:00")
+        # self.RaceTimerLabel.setStyleSheet("color: white; background-color: rgba(0,0,0,128); font-size: 16px;")
+        # self.RaceTimerLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         
-        self.RaceTimerLabel = QLabel("00:00")
-        self.RaceTimerLabel.setStyleSheet("color: white; background-color: rgba(0,0,0,128); font-size: 16px;")
-        self.RaceTimerLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        
-        self.LapTimerLabel = QLabel("00:00")
-        self.LapTimerLabel.setStyleSheet("color: white; background-color: rgba(0,0,0,128); font-size: 16px;")
-        self.LapTimerLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # self.LapTimerLabel = QLabel("00:00")
+        # self.LapTimerLabel.setStyleSheet("color: white; background-color: rgba(0,0,0,128); font-size: 16px;")
+        # self.LapTimerLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         controls = TabHolder()
         
 
-
         self.add_widgets_to_window(
-            mediaViews.add_widgets_to_group(
-                mediaViewsSpliter.add_widgets_to_spliter(
-                    self.overlayVideoWidget,
-                    self.bgVideoWidget,
-                    
-                    timeKeeperGroup.add_widgets_to_group(
-                        self.RaceTimerLabel,
-                        self.LapTimerLabel,
-                        self.table,
-                    ),
-                ),
+
+            mediaViewsSpliter.add_widgets_to_spliter(
+                self.myMediaView,
+                self.myTimerKeeperView,
             ),
-            
+
             controls.add_groups_as_tabs(
                 mediaControls.add_widgets_to_group(
-                    playbackControls.add_widgets_to_group(
-                        self.skipBackBtn,
-                        self.skipFwdBtn,
-                        self.playBtn,
-                        self.stepBackBtn,
-                        self.stepFwdBtn,
-                        setlayout="H"
-                        ),
 
+                    self.myMediaControls,
+                    
                     self.ElapsVideoTimer,
 
                     timelineControls.add_widgets_to_group(
-
                         self.mainTimeline,
                         self.overlayTimeline,
-                        offsetControls.add_widgets_to_group(
-                            self.offsetBackBtn,
-                            self.offsetFwdBtn,
-                            setlayout="H"
-                            ),
                         ),
                     ),
-
-
-                raceTimeGroup.add_widgets_to_group(
-                    self.grabLapTimeDuration,
-                    self.markRaceStartTime,
-                ),
-
-                setTimesGroup.add_widgets_to_group(
-                    setRaceTimeSubmitGroup.add_widgets_to_group(
-                        self.setRaceStartTimeBtn,
-                        self.raceStartTimeInput,
-                        setlayout="H"
-                        ),
-                    setOverlayOffsetSubmitGroup.add_widgets_to_group(
-                        self.setOverlayOffsetTimeBtn,
-                        self.overlayOffsetTimeInput,
-                        setlayout="H"
-                    ),
+                    self.myRacingTimeSetControls,
+                    self.mySecondViewOffsetControls,
                     
-                )
-
             )
         )
 

@@ -21,14 +21,14 @@ class FirstPageLogic:
     def update_table_lap_time(self):
         if self.current_lap_index < len(self.lap_times):
             lap_time = self.durations[self.current_lap_index]
-            self.ui.table.insertRow(self.ui.table.rowCount())
+            self.ui.myTimerKeeperView.table.insertRow(self.ui.myTimerKeeperView.table.rowCount())
             if lap_time is not None:
                 # Set the lap time in the table (for example, in the first row and first column)
-                self.ui.table.setItem(self.current_lap_index, 0, QTableWidgetItem(str(lap_time)))  # Convert back to seconds if needed
+                self.ui.myTimerKeeperView.table.setItem(self.current_lap_index, 0, QTableWidgetItem(str(lap_time)))  # Convert back to seconds if needed
 
             else:
                 # Handle case where lap time is None (e.g., display 'N/A' or leave it blank)
-                self.ui.table.setItem(self.current_lap_index, 0, QTableWidgetItem("N/A"))
+                self.ui.myTimerKeeperView.table.setItem(self.current_lap_index, 0, QTableWidgetItem("N/A"))
 
     def on_position_changed(self, pos_ms):
         # Update elapsed video timer
@@ -38,7 +38,7 @@ class FirstPageLogic:
         # Update race timer
         if self.race_start_ms is not None and pos_ms >= self.race_start_ms:
             race_time_ms = pos_ms - self.race_start_ms
-            self.ui.RaceTimerLabel.setText(f"{race_time_ms / 1000:06.3f}")
+            self.ui.myTimerKeeperView.RaceTimerLabel.setText(f"{race_time_ms / 1000:06.3f}")
 
             # Initialize lap start on first call
             if self.lap_start_ms is None:
@@ -54,14 +54,14 @@ class FirstPageLogic:
 
             # Update lap timer
             lap_time = (race_time_ms - self.lap_start_ms) / 1000
-            self.ui.LapTimerLabel.setText(f"{lap_time:06.3f}")
+            self.ui.myTimerKeeperView.LapTimerLabel.setText(f"{lap_time:06.3f}")
         else:
-            self.ui.RaceTimerLabel.setText("00.000")
-            self.ui.LapTimerLabel.setText("00.000")
+            self.ui.myTimerKeeperView.RaceTimerLabel.setText("00.000")
+            self.ui.myTimerKeeperView.LapTimerLabel.setText("00.000")
 
     def toggle_play(self):
-        bg = self.ui.bgPlayer
-        overlay = self.ui.overlayPlayer
+        bg = self.ui.myMediaView.bgPlayer
+        overlay = self.ui.myMediaView.overlayPlayer
         if bg.playbackState() == QMediaPlayer.PlaybackState.PlayingState:
             bg.pause()
             overlay.pause()
@@ -70,21 +70,21 @@ class FirstPageLogic:
             overlay.play()
 
     def seek(self, delta_ms):
-        bg = self.ui.bgPlayer
-        overlay = self.ui.overlayPlayer
+        bg = self.ui.myMediaView.bgPlayer
+        overlay = self.ui.myMediaView.overlayPlayer
         new_pos = max(0, bg.position() + delta_ms)
         bg.setPosition(new_pos)
         overlay.setPosition(max(0, new_pos + self.offset_ms))
 
     def seek_main(self, pos):
-        self.ui.bgPlayer.pause()
-        self.ui.overlayPlayer.pause()
-        self.ui.bgPlayer.setPosition(pos)
-        self.ui.overlayPlayer.setPosition(max(0, pos + self.offset_ms))
+        self.ui.myMediaView.bgPlayer.pause()
+        self.ui.myMediaView.overlayPlayer.pause()
+        self.ui.myMediaView.bgPlayer.setPosition(pos)
+        self.ui.myMediaView.overlayPlayer.setPosition(max(0, pos + self.offset_ms))
 
     def seek_overlay(self, pos):
-        self.ui.overlayPlayer.pause()
-        main_pos = self.ui.bgPlayer.position()
+        self.ui.myMediaView.overlayPlayer.pause()
+        main_pos = self.ui.myMediaView.bgPlayer.position()
         self.offset_ms = pos - main_pos
         print(f"Offset adjusted via slider: {self.offset_ms} ms")
         self.seek(0)
@@ -112,18 +112,18 @@ class FirstPageLogic:
 
     def step_frame(self, step):
         frame_ms = 1000 // 30  # Assuming 30 FPS
-        new_pos = max(0, self.ui.bgPlayer.position() + step * frame_ms)
-        self.ui.bgPlayer.pause()
-        self.ui.overlayPlayer.pause()
-        self.ui.bgPlayer.setPosition(new_pos)
-        self.ui.overlayPlayer.setPosition(max(0, new_pos + self.offset_ms))
+        new_pos = max(0, self.ui.myMediaView.bgPlayer.position() + step * frame_ms)
+        self.ui.myMediaView.bgPlayer.pause()
+        self.ui.myMediaView.overlayPlayer.pause()
+        self.ui.myMediaView.bgPlayer.setPosition(new_pos)
+        self.ui.myMediaView.overlayPlayer.setPosition(max(0, new_pos + self.offset_ms))
 
     def set_race_start_time(self):
 
         if not self.durations:
             self.set_lap_durations()
         
-        self.race_start_ms = self.ui.bgPlayer.position()
+        self.race_start_ms = self.ui.myMediaView.bgPlayer.position()
         print(f"Race starts at {self.race_start_ms} ms")
 
 
@@ -147,7 +147,7 @@ class FirstPageLogic:
 
 
     def manual_set_offset(self):
-        offset_ms = int(self.ui.overlayOffsetTimeInput.text())
+        offset_ms = int(self.ui.mySecondViewOffsetControls.overlayOffsetTimeInput.text())
         self.offset_ms = offset_ms
         print(f"Offset: {self.offset_ms} ms")
         self.seek(0)

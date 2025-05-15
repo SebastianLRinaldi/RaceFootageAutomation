@@ -24,7 +24,7 @@ from application.apps.myThirdWindow.myThirdPageConnections import ThirdPageConne
 class Dashboard(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("Car UI")
+        self.setWindowTitle("UI")
         self.resize(1571, 731)
 
         self.stack = QStackedWidget()

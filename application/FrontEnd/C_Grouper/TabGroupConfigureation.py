@@ -18,8 +18,6 @@ class TabHolder(QTabWidget):
     def add_groups_as_tabs(self, *pages: WidgetGroup):
         """Add tabs to the master tab widget for the group of widgets as pages"""
         for page in pages:
-            if page.title:
-                self.addTab(page, page.title)
-            else:
-                self.addTab(page, "EMPTY")
+            title = getattr(page, 'title', None) or page.windowTitle() or "EMPTY"
+            self.addTab(page, title)
         return self

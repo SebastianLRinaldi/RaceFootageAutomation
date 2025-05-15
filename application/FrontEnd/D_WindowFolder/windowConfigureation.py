@@ -4,7 +4,7 @@ from PyQt6.QtGui import *
 
 from typing import Dict, TypeVar, Union
 
-class AppLayoutManager(QWidget):
+class LayoutManager(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("My Progressive FlashCards")
@@ -12,13 +12,13 @@ class AppLayoutManager(QWidget):
         self.setup_stylesheets()
 
     def add_widgets_to_window(self, *widgets, setlayout:str=None):
-        if setlayout == "QVBox" or setlayout == None:
+        if setlayout == "V" or setlayout == None:
             layout = QVBoxLayout()
             for index, widget in enumerate(widgets):
                 layout.addWidget(widget)
             self.setLayout(layout)
 
-        elif setlayout == "QHBox":
+        elif setlayout == "H":
             layout = QHBoxLayout()
             for index, widget in enumerate(widgets):
                 layout.addWidget(widget)

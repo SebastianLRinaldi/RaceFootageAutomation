@@ -20,7 +20,7 @@ from application.FrontEnd.C_Grouper.widgetGroupFrameworks import *
 
 from application.FrontEnd.D_WindowFolder.windowConfigureation import *
 
-class My_Second_Page(AppLayoutManager):
+class My_Second_Page(LayoutManager):
     def __init__(self):
         super().__init__()
         self.list_widget = QListWidget()
