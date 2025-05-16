@@ -23,7 +23,7 @@ from application.FrontEnd.C_Grouper.widgetGroupFrameworks import *
 from application.FrontEnd.D_WindowFolder.windowConfigureation import *
 
 
-class MediaControls(LayoutManager):
+class MediaBtnControls(LayoutManager):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Media Controls")
@@ -34,7 +34,6 @@ class MediaControls(LayoutManager):
         self.skipBackBtn = QPushButton("<< 5s")
         self.stepFwdBtn = QPushButton("Frame →")
         self.stepBackBtn = QPushButton("← Frame")
-
 
         self.add_widgets_to_window(
 

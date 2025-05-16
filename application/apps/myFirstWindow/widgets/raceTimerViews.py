@@ -28,7 +28,6 @@ class RaceTimerView(LayoutManager):
         super().__init__()
         self.setWindowTitle("LapTimes and Race Timer View")
 
-
         # === Table (bottom right) ===
         self.table = QTableWidget(1, 1)
         self.table.setHorizontalHeaderLabels(['EpicX18 G9'])
@@ -40,7 +39,6 @@ class RaceTimerView(LayoutManager):
         self.LapTimerLabel = QLabel("00:00")
         self.LapTimerLabel.setStyleSheet("color: white; background-color: rgba(0,0,0,128); font-size: 16px;")
         self.LapTimerLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
-
 
         self.add_widgets_to_window(
 

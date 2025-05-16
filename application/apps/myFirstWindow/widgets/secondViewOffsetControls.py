@@ -28,29 +28,62 @@ class SecondViewOffsetControls(LayoutManager):
         super().__init__()
         self.setWindowTitle("Second View Offset Controls")
 
+
+        self.currentOffsetTimeLabel = QLabel("00:00")
+        self.currentOffsetTimeLabel.setStyleSheet("color: white; background-color: rgba(0,0,0,128); font-size: 16px;")
+        self.currentOffsetTimeLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
         
+
+        self.overlayTimeline = QSlider(Qt.Orientation.Horizontal)
+        self.overlayTimeline.setRange(0, 1000)
+        
+        largeJumpOffsetControls = WidgetGroup(title="Large Jump Offsets ")
+        mediumJumpOffsetControls = WidgetGroup(title="Medium Jump Offsets ")
+        smallJumpOffsetControls = WidgetGroup(title="Small Jump Offsets ")
+        
+        self.offsetLFwdBtn = QPushButton("Overlay +0.1s")
+        self.offsetLBackBtn = QPushButton("Overlay -0.1s")
+        self.offsetMFwdBtn = QPushButton("Overlay +0.01s")
+        self.offsetMBackBtn = QPushButton("Overlay -0.01s")
+        self.offsetSFwdBtn = QPushButton("Overlay +0.001s")
+        self.offsetSBackBtn = QPushButton("Overlay -0.001s")
+
+
+                
         setOverlayOffsetSubmitGroup = WidgetGroup(title="Overlay Offset Time Submit")
         self.overlayOffsetTimeInput = QLineEdit()
         self.setOverlayOffsetTimeBtn = QPushButton("Submit Overlay Offset Time")
 
-        offsetControls = WidgetGroup(title="Offset Controls")
-        self.offsetFwdBtn = QPushButton("Overlay +0.1s")
-        self.offsetBackBtn = QPushButton("Overlay -0.1s")
-
 
         self.add_widgets_to_window(
-            
-            offsetControls.add_widgets_to_group(
-                        self.offsetBackBtn,
-                        self.offsetFwdBtn,
-                        setlayout="H"
-                        ),
 
+            self.currentOffsetTimeLabel,
+
+            self.overlayTimeline,
+
+            largeJumpOffsetControls.add_widgets_to_group(
+                    self.offsetLBackBtn,
+                    self.offsetLFwdBtn,
+                    setlayout="H"
+                ),
+            
+            mediumJumpOffsetControls.add_widgets_to_group(
+                    self.offsetMBackBtn,
+                    self.offsetMFwdBtn,
+                    setlayout="H"
+                ),
+
+            smallJumpOffsetControls.add_widgets_to_group(
+                    self.offsetSBackBtn,
+                    self.offsetSFwdBtn,
+                    setlayout="H"
+                ),
 
             setOverlayOffsetSubmitGroup.add_widgets_to_group(
                     self.setOverlayOffsetTimeBtn,
                     self.overlayOffsetTimeInput,
                     setlayout="H"
                 ),
-
+            
         )

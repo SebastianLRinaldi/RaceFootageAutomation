@@ -30,10 +30,24 @@ class FirstPageLogic:
                 # Handle case where lap time is None (e.g., display 'N/A' or leave it blank)
                 self.ui.myTimerKeeperView.table.setItem(self.current_lap_index, 0, QTableWidgetItem("N/A"))
 
-    def on_position_changed(self, pos_ms):
+    def on_second_video_position_changed(self, pos_ms):
         # Update elapsed video timer
-        timestamp = pos_ms / 1000
-        self.ui.ElapsVideoTimer.setText(f"{timestamp:06.3f}")
+        timestamp_ms = pos_ms
+        minutes = timestamp_ms // 60000
+        seconds = (timestamp_ms % 60000) // 1000
+        milliseconds = timestamp_ms % 1000
+        self.ui.myMediaTimeline.ElapsSecondVideoTimer.setText(f"{int(minutes):02}:{int(seconds):02}.{int(milliseconds):03}")
+
+
+
+
+    def on_main_video_position_changed(self, pos_ms):
+        # Update elapsed video timer
+        timestamp_ms = pos_ms
+        minutes = timestamp_ms // 60000
+        seconds = (timestamp_ms % 60000) // 1000
+        milliseconds = timestamp_ms % 1000
+        self.ui.myMediaTimeline.ElapsMainVideoTimer.setText(f"{int(minutes):02}:{int(seconds):02}.{int(milliseconds):03}")
 
         # Update race timer
         if self.race_start_ms is not None and pos_ms >= self.race_start_ms:
@@ -83,36 +97,70 @@ class FirstPageLogic:
         self.ui.myMediaView.overlayPlayer.setPosition(max(0, pos + self.offset_ms))
 
     def seek_overlay(self, pos):
+        self.ui.myMediaView.bgPlayer.pause()
         self.ui.myMediaView.overlayPlayer.pause()
         main_pos = self.ui.myMediaView.bgPlayer.position()
         self.offset_ms = pos - main_pos
+
+
+        sign = "-" if self.offset_ms < 0 else ""
+        abs_ms = abs(self.offset_ms)
+
+        minutes = abs_ms // 60000
+        seconds = (abs_ms % 60000) // 1000
+        milliseconds = abs_ms % 1000
+        
         print(f"Offset adjusted via slider: {self.offset_ms} ms")
+        print(f"Offset adjusted via slider: {sign}{minutes:02}:{seconds:02}.{milliseconds:03}")
+        self.ui.mySecondViewOffsetControls.currentOffsetTimeLabel.setText(f"{int(minutes):02}:{int(seconds):02}.{int(milliseconds):03}")
+
         self.seek(0)
 
     def update_main_duration(self, duration):
-        self.ui.mainTimeline.setRange(0, duration)
+        self.ui.myMediaTimeline.mainTimeline.setRange(0, duration)
 
     def update_main_slider(self, position):
-        self.ui.mainTimeline.blockSignals(True)
-        self.ui.mainTimeline.setValue(position)
-        self.ui.mainTimeline.blockSignals(False)
+        self.ui.myMediaTimeline.mainTimeline.blockSignals(True)
+        self.ui.myMediaTimeline.mainTimeline.setValue(position)
+        self.ui.myMediaTimeline.mainTimeline.blockSignals(False)
 
     def update_overlay_duration(self, duration):
-        self.ui.overlayTimeline.setRange(0, duration)
+        self.ui.myMediaTimeline.overlayTimeline.setRange(0, duration)
+        self.ui.mySecondViewOffsetControls.overlayTimeline.setRange(0, duration)
 
     def update_overlay_slider(self, position):
-        self.ui.overlayTimeline.blockSignals(True)
-        self.ui.overlayTimeline.setValue(position)
-        self.ui.overlayTimeline.blockSignals(False)
+        self.ui.myMediaTimeline.overlayTimeline.blockSignals(True)
+        self.ui.myMediaTimeline.overlayTimeline.setValue(position)
+        self.ui.myMediaTimeline.overlayTimeline.blockSignals(False)
+
+        self.ui.mySecondViewOffsetControls.overlayTimeline.blockSignals(True)
+        self.ui.mySecondViewOffsetControls.overlayTimeline.setValue(position)
+        self.ui.mySecondViewOffsetControls.overlayTimeline.blockSignals(False)
+
 
     def adjust_offset(self, delta):
         self.offset_ms += delta
+
+        sign = "-" if self.offset_ms < 0 else ""
+        abs_ms = abs(self.offset_ms)
+
+        minutes = abs_ms // 60000
+        seconds = (abs_ms % 60000) // 1000
+        milliseconds = abs_ms % 1000
+
         print(f"Offset: {self.offset_ms} ms")
+
+        print(f"Offset: {sign}{minutes:02}:{seconds:02}.{milliseconds:03}")
+
+        self.ui.mySecondViewOffsetControls.currentOffsetTimeLabel.setText(f"{int(minutes):02}:{int(seconds):02}.{int(milliseconds):03}")
+
+
+        
         self.seek(0)
 
     def step_frame(self, step):
-        frame_ms = 1000 // 30  # Assuming 30 FPS
-        new_pos = max(0, self.ui.myMediaView.bgPlayer.position() + step * frame_ms)
+        frame_ms = 1000 / 60  # Accurate frame time
+        new_pos = max(0, int(self.ui.myMediaView.bgPlayer.position() + step * frame_ms))
         self.ui.myMediaView.bgPlayer.pause()
         self.ui.myMediaView.overlayPlayer.pause()
         self.ui.myMediaView.bgPlayer.setPosition(new_pos)
@@ -125,6 +173,14 @@ class FirstPageLogic:
         
         self.race_start_ms = self.ui.myMediaView.bgPlayer.position()
         print(f"Race starts at {self.race_start_ms} ms")
+
+        pos_ms = self.ui.myMediaView.bgPlayer.position()
+        minutes = pos_ms // 60000
+        seconds = (pos_ms % 60000) // 1000
+        milliseconds = pos_ms % 1000
+        print(f"Race starts at {minutes:02}:{seconds:02}.{milliseconds:03}")
+        self.ui.myRacingTimeSetControls.currentRaceTimeStartLabel.setText(f"{int(minutes):02}:{int(seconds):02}.{int(milliseconds):03}")
+        self.race_start_ms = pos_ms
 
 
     def set_lap_durations(self):
@@ -149,7 +205,21 @@ class FirstPageLogic:
     def manual_set_offset(self):
         offset_ms = int(self.ui.mySecondViewOffsetControls.overlayOffsetTimeInput.text())
         self.offset_ms = offset_ms
+        
+
+        sign = "-" if self.offset_ms < 0 else ""
+        abs_ms = abs(self.offset_ms)
+
+        minutes = abs_ms // 60000
+        seconds = (abs_ms % 60000) // 1000
+        milliseconds = abs_ms % 1000
+
         print(f"Offset: {self.offset_ms} ms")
+
+        print(f"Offset: {sign}{minutes:02}:{seconds:02}.{milliseconds:03}")
+
+        self.ui.mySecondViewOffsetControls.currentOffsetTimeLabel.setText(f"{int(minutes):02}:{int(seconds):02}.{int(milliseconds):03}")
+        
         self.seek(0)
 
 
@@ -157,6 +227,14 @@ class FirstPageLogic:
         if not self.durations:
             self.set_lap_durations()
         
-        ms = int(self.ui.raceStartTimeInput.text())
+        ms = int(self.ui.myRacingTimeSetControls.raceStartTimeInput.text())
         self.race_start_ms = ms
         print(f"Race starts at {self.race_start_ms} ms")
+
+        minutes = ms // 60000
+        seconds = (ms % 60000) // 1000
+        milliseconds = ms % 1000
+        print(f"Race starts at {minutes:02}:{seconds:02}.{milliseconds:03}")
+        self.race_start_ms = ms
+        
+        self.ui.myRacingTimeSetControls.currentRaceTimeStartLabel.setText(f"{int(minutes):02}:{int(seconds):02}.{int(milliseconds):03}")

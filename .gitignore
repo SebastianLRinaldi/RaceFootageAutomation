@@ -177,3 +177,6 @@ lap_times.csv
 main_bg.mp4
 main_overlay.mp4
 video_only.mp4
+marks.json
+.gitignore
+marks.txt

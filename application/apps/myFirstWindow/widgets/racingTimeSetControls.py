@@ -28,8 +28,14 @@ class RacingTimeSetControls(LayoutManager):
         super().__init__()
         self.setWindowTitle("Racing Time Set Controls")
 
+
+        self.currentRaceTimeStartLabel = QLabel("00:00")
+        self.currentRaceTimeStartLabel.setStyleSheet("color: white; background-color: rgba(0,0,0,128); font-size: 16px;")
+        self.currentRaceTimeStartLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
         self.markRaceStartTime = QPushButton("Start Race Timer")
         self.grabLapTimeDuration = QPushButton("Grab lap Times From A Racer")
+
         setRaceTimeSubmitGroup = WidgetGroup(title="Set Race Time Submit")
         self.raceStartTimeInput = QLineEdit()
         self.setRaceStartTimeBtn = QPushButton("Submit Race Start Time")
@@ -37,14 +43,19 @@ class RacingTimeSetControls(LayoutManager):
 
         self.add_widgets_to_window(
 
+            self.currentRaceTimeStartLabel,
+            
+            self.grabLapTimeDuration,
+            self.markRaceStartTime,
+            
+
             setRaceTimeSubmitGroup.add_widgets_to_group(
                 self.setRaceStartTimeBtn,
                 self.raceStartTimeInput,
                 setlayout="H"
             ),
 
-            self.grabLapTimeDuration,
-            self.markRaceStartTime,
+
             
 
 
