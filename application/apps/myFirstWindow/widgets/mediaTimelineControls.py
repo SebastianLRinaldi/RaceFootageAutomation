@@ -176,34 +176,6 @@ class MarkedSlider(QSlider):
         super().mouseMoveEvent(event)
 
 
-# # --- App with Button ---
-# if __name__ == "__main__":
-#     app = QApplication(sys.argv)
-#     window = QWidget()
-#     layout = QVBoxLayout(window)
-
-#     slider = MarkedSlider()
-#     slider.setMinimum(0)
-#     slider.setMaximum(100)
-#     slider.setFixedHeight(80)
-
-#     button = QPushButton("Mark This Point")
-#     button.clicked.connect(lambda: slider.add_mark(slider.value()))
-
-#     layout.addWidget(slider)
-#     layout.addWidget(button)
-
-#     window.show()
-#     sys.exit(app.exec())
-
-
-
-
-
-
-
-
-
 class MediaTimeLineControls(LayoutManager):
     def __init__(self):
         super().__init__()
