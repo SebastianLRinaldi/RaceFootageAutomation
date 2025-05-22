@@ -20,31 +20,48 @@ from application.FrontEnd.C_Grouper.widgetGroupFrameworks import *
 
 from application.FrontEnd.D_WindowFolder.windowConfigureation import *
 
+
+"""
+https://www.youtube.com/watch?v=Q2d1tYvTjRw
+https://www.blackmagicdesign.com/products/davinciresolve
+https://www.mltframework.org
+text timers - https://www.youtube.com/watch?v=__CJ20RQUlY
+keyframes - https://www.youtube.com/watch?v=vcnsA38xDx4
+"""
+
+
 class My_Second_Page(LayoutManager):
     def __init__(self):
         super().__init__()
-        self.list_widget = QListWidget()
-        self.name_label = QLabel(text="Enter your name:")
-        self.text_edit = QTextEdit("This is a multi-line text editor")
         
-        self.radio_button = QRadioButton(text="Select this option")
-        self.check_box = QCheckBox(text="Accept terms and conditions")
+        self.canvas = QLabel(text="Canvas")
+        self.mainVideo = QLabel(text="Canvas")
+        self.overlayVideo = QLabel(text="Canvas")
+        self.lapTimerElement = QLabel(text="Canvas")
+        self.labTableElement = QLabel(text="Canvas")
+        
+        self.overlayOffsetTime = QLabel(text="Canvas")
+        
+        self.videoStartTime = QLabel(text="Addtional Time to keep before race start")
+        self.raceStartTime = QLabel(text="Canvas")
+        
+        self.raceEndTime = QLabel(text="Canvas")
+        self.videoEndTime = QLabel(text="Addtional Time to keep after race ends")
+
+        self.markedTimeline = QLabel(text="Canvas")
+        
+        self.playBtn = QPushButton("Play/Pause")
+        self.skipFwdBtn = QPushButton(">> 5s")
+        self.skipBackBtn = QPushButton("<< 5s")
+        self.stepFwdBtn = QPushButton("Frame →")
+        self.stepBackBtn = QPushButton("← Frame")
+
+
         
         middleSplit = MasterSpliterGroup(orientation=Qt.Orientation.Vertical)
         labelsGroup = WidgetGroup(title="Random Labels")
         btnsGroup = WidgetGroup(title="Random Btns")
         
         self.add_widgets_to_window(
-            middleSplit.add_widgets_to_spliter(
-                labelsGroup.add_widgets_to_group(
-                    self.name_label,
-                    self.text_edit,
-                    self.list_widget,
-                ),
 
-                btnsGroup.add_widgets_to_group(
-                    self.radio_button,
-                    self.check_box,
-                )
-            )
         )

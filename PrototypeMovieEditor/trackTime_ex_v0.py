@@ -170,26 +170,26 @@ for i in range(frame_count):
     frame = make_frame_overlay(t)
     cv2.imwrite(f"{overlay_dir}/frame_{i:05d}.png", frame)
 
-print("🎞️  Converting to transparent video...")
-subprocess.run([
-    "ffmpeg", "-y",
-    "-framerate", str(fps),
-    "-i", f"{overlay_dir}/frame_%05d.png",
-    "-c:v", "libvpx-vp9",
-    "-pix_fmt", "yuva420p",
-    "-b:v", "2M",
-    "overlay.webm"
-], check=True)
+# print("🎞️  Converting to transparent video...")
+# subprocess.run([
+#     "ffmpeg", "-y",
+#     "-framerate", str(fps),
+#     "-i", f"{overlay_dir}/frame_%05d.png",
+#     "-c:v", "libvpx-vp9",
+#     "-pix_fmt", "yuva420p",
+#     "-b:v", "2M",
+#     "overlay.webm"
+# ], check=True)
 
-print("🔀 Merging overlay with input video...")
-subprocess.run([
-    "ffmpeg", "-y",
-    "-i", input_video,
-    "-i", "overlay.webm",
-    "-filter_complex", "[0:v][1:v]overlay=shortest=1[outv]",
-    "-map", "[outv]", "-map", "0:a",
-    "-c:a", "copy",
-    output_video
-], check=True)
+# print("🔀 Merging overlay with input video...")
+# subprocess.run([
+#     "ffmpeg", "-y",
+#     "-i", input_video,
+#     "-i", "overlay.webm",
+#     "-filter_complex", "[0:v][1:v]overlay=shortest=1[outv]",
+#     "-map", "[outv]", "-map", "0:a",
+#     "-c:a", "copy",
+#     output_video
+# ], check=True)
 
 print(f"✅ Done. Final video saved to: {output_video}")

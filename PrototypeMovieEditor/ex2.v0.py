@@ -557,172 +557,149 @@
 
 
 
-# import cv2
-# import numpy as np
+import cv2
+import numpy as np
 
-# lap_times = [24.459, 23.888, 22.623, 23.368, 23.087, 24.201, 22.646, 22.654, 25.23, 23.231,
-#              25.676, 22.721, 22.708, 23.561, 26.509, 22.933, 22.871, 22.643, 22.671, 23.544,
-#              23.424, 22.756, 22.609, 22.474, None]
+lap_times = [24.459, 23.888, 22.623, 23.368, 23.087, 24.201, 22.646, 22.654, 25.23, 23.231,
+             25.676, 22.721, 22.708, 23.561, 26.509, 22.933, 22.871, 22.643, 22.671, 23.544,
+             23.424, 22.756, 22.609, 22.474, None]
 
-# countdown_time = 5
-# total_duration = countdown_time + sum(t for t in lap_times if t is not None)
+countdown_time = 5
+total_duration = countdown_time + sum(t for t in lap_times if t is not None)
 
-# fps = 30
-# fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+fps = 30
+fourcc = cv2.VideoWriter_fourcc(*'mp4v')
 
-# # Video sizes: timer smaller, table taller
-# timer_size = (500, 200)  # width x height
-# table_size = (500, 1500)
+# Video sizes: timer smaller, table taller
+timer_size = (500, 200)  # width x height
+table_size = (500, 1500)
 
-# font = cv2.FONT_HERSHEY_DUPLEX
-# white = (255, 255, 255)
-
-
-
-# def draw_centered_text(img, text, x, y, font, font_scale, thickness, color):
-#     (text_w, text_h), _ = cv2.getTextSize(text, font, font_scale, thickness)
-#     pos = (int(x - text_w / 2), int(y + text_h / 2))
-#     cv2.putText(img, text, pos, font, font_scale, color, thickness, lineType=cv2.LINE_AA)
-
-# def draw_table(img, x, y, lap_times):
-#     col1_w, col2_w = 100, 200
-#     total_rows = len(lap_times) + 1  # header
-#     max_height = table_size[1] - y - 20
-#     row_h = max(20, min(40, max_height // total_rows))
-
-#     font_scale_header = row_h / 40 * 0.8
-#     font_scale_row = row_h / 40 * 0.7
-#     thickness_scaled = 1
-
-#     # Header
-#     cv2.rectangle(img, (x, y), (x + col1_w + col2_w, y + row_h), white, 1)
-#     cv2.line(img, (x + col1_w, y), (x + col1_w, y + row_h), white, 1)
-#     draw_centered_text(img, "Lap", x + col1_w // 2, y + row_h // 2, font, font_scale_header, thickness_scaled, white)
-#     draw_centered_text(img, "Time (s)", x + col1_w + col2_w // 2, y + row_h // 2, font, font_scale_header, thickness_scaled, white)
-
-#     # Rows
-#     for i, t in enumerate(lap_times):
-#         top = y + row_h * (i + 1)
-#         cv2.rectangle(img, (x, top), (x + col1_w + col2_w, top + row_h), white, 1)
-#         cv2.line(img, (x + col1_w, top), (x + col1_w, top + row_h), white, 1)
-
-#         lap_num = str(i + 1)
-#         time_str = f"{t:.3f}" if t is not None else "—"
-
-#         draw_centered_text(img, lap_num, x + col1_w // 2, top + row_h // 2, font, font_scale_row, thickness_scaled, white)
-#         draw_centered_text(img, time_str, x + col1_w + col2_w // 2, top + row_h // 2, font, font_scale_row, thickness_scaled, white)
-
-# def make_timer_frame(t):
-#     img = np.zeros((timer_size[1], timer_size[0], 3), dtype=np.uint8)
-
-#     if t < countdown_time:
-#         count = max(1, int(np.ceil(countdown_time - t)))
-#         draw_centered_text(img, str(count), timer_size[0] // 2, timer_size[1] // 2 - 20, font, 3, 3, white)
-#         draw_centered_text(img, "Get Ready...", timer_size[0] // 2, timer_size[1] // 2 + 40, font, 1, 2, white)
-#     else:
-#         lap_time_passed = t - countdown_time
-#         lap = 0
-#         time_in_lap = lap_time_passed
-
-#         for lt in lap_times:
-#             if lt is None:
-#                 break
-#             if time_in_lap < lt:
-#                 break
-#             time_in_lap -= lt
-#             lap += 1
-
-#         cv2.putText(img, f"Time: {time_in_lap:.3f}s", (50, 50), font, 1, white, 2, cv2.LINE_AA)
-#         cv2.putText(img, f"Lap: {min(lap + 1, len(lap_times))}/{len(lap_times)}", (50, 100), font, 1, white, 2, cv2.LINE_AA)
-
-#     return img
-
-# def make_table_frame(t):
-#     img = np.zeros((table_size[1], table_size[0], 3), dtype=np.uint8)
-
-#     # if t >= countdown_time:
-#     #     lap_time_passed = t - countdown_time
-#     #     lap = 0
-#     #     time_in_lap = lap_time_passed
-
-#     #     for lt in lap_times:
-#     #         if lt is None:
-#     #             break
-#     #         if time_in_lap < lt:
-#     #             break
-#     #         time_in_lap -= lt
-#     #         lap += 1
-
-#     #     if lap > 0:
-#     #         cv2.putText(img, "Completed Laps:", (50, 50), font, 1, white, 2, cv2.LINE_AA)
-#     #         draw_table(img, 50, 100, lap_times[:lap])
-
-#     # return img
+font = cv2.FONT_HERSHEY_DUPLEX
+white = (255, 255, 255)
 
 
 
+def draw_centered_text(img, text, x, y, font, font_scale, thickness, color):
+    (text_w, text_h), _ = cv2.getTextSize(text, font, font_scale, thickness)
+    pos = (int(x - text_w / 2), int(y + text_h / 2))
+    cv2.putText(img, text, pos, font, font_scale, color, thickness, lineType=cv2.LINE_AA)
 
+def draw_table(img, x, y, lap_times):
+    col1_w, col2_w = 100, 200
+    total_rows = len(lap_times) + 1  # header
+    max_height = table_size[1] - y - 20
+    row_h = max(20, min(40, max_height // total_rows))
 
-#     if t >= countdown_time:
-#         lap_time_passed = t - countdown_time
-#         lap = 0
-#         time_in_lap = lap_time_passed
+    font_scale_header = row_h / 40 * 0.8
+    font_scale_row = row_h / 40 * 0.7
+    thickness_scaled = 1
 
-#         for lt in lap_times:
-#             if lt is None:
-#                 break
-#             if time_in_lap < lt:
-#                 break
-#             time_in_lap -= lt
-#             lap += 1
+    # Header
+    cv2.rectangle(img, (x, y), (x + col1_w + col2_w, y + row_h), white, 1)
+    cv2.line(img, (x + col1_w, y), (x + col1_w, y + row_h), white, 1)
+    draw_centered_text(img, "Lap", x + col1_w // 2, y + row_h // 2, font, font_scale_header, thickness_scaled, white)
+    draw_centered_text(img, "Time (s)", x + col1_w + col2_w // 2, y + row_h // 2, font, font_scale_header, thickness_scaled, white)
 
-#         cv2.putText(img, "Completed Laps:", (50, 50), font, 1, white, 2, cv2.LINE_AA)
-#         draw_table(img, 50, 100, lap_times[:lap])  # handles lap=0: just draws headers
+    # Rows
+    for i, t in enumerate(lap_times):
+        top = y + row_h * (i + 1)
+        cv2.rectangle(img, (x, top), (x + col1_w + col2_w, top + row_h), white, 1)
+        cv2.line(img, (x + col1_w, top), (x + col1_w, top + row_h), white, 1)
 
-#     return img
+        lap_num = str(i + 1)
+        time_str = f"{t:.3f}" if t is not None else "—"
 
-# out_timer = cv2.VideoWriter('lap_timer.mp4', fourcc, fps, timer_size)
-# out_table = cv2.VideoWriter('lap_table.mp4', fourcc, fps, table_size)
+        draw_centered_text(img, lap_num, x + col1_w // 2, top + row_h // 2, font, font_scale_row, thickness_scaled, white)
+        draw_centered_text(img, time_str, x + col1_w + col2_w // 2, top + row_h // 2, font, font_scale_row, thickness_scaled, white)
 
-# from tqdm import tqdm
+def make_timer_frame(t):
+    img = np.zeros((timer_size[1], timer_size[0], 3), dtype=np.uint8)
 
-# total_frames = int(total_duration * fps)
-# for i in tqdm(range(total_frames), desc="Rendering video"):
-#     t = i / fps
-#     out_timer.write(make_timer_frame(t))
-#     out_table.write(make_table_frame(t))
-
-# out_timer.release()
-# out_table.release()
-
-
-
-
-
-import subprocess
-
-def remove_black_bg(input_file, output_file):
-    cmd = [
-        "ffmpeg",
-        "-i", input_file,
-        "-vf", "colorkey=black:0.1:0.0",
-        "-c:v", "png",
-        "-pix_fmt", "rgba",
-        output_file
-    ]
-    result = subprocess.run(cmd, text=True)
-    if result.returncode != 0:
-        print("Error:", result.stderr)
+    if t < countdown_time:
+        count = max(1, int(np.ceil(countdown_time - t)))
+        draw_centered_text(img, str(count), timer_size[0] // 2, timer_size[1] // 2 - 20, font, 3, 3, white)
+        draw_centered_text(img, "Get Ready...", timer_size[0] // 2, timer_size[1] // 2 + 40, font, 1, 2, white)
     else:
-        print(f"Output saved to {output_file}")
+        lap_time_passed = t - countdown_time
+        lap = 0
+        time_in_lap = lap_time_passed
 
-if __name__ == "__main__":
-    input_path1 = "lap_timer.mp4"  
-    output_path1 = "lap_timer_no_bg.mov"
-    input_path2 = "lap_table.mp4"  
-    output_path2 = "lap_table_no_bg.mov"# Output with transparency support
-    remove_black_bg(input_path1, output_path1)
-    remove_black_bg(input_path2, output_path2)
+        for lt in lap_times:
+            if lt is None:
+                break
+            if time_in_lap < lt:
+                break
+            time_in_lap -= lt
+            lap += 1
+
+        cv2.putText(img, f"Time: {time_in_lap:.3f}s", (50, 50), font, 1, white, 2, cv2.LINE_AA)
+        cv2.putText(img, f"Lap: {min(lap + 1, len(lap_times))}/{len(lap_times)}", (50, 100), font, 1, white, 2, cv2.LINE_AA)
+
+    return img
+
+def make_table_frame(t):
+    img = np.zeros((table_size[1], table_size[0], 3), dtype=np.uint8)
+
+    if t >= countdown_time:
+        lap_time_passed = t - countdown_time
+        lap = 0
+        time_in_lap = lap_time_passed
+
+        for lt in lap_times:
+            if lt is None:
+                break
+            if time_in_lap < lt:
+                break
+            time_in_lap -= lt
+            lap += 1
+
+        cv2.putText(img, "Completed Laps:", (50, 50), font, 1, white, 2, cv2.LINE_AA)
+        draw_table(img, 50, 100, lap_times[:lap])  # handles lap=0: just draws headers
+
+    return img
+
+out_timer = cv2.VideoWriter('lap_timer.mp4', fourcc, fps, timer_size)
+out_table = cv2.VideoWriter('lap_table.mp4', fourcc, fps, table_size)
+
+from tqdm import tqdm
+
+total_frames = int(total_duration * fps)
+for i in tqdm(range(total_frames), desc="Rendering video"):
+    t = i / fps
+    out_timer.write(make_timer_frame(t))
+    out_table.write(make_table_frame(t))
+
+out_timer.release()
+out_table.release()
+
+
+
+
+
+# import subprocess
+
+# def remove_black_bg(input_file, output_file):
+#     cmd = [
+#         "ffmpeg",
+#         "-i", input_file,
+#         "-vf", "colorkey=black:0.1:0.0",
+#         "-c:v", "png",
+#         "-pix_fmt", "rgba",
+#         output_file
+#     ]
+#     result = subprocess.run(cmd, text=True)
+#     if result.returncode != 0:
+#         print("Error:", result.stderr)
+#     else:
+#         print(f"Output saved to {output_file}")
+
+# if __name__ == "__main__":
+#     input_path1 = "lap_timer.mp4"  
+#     output_path1 = "lap_timer_no_bg.mov"
+#     input_path2 = "lap_table.mp4"  
+#     output_path2 = "lap_table_no_bg.mov"# Output with transparency support
+#     remove_black_bg(input_path1, output_path1)
+#     remove_black_bg(input_path2, output_path2)
 
 
 

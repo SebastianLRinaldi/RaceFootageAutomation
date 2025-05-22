@@ -21,159 +21,10 @@ from application.FrontEnd.C_Grouper.TabGroupConfigureation import *
 from application.FrontEnd.C_Grouper.widgetGroupFrameworks import *
 
 
+from .markedSliderCustomWidget import MarkedSlider
+
 from application.FrontEnd.D_WindowFolder.windowConfigureation import *
 
-import sys, json, os
-MARKS_FILE = "marks.json"
-
-class MarkedSlider(QSlider):
-    def __init__(self, orientation=Qt.Orientation.Horizontal, parent=None):
-        super().__init__(orientation, parent)
-        self.custom_marks = []  # list of dicts with keys: value, name, note, color
-
-        self.setTickPosition(QSlider.TickPosition.TicksBelow)
-        self.setTickInterval(10)
-
-        self.load_marks()
-
-        self.setMouseTracking(True)  # For tooltips
-
-    def add_mark(self, value):
-        if any(abs(m['value'] - value) < 1e-5 for m in self.custom_marks):
-            return  # Already exists
-
-        mark = {
-            'value': value,
-            'name': f'Mark {value}',
-            'note': '',
-            'color': '#FF0000'  # default red
-        }
-        self.custom_marks.append(mark)
-        self.save_marks()
-        self.update()
-
-    def remove_mark_near(self, pixel_x):
-        for mark in self.custom_marks:
-            mark_x = self._value_to_pixel(mark['value'])
-            if abs(mark_x - pixel_x) < 5:
-                self.custom_marks.remove(mark)
-                self.save_marks()
-                self.update()
-                break
-
-    def edit_mark_near(self, pixel_x):
-        for mark in self.custom_marks:
-            mark_x = self._value_to_pixel(mark['value'])
-            if abs(mark_x - pixel_x) < 5:
-                self._open_edit_dialog(mark)
-                break
-
-    def _open_edit_dialog(self, mark):
-        # Name
-        name, ok = QInputDialog.getText(self, "Edit Mark Name", "Name:", text=mark['name'])
-        if not ok:
-            return
-        # Note
-        note, ok = QInputDialog.getMultiLineText(self, "Edit Mark Note", "Note:", text=mark['note'])
-        if not ok:
-            return
-        # Color
-        color = QColorDialog.getColor(QColor(mark['color']), self, "Choose Mark Color")
-        if not color.isValid():
-            return
-
-        mark['name'] = name
-        mark['note'] = note
-        mark['color'] = color.name()
-
-        self.save_marks()
-        self.update()
-
-    def mousePressEvent(self, event: QMouseEvent):
-        if event.button() == Qt.MouseButton.RightButton:
-            # Show context menu: remove or edit?
-            pixel_x = event.position().x()
-
-            # Detect if click is on a mark
-            for mark in self.custom_marks:
-                mark_x = self._value_to_pixel(mark['value'])
-                if abs(mark_x - pixel_x) < 5:
-                    # Ask what to do
-                    choice = QMessageBox.question(
-                        self, "Mark Options",
-                        f"Mark: {mark['name']}\n\nChoose action:",
-                        QMessageBox.StandardButton.Cancel |
-                        QMessageBox.StandardButton.Yes |  # Use Yes for edit
-                        QMessageBox.StandardButton.No    # Use No for remove
-                    )
-                    if choice == QMessageBox.StandardButton.Yes:
-                        self._open_edit_dialog(mark)
-                    elif choice == QMessageBox.StandardButton.No:
-                        self.custom_marks.remove(mark)
-                        self.save_marks()
-                        self.update()
-                    return
-            # If no mark nearby, pass event
-            super().mousePressEvent(event)
-        else:
-            super().mousePressEvent(event)
-
-    def paintEvent(self, event):
-        super().paintEvent(event)
-        painter = QPainter(self)
-        painter.setFont(QFont("Arial", 8))
-
-        for mark in self.custom_marks:
-            x = self._value_to_pixel(mark['value'])
-            y = self.height() - 60
-            # Draw colored line
-            color = QColor(mark['color'])
-            painter.setPen(color)
-            painter.drawLine(x, y, x, y - 10)
-            # Draw name label above line (centered)
-            text_width = painter.fontMetrics().horizontalAdvance(mark['name'])
-            painter.drawText(QPoint(x - text_width // 2, y - 12), mark['name'])
-
-        painter.end()
-
-    def _value_to_pixel(self, value):
-        slider_min = self.minimum()
-        slider_max = self.maximum()
-        slider_range = slider_max - slider_min
-
-        slider_length = self.style().pixelMetric(QStyle.PixelMetric.PM_SliderLength)
-        available_width = self.width() - slider_length
-        offset = slider_length // 2
-
-        ratio = (value - slider_min) / slider_range
-        return int(offset + ratio * available_width)
-
-    def save_marks(self):
-        try:
-            with open(MARKS_FILE, "w") as f:
-                json.dump(self.custom_marks, f, indent=2)
-        except Exception as e:
-            print(f"Save failed: {e}")
-
-    def load_marks(self):
-        if not os.path.exists(MARKS_FILE):
-            return
-        try:
-            with open(MARKS_FILE, "r") as f:
-                self.custom_marks = json.load(f)
-        except Exception as e:
-            print(f"Load failed: {e}")
-
-    def mouseMoveEvent(self, event):
-        # Show tooltip with note if hovering near mark
-        pos_x = event.position().x()
-        for mark in self.custom_marks:
-            mark_x = self._value_to_pixel(mark['value'])
-            if abs(mark_x - pos_x) < 7 and mark['note']:
-                QToolTip.showText(event.globalPosition().toPoint(), mark['note'], self)
-                return
-        QToolTip.hideText()
-        super().mouseMoveEvent(event)
 
 
 class MediaTimeLineControls(LayoutManager):
@@ -217,3 +68,87 @@ class MediaTimeLineControls(LayoutManager):
             self.overlayTimeline,
 
         )
+
+
+# from PyQt6.QtWidgets import (
+#     QApplication, QSlider, QWidget, QVBoxLayout, QPushButton, QStyle
+# )
+# from PyQt6.QtCore import Qt
+# from PyQt6.QtGui import QPainter, QBrush, QColor, QPaintEvent
+
+
+# self.lap_segments = [
+#     {'start': 0, 'end': 85.3, 'color': Qt.green},
+#     {'start': 85.3, 'end': 172.6, 'color': Qt.red},
+#     ...
+# ]
+
+# class LapSlider(QSlider):
+#     def __init__(self, orientation, parent=None):
+#         super().__init__(orientation, parent)
+#         self.setMinimum(0)
+#         self.setMaximum(1000)
+#         self.lap_segments = []
+
+#     def set_lap_segments(self, segments):
+#         self.lap_segments = segments
+#         self.update()
+
+#     def _value_to_pixel(self, value: float) -> int:
+#         groove_margin = self.style().pixelMetric(QStyle.PixelMetric.PM_SliderLength) // 2
+#         available_width = self.width() - groove_margin * 2
+#         if self.maximum() == self.minimum():
+#             return 0
+#         x = groove_margin + int((value - self.minimum()) / (self.maximum() - self.minimum()) * available_width)
+#         return x
+
+#     def paintEvent(self, event: QPaintEvent):
+#         super().paintEvent(event)
+#         painter = QPainter(self)
+#         for seg in self.lap_segments:
+#             x1 = self._value_to_pixel(seg['start'])
+#             x2 = self._value_to_pixel(seg['end'])
+#             width = max(1, x2 - x1)
+#             color = QColor(seg.get('color', 'black'))
+#             y = (self.height() // 2) - 3
+#             painter.setBrush(QBrush(color))
+#             painter.setPen(Qt.PenStyle.NoPen)
+#             painter.drawRect(x1, y, width, 6)
+#         painter.end()
+
+
+# class Window(QWidget):
+#     def __init__(self):
+#         super().__init__()
+#         self.setWindowTitle("LapSlider Example")
+#         self.slider = LapSlider(Qt.Orientation.Horizontal)
+#         self.slider.setValue(0)
+
+#         self.button = QPushButton("Add Test Lap")
+#         self.button.clicked.connect(self.add_lap)
+
+#         self.laps = []
+#         self.last_val = 0
+#         self.layout = QVBoxLayout()
+#         self.layout.addWidget(self.slider)
+#         self.layout.addWidget(self.button)
+#         self.setLayout(self.layout)
+
+#     def add_lap(self):
+#         current = self.slider.value()
+#         if current <= self.last_val:
+#             return
+#         # Alternate colors for demo
+#         color = 'green' if len(self.laps) % 2 == 0 else 'red'
+#         self.laps.append({'start': self.last_val, 'end': current, 'color': color})
+#         self.last_val = current
+#         self.slider.set_lap_segments(self.laps)
+
+
+# if __name__ == '__main__':
+#     import sys
+#     app = QApplication(sys.argv)
+#     w = Window()
+#     w.resize(600, 150)
+#     w.show()
+#     sys.exit(app.exec())
