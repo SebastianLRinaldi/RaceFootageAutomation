@@ -41,8 +41,11 @@ class MediaView(LayoutManager):
         self.overlayPlayer.setVideoOutput(self.overlayVideoWidget)
 
         # === Load media ===
-        file1 = 'main_bg.mp4'   # Background video
-        file2 = 'main_overlay.mp4'   # Overlay video
+        # file1 = 'main_bg.mp4'   # Background video
+        # file2 = 'main_overlay.mp4'   # Overlay video
+
+        file1 = 'merged_output(5-23-25)-R2.mp4'
+        file2 = 'lap_table_video_test_multi_column.mp4'
         self.bgPlayer.setSource(QUrl.fromLocalFile(file1))
         self.overlayPlayer.setSource(QUrl.fromLocalFile(file2))
 

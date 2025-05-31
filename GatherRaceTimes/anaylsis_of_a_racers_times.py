@@ -52,10 +52,10 @@
 #         else:
 #             delta = t - times[i - 1] if times[i - 1] is not None else 0
 #         sign = "+" if delta >= 0 else "-"
-#         print(f"Lap {i+1}: {t:.2f} ({sign}{abs(delta):.2f})")
+#         print(f"Lap {i+1}: {t:.3f} ({sign}{abs(delta):.3f})")
     
-#     print(f"\nBest Lap: {best:.2f}")
-#     print(f"Average Lap: {avg:.2f}")
+#     print(f"\nBest Lap: {best:.3f}")
+#     print(f"Average Lap: {avg:.3f}")
 
 
 # times = get_racer_times('lap_times.csv', 'EpicX18 GT9')
@@ -147,15 +147,15 @@ def get_racer_times(filename, racer_name):
                     times.append(None)
         return times
 
-# 2. Time Delta Analysis
-def format_deltas(times):
+# 2. Time Delta Analysis (Delta From Prev Lap)
+def pre_lap_deltas(times):
     if not times:
         return
     
     best = min(t for t in times if t is not None)
     avg = sum(t for t in times if t is not None) / sum(1 for t in times if t is not None)
     
-    print("\n--- Time Delta Analysis ---")
+    print("\n--- Deltas From Prev Lap---")
     
     gain = 0
     reduction = 0
@@ -169,7 +169,7 @@ def format_deltas(times):
         else:
             delta = t - times[i - 1] if times[i - 1] is not None else 0
         sign = "+" if delta >= 0 else "-"
-        print(f"Lap {i+1}: {t:.2f} ({sign}{abs(delta):.2f})")
+        print(f"Lap {i+1}: {t:.3f} ({sign}{abs(delta):.3f})")
         
         # Track gain or reduction
         if delta > 0:
@@ -177,14 +177,14 @@ def format_deltas(times):
         elif delta < 0:
             reduction += abs(delta)  # Accumulating constant reduction
     
-    print(f"\nBest Lap: {best:.2f}")
-    print(f"Average Lap: {avg:.2f}")
+    print(f"\nBest Lap: {best:.3f}")
+    print(f"Average Lap: {avg:.3f}")
     
     # Analyze constant gain or reduction
     if gain > reduction:
-        print(f"Constant Gain: {gain:.2f} seconds")
+        print(f"Constant Gain: {gain:.3f} seconds")
     elif reduction > gain:
-        print(f"Constant Reduction: {reduction:.2f} seconds")
+        print(f"Constant Reduction: {reduction:.3f} seconds")
     else:
         print("No clear trend in gain or reduction.")
 
@@ -200,8 +200,8 @@ def consistency_metrics(times):
     stddev = statistics.stdev(valid_times)
     
     print("\n--- Consistency Metrics ---")
-    print(f"Variance: {variance:.2f}")
-    print(f"Standard Deviation: {stddev:.2f}")
+    print(f"Variance: {variance:.3f}")
+    print(f"Standard Deviation: {stddev:.3f}")
 
 # 4. Time Loss Identification
 def time_loss_identification(times):
@@ -213,9 +213,9 @@ def time_loss_identification(times):
             for threshold in thresholds:
                 if abs(delta) > threshold:  # Check if the time difference exceeds the threshold
                     if delta > 0:
-                        print(f"Lap {i+1}: Time gained ({delta:.2f}s) compared to previous lap with threshold {threshold}s.")
+                        print(f"Lap {i+1}: Time gained ({delta:.3f}s) compared to previous lap with threshold {threshold}s.")
                     else:
-                        print(f"Lap {i+1}: Time lost ({-delta:.2f}s) compared to previous lap with threshold {threshold}s.")
+                        print(f"Lap {i+1}: Time lost ({-delta:.3f}s) compared to previous lap with threshold {threshold}s.")
 
 # 5. Performance Drop-off
 def performance_dropoff(times):
@@ -224,29 +224,32 @@ def performance_dropoff(times):
     if start_time and end_time:
         dropoff = end_time - start_time
         print("\n--- Performance Drop-off ---")
-        print(f"Start Time: {start_time:.2f}")
-        print(f"End Time: {end_time:.2f}")
-        print(f"Performance Drop-off: {dropoff:.2f}")
+        print(f"Start Time: {start_time:.3f}")
+        print(f"End Time: {end_time:.3f}")
+        print(f"Performance Drop-off: {dropoff:.3f}")
 
 # 6. Lap Segmentation (Assuming sectors are provided)
 def lap_segmentation(sector_times):
     print("\n--- Lap Segmentation ---")
     for lap_num, sectors in enumerate(sector_times, 1):
         total_time = sum(sectors)
-        print(f"Lap {lap_num}: Total Time: {total_time:.2f} | Sectors: {sectors}")
+        print(f"Lap {lap_num}: Total Time: {total_time:.3f} | Sectors: {sectors}")
 
-# 7. Time Trends
-def time_trends(times):
-    print("\n--- Time Trends ---")
+# 7. Time Delta Analysis (Deltas From Best Lap)
+def best_lap_deltas(times):
+    print("\n--- Deltas From Best Lap ---")
     best_time = min([t for t in times if t is not None])
+    lap_times_with_best_time_deltas = []
 
     for i, time in enumerate(times):
         if time is not None:
             delta = time - best_time
-            delta_str = f"{delta:+.2f}"  # Format the delta with + or - and two decimal places
-            print(f"Lap {i+1}: {time:.2f} ({delta_str})")
+            delta_str = f"{delta:+.3f}"  # Format the delta with + or - and two decimal places
+            time_formated = f"{time:.3f}"
+            print(f"Lap {i+1}: {time_formated} ({delta_str})")
+            lap_times_with_best_time_deltas.append((time_formated, delta_str))
 
-
+    return lap_times_with_best_time_deltas
 
 # 8. Statistical Analysis
 def statistical_analysis(times):
@@ -259,8 +262,8 @@ def statistical_analysis(times):
     best_time = min(valid_times)
     
     print("\n--- Statistical Analysis ---")
-    print(f"Average Lap Time: {avg_time:.2f}")
-    print(f"Best Lap Time: {best_time:.2f}")
+    print(f"Average Lap Time: {avg_time:.3f}")
+    print(f"Best Lap Time: {best_time:.3f}")
     print(f"Distribution of Lap Times: {valid_times}")
 
 # 9. Main function to call all analyses
@@ -268,13 +271,13 @@ def analyze_lap_times(filename, racer_name):
     times = get_racer_times(filename, racer_name)
     
     if times:
-        format_deltas(times)
+        pre_lap_deltas(times)
         consistency_metrics(times)
         time_loss_identification(times)
         performance_dropoff(times)
         # If you had sector data, you could use lap_segmentation here
-        time_trends(times)
+        print(best_lap_deltas(times))
         statistical_analysis(times)
 
 # Running the analysis
-analyze_lap_times('lap_times.csv', 'EpicX18 GT9')
+analyze_lap_times('lap_times1.csv', 'EpicX18 GT9')

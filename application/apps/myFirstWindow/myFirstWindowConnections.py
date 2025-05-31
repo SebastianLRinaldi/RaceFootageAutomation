@@ -11,12 +11,14 @@ class FirstPageConnections:
         self.ui.myMediaControls.playBtn.clicked.connect(self.logic.toggle_play)
         self.ui.myMediaControls.skipFwdBtn.clicked.connect(lambda: self.logic.seek(5000))
         self.ui.myMediaControls.skipBackBtn.clicked.connect(lambda: self.logic.seek(-5000))
+        
         self.ui.mySecondViewOffsetControls.offsetLFwdBtn.clicked.connect(lambda: self.logic.adjust_offset(100))
         self.ui.mySecondViewOffsetControls.offsetLBackBtn.clicked.connect(lambda: self.logic.adjust_offset(-100))
         self.ui.mySecondViewOffsetControls.offsetMFwdBtn.clicked.connect(lambda: self.logic.adjust_offset(10))
         self.ui.mySecondViewOffsetControls.offsetMBackBtn.clicked.connect(lambda: self.logic.adjust_offset(-10))
         self.ui.mySecondViewOffsetControls.offsetSFwdBtn.clicked.connect(lambda: self.logic.adjust_offset(1))
         self.ui.mySecondViewOffsetControls.offsetSBackBtn.clicked.connect(lambda: self.logic.adjust_offset(-1))
+        
         self.ui.myMediaControls.stepFwdBtn.clicked.connect(lambda: self.logic.step_frame(1))
         self.ui.myMediaControls.stepBackBtn.clicked.connect(lambda: self.logic.step_frame(-1))
 

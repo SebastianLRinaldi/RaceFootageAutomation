@@ -5,7 +5,7 @@ from PyQt6.QtMultimedia import *
 from PyQt6.QtMultimediaWidgets import *
 
 import csv
-from anaylsis_of_a_racers_times import get_racer_times
+from GatherRaceTimes.anaylsis_of_a_racers_times import get_racer_times
 from application.apps.myFirstWindow.myFirstWindowLayout import My_First_Page
 
 class FirstPageLogic:
@@ -80,8 +80,9 @@ class FirstPageLogic:
             bg.pause()
             overlay.pause()
         else:
-            bg.play()
             overlay.play()
+            bg.play()
+            
 
     def seek(self, delta_ms):
         bg = self.ui.myMediaView.bgPlayer
@@ -185,7 +186,7 @@ class FirstPageLogic:
 
     def set_lap_durations(self):
         # durations = [24.552, 23.575, ...] in seconds
-        self.durations = get_racer_times('lap_times.csv', 'EpicX18 GT9')
+        self.durations = get_racer_times('lap_times1.csv', 'EpicX18 GT9')
         print(self.durations)
 
         end_times = []
