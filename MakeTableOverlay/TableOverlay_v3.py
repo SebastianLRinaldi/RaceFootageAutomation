@@ -37,7 +37,7 @@ IMG_FOLDER = "lap_tables_test_3"
 OUTPUT_VIDEO = "lap_table_video_test_3_multi_column.mp4"
 FFMPEG_INPUT_FILE = "ffmpeg_input.txt"
 
-FPS = "59.94"
+FPS = 59.94
 START_DURATION = 5
 LAST_HOLD_DURATION = 5
 
@@ -179,7 +179,7 @@ if __name__ == "__main__":
         "-i", FFMPEG_INPUT_FILE,
         "-fps_mode", "cfr",
         "-c:v", "libx264",
-        "-r", FPS,
+        "-r", str(FPS),
         "-crf", "18",
         "-preset", "slow",
         "-pix_fmt", "yuv420p",
@@ -196,7 +196,7 @@ if __name__ == "__main__":
         "-i", FFMPEG_INPUT_FILE,
         "-fps_mode", "cfr",
         "-c:v", "h264_nvenc",
-        "-r", FPS,
+        "-r", str(FPS),
         "-preset", "fast",   # NVENC specific presets: default, slow, medium, fast, hp, hq, bd, ll, llhq, llhp
         "-rc", "vbr",        # rate control: vbr, cbr, etc.
         "-cq", "18",         # constant quantizer (quality)

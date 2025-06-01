@@ -18,11 +18,11 @@ HEIGHT = 600
 MAX_TIME = 25.000  # seconds
 
 FPS = 59.94
-USE_GPU = True
+USE_GPU = False
 START_DURATION = 5  # seconds blank start screen
 END_DURATION = 5  # seconds hold last frame
-OUTPUT_VIDEO_FILE = "timer_overlay_test_4.mp4"
-OUTPUT_COUNTUP_TIMER = "timer_overlay.mp4"
+OUTPUT_VIDEO_FILE = "timer_overlay_quality.mp4"
+OUTPUT_COUNTUP_TIMER = "timer_overlay_temp.mp4"
 
 FONT_PATH = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"
 FONT_SIZE = 64
@@ -33,11 +33,16 @@ LAP_TIMES = [23.715, 22.728, 22.784, 22.75, 23.901, 23.076, 22.719, 22.742, 23.3
 
 FONT = ImageFont.truetype(FONT_PATH, FONT_SIZE)
 
+DISTANCE_FROM_CENTER = 80
+
+
+
 TEXT_POSITIONS = {
-    "timer": {"x": WIDTH // 2, "y": HEIGHT // 3 + 40, "fill": (0, 255, 0)},
-    "lap": {"x": WIDTH // 2, "y": HEIGHT // 3 - 80, "fill": (255, 255, 255)},
-    "stats": {"start_y": HEIGHT // 3, "spacing": 50, "fill": (0, 255, 0)},
+    "lap": {"x": WIDTH // 2, "y": HEIGHT // 2 - DISTANCE_FROM_CENTER, "fill": (255, 255, 255)},
+    "timer": {"x": WIDTH // 2, "y": HEIGHT // 2 , "fill": (0, 255, 0)},
+    "stats": {"start_y": HEIGHT // 2-DISTANCE_FROM_CENTER, "spacing": 70, "fill": (0, 255, 0)},
 }
+
 
 def draw_centered_text(draw, text, pos=TEXT_POSITIONS):
     fill = pos["fill"]
@@ -58,12 +63,27 @@ def draw_centered_text(draw, text, pos=TEXT_POSITIONS):
         y = pos["y"]
         draw.text((x - text_w // 2, y), text, font=FONT, fill=fill)
 
+def draw_center_cross_hair(draw):
+    # Red crosshair lines
+    red = (255, 0, 0)
+    center_x = WIDTH // 2
+    center_y = HEIGHT // 2
+    # Horizontal line
+    draw.line([(0, center_y), (WIDTH, center_y)], fill=red, width=5)
 
+    # Vertical line
+    draw.line([(center_x, 0), (center_x, HEIGHT)], fill=red, width=5)
+
+    # Middle dot
+    dot_radius = 5
+    draw.ellipse([
+        (center_x - dot_radius, center_y - dot_radius),
+        (center_x + dot_radius, center_y + dot_radius)
+    ], fill=red)
 
 
 
 def generate_timer_video():
-    
     total_frames = int(MAX_TIME * FPS)
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     out = cv2.VideoWriter(OUTPUT_COUNTUP_TIMER, fourcc, FPS, (WIDTH, HEIGHT), True)
@@ -75,11 +95,6 @@ def generate_timer_video():
 
         img = Image.new("RGB", (WIDTH, HEIGHT), (0, 0, 0))  # Black background
         draw = ImageDraw.Draw(img)
-
-        # text_bbox = FONT.getbbox(time_text)
-        # text_w = text_bbox[2] - text_bbox[0]
-        # text_x = (WIDTH // 2) - (text_w // 2)
-        # draw.text((text_x, HEIGHT // 3 + 40), time_text, font=FONT, fill=(0, 255, 0))
 
         draw_centered_text(draw, time_text, TEXT_POSITIONS["timer"])
 
@@ -105,20 +120,17 @@ v3 7-20sec
 """
 def create_lap_overlay(lap_number):
     lap_text = f"Lap {lap_number:02}"
-    # lap_bbox = FONT.getbbox(lap_text)
-    # lap_w = lap_bbox[2] - lap_bbox[0]
-    # lap_h = lap_bbox[3] - lap_bbox[1]
-    # lap_x = (WIDTH // 2) - (lap_w // 2)
-    # lap_y = HEIGHT // 3 - 80
 
     img = Image.new("RGB", (WIDTH, HEIGHT), (0, 0, 0))  # black bg
     draw = ImageDraw.Draw(img)
-    # draw.text((lap_x, lap_y), lap_text, font=FONT, fill=(255, 255, 255))
-    draw_centered_text(draw, lap_text, TEXT_POSITIONS["lap"])
 
+    draw_centered_text(draw, lap_text, TEXT_POSITIONS["lap"])
+    
     # Convert once to numpy BGR for direct overlay
     overlay = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
     return overlay
+
+
 
 def create_lap_overlay_and_mask(lap_number):
     lap_overlay = create_lap_overlay(lap_number)
@@ -186,20 +198,10 @@ def draw_stats(draw):
     ]
 
     draw_centered_text(draw, stats, TEXT_POSITIONS["stats"])
-    # y_base = HEIGHT // 3
-    # spacing = 50
-
-    # for i, text in enumerate(stats):
-    #     text_bbox = FONT.getbbox(text)
-    #     text_w = text_bbox[2] - text_bbox[0]
-    #     x = (WIDTH // 2) - (text_w // 2)
-    #     y = y_base + i * spacing
-    #     draw.text((x, y), text, font=FONT, fill=(0, 255, 0))
 
 
 
 def create_blank_video(duration, filename):
-    
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
     writer = cv2.VideoWriter(filename, fourcc, FPS, (WIDTH, HEIGHT))
     blank = np.zeros((HEIGHT, WIDTH, 3), dtype=np.uint8)
@@ -276,15 +278,23 @@ def main():
 
         # 2. Render laps in parallel
         lap_videos = []
-        with ThreadPoolExecutor() as executor:
-            futures = {
-                        executor.submit(render_lap_video, i + 1, lap_time, temp_dir, timer_frames): i + 1
-                        for i, lap_time in enumerate(LAP_TIMES)
-                    }
+        render_single = False
+        
+        if render_single:
+            lap_video = render_lap_video(1, LAP_TIMES[1], temp_dir, timer_frames)
+            lap_videos.append(lap_video)
+        else:
+            with ThreadPoolExecutor() as executor:
+                futures = {
+                            executor.submit(render_lap_video, i + 1, lap_time, temp_dir, timer_frames): i + 1
+                            for i, lap_time in enumerate(LAP_TIMES)
+                        }
 
-            for future in tqdm(as_completed(futures), total=len(futures), desc="Rendering laps in parallel"):
-                lap_number = futures[future]
-                lap_videos.append(future.result())
+                for future in tqdm(as_completed(futures), total=len(futures), desc="Rendering laps in parallel"):
+                    lap_number = futures[future]
+                    lap_videos.append(future.result())
+
+
 
         # Sort videos by lap number (they can complete out of order)
         lap_videos.sort(key=lambda x: int(os.path.basename(x).split('_')[1].split('.')[0]))
