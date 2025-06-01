@@ -13,8 +13,8 @@ LAP_TIMES = [('23.715', '+1.528'), ('22.728', '+0.541'), ('22.784', '+0.597'), (
 
 
 # Dynamic headers and column widths - add more columns here
-HEADERS = ["Lap", "Time", "Delta"]  
-COL_WIDTHS = [100, 200, 150]
+HEADERS = ["Lap", "Time", "Best Lap Diff"]  
+COL_WIDTHS = [100, 200, 220]
 
 # Canvas dimensions and padding
 CANVAS_WIDTH = 1920
@@ -170,7 +170,8 @@ if __name__ == "__main__":
         print(f"last={last_img} | LAST_HOLD_DURATION={LAST_HOLD_DURATION}")
 
     # Run ffmpeg
-    subprocess.run([
+
+    cmd_cpu = [
         "ffmpeg",
         "-y",
         "-f", "concat",
@@ -183,6 +184,27 @@ if __name__ == "__main__":
         "-preset", "slow",
         "-pix_fmt", "yuv420p",
         OUTPUT_VIDEO
-    ], check=True)
+    ]
+    
+
+
+    cmd_gpu = [
+        "ffmpeg",
+        "-y",
+        "-f", "concat",
+        "-safe", "0",
+        "-i", FFMPEG_INPUT_FILE,
+        "-fps_mode", "cfr",
+        "-c:v", "h264_nvenc",
+        "-r", FPS,
+        "-preset", "fast",   # NVENC specific presets: default, slow, medium, fast, hp, hq, bd, ll, llhq, llhp
+        "-rc", "vbr",        # rate control: vbr, cbr, etc.
+        "-cq", "18",         # constant quantizer (quality)
+        "-pix_fmt", "yuv420p",
+        OUTPUT_VIDEO
+    ]
+
+    
+    subprocess.run(cmd_cpu, check=True)
 
     print(f"✅ Video saved as {OUTPUT_VIDEO}")
