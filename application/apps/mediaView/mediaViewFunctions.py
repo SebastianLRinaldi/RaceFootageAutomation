@@ -6,10 +6,10 @@ from PyQt6.QtMultimediaWidgets import *
 
 import csv
 from GatherRaceTimes.anaylsis_of_a_racers_times import get_racer_times
-from application.apps.myFirstWindow.myFirstWindowLayout import My_First_Page
+from application.apps.mediaView.mediaViewLayout import MediaViewLayout
 
-class FirstPageLogic:
-    def __init__(self, ui: My_First_Page):
+class MediaViewLogic:
+    def __init__(self, ui: MediaViewLayout):
         self.ui = ui
         self.offset_ms = 0
         self.race_start_ms = None

@@ -17,8 +17,8 @@ import os
 # sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
 from application.FrontEnd.E_combiner.PageController import *
-from application.apps.myFirstWindow.myFirstWindowConnections import FirstPageConnections
-from application.apps.mySecondWindow.mySecondWindowConnections import SecondPageConnections
+from application.apps.mediaView.mediaViewConnections import MediaViewConnections
+from application.apps.raceStats.raceStatsConnections import RaceStatsConnections
 from application.apps.myThirdWindow.myThirdPageConnections import ThirdPageConnections
 
 class Dashboard(QMainWindow):
@@ -32,8 +32,8 @@ class Dashboard(QMainWindow):
         # Your dynamic page creation
         # Define pages with: name, UI class, Logic class, Controller class
         pages = [
-            ("first", My_First_Page, FirstPageLogic, FirstPageConnections),
-            ("second", My_Second_Page, SecondPageLogic, SecondPageConnections),
+            ("first", MediaViewLayout, MediaViewLogic, MediaViewConnections),
+            ("second", RaceStatsLayout, RaceStatsLogic, RaceStatsConnections),
             ("third", My_Third_Page, ThirdPageLogic, ThirdPageConnections),
         ]
 
@@ -73,7 +73,7 @@ class Dashboard(QMainWindow):
         layout.addWidget(self.stack)
         self.setCentralWidget(container)
 
-        self.switch_to("first")
+        self.switch_to("second")
 
     def switch_to(self, app_name):
         self.stack.setCurrentWidget(self.apps[app_name])

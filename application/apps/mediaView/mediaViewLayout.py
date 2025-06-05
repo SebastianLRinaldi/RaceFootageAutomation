@@ -30,7 +30,7 @@ from .widgets.racingTimeSetControls import RacingTimeSetControls
 from .widgets.mediaTimelineControls import MediaTimeLineControls
 
 
-class My_First_Page(LayoutManager):
+class MediaViewLayout(LayoutManager):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Dual Video Player with Timer & Table")

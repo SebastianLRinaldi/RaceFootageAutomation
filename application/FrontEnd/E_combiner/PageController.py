@@ -1,11 +1,11 @@
 from typing import Dict, TypedDict
-from application.apps.myFirstWindow.myFirstWindowFunctions import*
-from application.apps.mySecondWindow.mySecondWindowFunctions import*
+from application.apps.mediaView.mediaViewFunctions import*
+from application.apps.raceStats.raceStatsFunctions import*
 from application.apps.myThirdWindow.myThirdWindowFunctions import*
 
 class LogicDict(TypedDict):
-    first: FirstPageLogic
-    second:SecondPageLogic
+    first: MediaViewLogic
+    second:RaceStatsLogic
     third: ThirdPageLogic
 
 class PageController:

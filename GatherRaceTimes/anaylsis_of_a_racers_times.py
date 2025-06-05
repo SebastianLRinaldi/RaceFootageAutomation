@@ -279,5 +279,5 @@ def analyze_lap_times(filename, racer_name):
         print(best_lap_deltas(times))
         statistical_analysis(times)
 
-# Running the analysis
-analyze_lap_times('lap_times1.csv', 'EpicX18 GT9')
+# # Running the analysis
+# analyze_lap_times('lap_times1.csv', 'EpicX18 GT9')

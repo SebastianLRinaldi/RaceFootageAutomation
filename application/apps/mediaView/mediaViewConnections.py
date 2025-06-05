@@ -1,7 +1,7 @@
-from application.apps.myFirstWindow.myFirstWindowFunctions import*
+from application.apps.mediaView.mediaViewFunctions import*
 
-class FirstPageConnections:
-    def __init__(self, ui: My_First_Page, logic: FirstPageLogic):
+class MediaViewConnections:
+    def __init__(self, ui: MediaViewLayout, logic: MediaViewLogic):
         self.ui = ui
         self.logic = logic
 
