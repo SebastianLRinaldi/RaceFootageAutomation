@@ -18,18 +18,24 @@ HEIGHT = 600
 MAX_TIME = 25.000  # seconds
 
 FPS = 59.94
-USE_GPU = False
+USE_GPU = True
 START_DURATION = 5  # seconds blank start screen
-END_DURATION = 5  # seconds hold last frame
-OUTPUT_VIDEO_FILE = "timer_overlay_quality.mp4"
-OUTPUT_COUNTUP_TIMER = "timer_overlay_temp.mp4"
+END_DURATION = 15  # seconds hold last frame
+OUTPUT_VIDEO_FILE = "Race_2_Timer_Overlay_(5-30-25).mp4"
+OUTPUT_COUNTUP_TIMER = "timer_temp.mp4"
 
 FONT_PATH = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"
 FONT_SIZE = 64
 
-LAP_TIMES = [23.715, 22.728, 22.784, 22.75, 23.901, 23.076, 22.719, 22.742, 23.345,
-            22.614, 22.423, 23.725, 22.988, 22.766, 22.386, 22.592, 22.322, 22.796,
-            22.49, 22.315, 22.473, 22.187, 22.221]
+from application.apps.raceStats.functions.racerTimersStats import get_racer_times
+
+LAP_TIMES = get_racer_times("EpicX18 GT9")
+
+
+
+# LAP_TIMES = [23.715, 22.728, 22.784, 22.75, 23.901, 23.076, 22.719, 22.742, 23.345,
+#             22.614, 22.423, 23.725, 22.988, 22.766, 22.386, 22.592, 22.322, 22.796,
+#             22.49, 22.315, 22.473, 22.187, 22.221]
 
 FONT = ImageFont.truetype(FONT_PATH, FONT_SIZE)
 
@@ -248,7 +254,7 @@ def get_ffmpeg_cmd(concat_txt):
 
 def concat_videos(file_list, output_file):
     # Create concat text file for ffmpeg
-    concat_txt = os.path.join(os.path.dirname(output_file), "concat_list.txt")
+    concat_txt = os.path.join(os.path.dirname(output_file), "concat_list_timer_overlay.txt")
     with open(concat_txt, "w") as f:
         for file in file_list:
             f.write(f"file '{file}'\n")
@@ -259,9 +265,9 @@ def concat_videos(file_list, output_file):
 
 
 def main():
-    rerender_input = input("Rerender: Timer Counter? [Y/n]: ")
-    if rerender_input.strip().lower() in ('y', 'yes', ''):
-        generate_timer_video()
+    # rerender_input = input("Rerender: Timer Counter? [Y/n]: ")
+    # if rerender_input.strip().lower() in ('y', 'yes', ''):
+    generate_timer_video()
 
     # Setup once
     timer_frames = preload_timer_frames()
@@ -300,7 +306,7 @@ def main():
         lap_videos.sort(key=lambda x: int(os.path.basename(x).split('_')[1].split('.')[0]))
 
         # 3. Concatenate all videos: start_blank + lap videos
-        concat_videos([start_blank] + lap_videos + [end_stats], OUTPUT_VIDEO_FILE)
+        concat_videos(lap_videos + [end_stats], OUTPUT_VIDEO_FILE)
 
         # Temp files deleted automatically on context exit
         print(f"✅ Timer Overlay Video saved as {OUTPUT_VIDEO_FILE}")

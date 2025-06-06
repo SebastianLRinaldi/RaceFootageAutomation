@@ -186,7 +186,7 @@ class MediaViewLogic:
 
     def set_lap_durations(self):
         # durations = [24.552, 23.575, ...] in seconds
-        self.durations = get_racer_times('outputFiles\lap_times1.csv', 'EpicX18 GT9')
+        self.durations = get_racer_times('Race_2_(5-30-25).csv', 'EpicX18 GT9')
         print(self.durations)
 
         end_times = []

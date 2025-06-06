@@ -17,21 +17,28 @@ CANVAS_WIDTH = 1920
 CANVAS_HEIGHT = 1080
 
 FPS = 59.94
-USE_GPU = False
+USE_GPU = True
 START_DURATION = 5
 END_DURATION = 5
-OUTPUT_VIDEO_FILE = "lap_table_video_multi_column_quality.mp4"
+OUTPUT_VIDEO_FILE = "Race_2_Table_Overlay_(5-30-25).mp4"
 
 
 
 FONTPATH = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"
 FONT_SIZE = 64
-LAP_TIMES = [('23.715', '+1.528'), ('22.728', '+0.541'), ('22.784', '+0.597'), ('22.750', '+0.563'), 
-            ('23.901', '+1.714'), ('23.076', '+0.889'), ('22.719', '+0.532'), ('22.742', '+0.555'), 
-            ('23.345', '+1.158'), ('22.614', '+0.427'), ('22.423', '+0.236'), ('23.725', '+1.538'), 
-            ('22.988', '+0.801'), ('22.766', '+0.579'), ('22.386', '+0.199'), ('22.592', '+0.405'), 
-            ('22.322', '+0.135'), ('22.796', '+0.609'), ('22.490', '+0.303'), ('22.315', '+0.128'), 
-            ('22.473', '+0.286'), ('22.187', '+0.000'), ('22.221', '+0.034')]
+
+
+from application.apps.raceStats.functions.racerTimersStats import get_racer_times, best_lap_deltas
+times = get_racer_times("EpicX18 GT9")
+LAP_TIMES = best_lap_deltas(times)
+
+
+# LAP_TIMES = [('23.715', '+1.528'), ('22.728', '+0.541'), ('22.784', '+0.597'), ('22.750', '+0.563'), 
+#             ('23.901', '+1.714'), ('23.076', '+0.889'), ('22.719', '+0.532'), ('22.742', '+0.555'), 
+#             ('23.345', '+1.158'), ('22.614', '+0.427'), ('22.423', '+0.236'), ('23.725', '+1.538'), 
+#             ('22.988', '+0.801'), ('22.766', '+0.579'), ('22.386', '+0.199'), ('22.592', '+0.405'), 
+#             ('22.322', '+0.135'), ('22.796', '+0.609'), ('22.490', '+0.303'), ('22.315', '+0.128'), 
+#             ('22.473', '+0.286'), ('22.187', '+0.000'), ('22.221', '+0.034')]
 
 
 
@@ -204,7 +211,7 @@ def get_ffmpeg_cmd(concat_txt):
 
 def concat_videos(file_list, output_file):
     # Create concat text file for ffmpeg
-    concat_txt = os.path.join(os.path.dirname(output_file), "concat_list.txt")
+    concat_txt = os.path.join(os.path.dirname(output_file), "concat_list_table_overlay.txt")
     with open(concat_txt, "w") as f:
         for file in file_list:
             f.write(f"file '{file}'\n")
@@ -338,7 +345,7 @@ def main():
         lap_videos.sort(key=lambda x: int(os.path.basename(x).split('_')[1].split('.')[0]))
 
         # 3. Concatenate all videos: start_blank + lap videos
-        concat_videos([start_blank] + lap_videos, OUTPUT_VIDEO_FILE)
+        concat_videos(lap_videos, OUTPUT_VIDEO_FILE)
 
         # Temp files deleted automatically on context exit
         print(f"✅ Timer Overlay Video saved as {OUTPUT_VIDEO_FILE}")

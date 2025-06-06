@@ -1,4 +1,5 @@
 import os
+import subprocess
 import cv2
 import numpy as np
 import math
@@ -9,17 +10,42 @@ from tqdm import tqdm
 WIDTH = 1920
 HEIGHT = 120
 FPS = 59.94
-OUTPUT_DIR = "overlays"
+OUTPUT_DIR = "Race_2_(5-30-25)"
+
+
+# Filenames
 os.makedirs(OUTPUT_DIR, exist_ok=True)
+BAR_OVERLAY = f"{OUTPUT_DIR}/bar_overlay1.mp4"
+DOT_OVERLAY = f"{OUTPUT_DIR}/dot_overlay1.mp4"
+SEGMENT_OVERLAY = f"{OUTPUT_DIR}/segment_overlay1.mp4"
+
+FINAL_OUTPUT = "final_full_video1.mp4"
+CONCAT_LIST_TXT = f"{OUTPUT_DIR}/concat_list1.txt"
+
+# ffmpeg exe path if needed
+FFMPEG_BIN = "ffmpeg"  # Change if you need an absolute path
+
+
+
 END_DURATION = 5  # seconds hold last frame
 FONT_PATH = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"
 FONT_SIZE = 24
 FONT = ImageFont.truetype(FONT_PATH, FONT_SIZE)
 
 # Lap times
-LAP_TIMES = [23.715, 22.728, 22.784, 22.75, 23.901, 23.076, 22.719, 22.742, 23.345,
-             22.614, 22.423, 23.725, 22.988, 22.766, 22.386, 22.592, 22.322, 22.796,
-             22.49, 22.315, 22.473, 22.187, 22.221]
+
+
+from application.apps.raceStats.functions.racerTimersStats import get_racer_times
+
+LAP_TIMES = get_racer_times("EpicX18 GT9")
+
+
+# LAP_TIMES = [23.715, 22.728, 22.784, 22.75, 23.901, 23.076, 22.719, 22.742, 23.345,
+#              22.614, 22.423, 23.725, 22.988, 22.766, 22.386, 22.592, 22.322, 22.796,
+#              22.49, 22.315, 22.473, 22.187, 22.221]
+
+
+
 
 # --- Bar Overlay ---
 def create_bar_overlay_frame(lap_done_idx):
@@ -200,21 +226,6 @@ save_dot_video_reg(dot_file_reg, total_duration_sec)
 # save_dot_video_trans(dot_file_trans, total_duration_sec)
 # print("✅ Done — overlays saved to:", OUTPUT_DIR)
 
-
-import os
-import subprocess
-
-# Filenames
-START_BLANK = "start_blank1.mp4"
-BAR_OVERLAY = "overlays/bar_overlay1.mp4"
-DOT_OVERLAY = "overlays/dot_overlay1.mp4"
-SEGMENT_OVERLAY = "overlays/segment_overlay1.mp4"
-END_STATS = "end_stats1.mp4"
-FINAL_OUTPUT = "final_full_video1.mp4"
-CONCAT_LIST_TXT = "overlays/concat_list1.txt"
-
-# ffmpeg exe path if needed
-FFMPEG_BIN = "ffmpeg"  # Change if you need an absolute path
 
 
 """

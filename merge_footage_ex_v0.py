@@ -117,7 +117,9 @@ class VideoMerger(QWidget):
             for path in file_paths:
                 f.write(f"file '{path}'\n")
 
-        out = "merged_output(5-23-25)-R2.mp4"
+        out = "merged_output(M-DD-YY)-R#.mp4"
+        # Race_2_MainCam_(5-30-25).mp4
+        # MainCam_Race_2_(5-30-25).mp4
         cmd = ["ffmpeg", "-f", "concat", "-safe", "0", "-i", "files.txt", "-c", "copy", out]
 
         try:

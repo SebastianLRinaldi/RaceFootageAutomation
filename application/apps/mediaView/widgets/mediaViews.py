@@ -44,8 +44,8 @@ class MediaView(LayoutManager):
         # file1 = 'main_bg.mp4'   # Background video
         # file2 = 'main_overlay.mp4'   # Overlay video
 
-        file1 = r'outputFiles\merged_output(5-23-25)-R2.mp4'
-        file2 = r'overlays\segment_overlay1.mp4'
+        file1 = r'Race_2_MainCam_(5-30-25).mp4'
+        file2 = r'Race_2_RearCam_(5-30-25).mp4'
         self.bgPlayer.setSource(QUrl.fromLocalFile(file1))
         self.overlayPlayer.setSource(QUrl.fromLocalFile(file2))
 
