@@ -8,7 +8,7 @@ import re
 from application.apps.raceStats.raceStatsLayout import RaceStatsLayout
 
 from .functions.lapDataParser import LapDataParser
-
+from .functions.racerTimersStats import *
 class RaceStatsLogic:
     def __init__(self, ui: RaceStatsLayout):
         self.ui = ui
@@ -20,3 +20,8 @@ class RaceStatsLogic:
             parser.process_and_save_csv(data)
         else:
             print(f"bad data: {type(data)}")
+
+
+    def get_lap_times(self):
+        times = get_racer_times( 'EpicX18 GT9')
+        return times
