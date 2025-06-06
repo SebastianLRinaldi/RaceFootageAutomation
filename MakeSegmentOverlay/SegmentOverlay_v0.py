@@ -11,7 +11,7 @@ HEIGHT = 120
 FPS = 59.94
 OUTPUT_DIR = "overlays"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
-
+END_DURATION = 5  # seconds hold last frame
 FONT_PATH = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"
 FONT_SIZE = 24
 FONT = ImageFont.truetype(FONT_PATH, FONT_SIZE)
@@ -187,7 +187,7 @@ MP4 + mp4v: Slow(er), saves disk space, heavy CPU encoding load.
 If speed matters and you have enough disk space, uncompressed AVI is often faster. 
 If you want smaller files and can afford the encoding time, MP4 is better.
 """
-total_duration_sec = sum(LAP_TIMES)+1  # Total duration is sum of laps
+total_duration_sec = sum(LAP_TIMES)+END_DURATION  # Total duration is sum of laps
 
 bar_file = os.path.join(OUTPUT_DIR, "bar_overlay1.mp4")
 dot_file_reg = os.path.join(OUTPUT_DIR, "dot_overlay1.mp4")
