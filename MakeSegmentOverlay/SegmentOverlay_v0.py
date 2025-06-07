@@ -12,37 +12,88 @@ HEIGHT = 120
 FPS = 59.94
 OUTPUT_DIR = "Race_2_(5-30-25)"
 
+"""
+python -m MakeSegmentOverlay.SegmentOverlay_v0
+"""
 
 # Filenames
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 BAR_OVERLAY = f"{OUTPUT_DIR}/bar_overlay1.mp4"
 DOT_OVERLAY = f"{OUTPUT_DIR}/dot_overlay1.mp4"
-SEGMENT_OVERLAY = f"{OUTPUT_DIR}/segment_overlay1.mp4"
+SEGMENT_OVERLAY = f"{OUTPUT_DIR}/Race_2_Segment_Overlay_(5-30-25).mp4"
 
 FINAL_OUTPUT = "final_full_video1.mp4"
-CONCAT_LIST_TXT = f"{OUTPUT_DIR}/concat_list1.txt"
+CONCAT_LIST_TXT = f"{OUTPUT_DIR}/concat_list_segment_overlay.txt"
 
 # ffmpeg exe path if needed
 FFMPEG_BIN = "ffmpeg"  # Change if you need an absolute path
 
 
 
-END_DURATION = 5  # seconds hold last frame
+END_DURATION = 15  # seconds hold last frame
 FONT_PATH = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"
 FONT_SIZE = 24
 FONT = ImageFont.truetype(FONT_PATH, FONT_SIZE)
 
 # Lap times
+# from application.apps.raceStats.functions.racerTimersStats import get_racer_times
 
+from GatherRaceTimes.anaylsis_of_a_racers_times import get_racer_times
 
-from application.apps.raceStats.functions.racerTimersStats import get_racer_times
-
-LAP_TIMES = get_racer_times("EpicX18 GT9")
+LAP_TIMES = get_racer_times("Race_2_(5-30-25).csv", "EpicX18 GT9")
 
 
 # LAP_TIMES = [23.715, 22.728, 22.784, 22.75, 23.901, 23.076, 22.719, 22.742, 23.345,
 #              22.614, 22.423, 23.725, 22.988, 22.766, 22.386, 22.592, 22.322, 22.796,
 #              22.49, 22.315, 22.473, 22.187, 22.221]
+
+def test_alignment():
+    total_time = sum(LAP_TIMES)
+    segment_length = [ (lap / total_time) * WIDTH for lap in LAP_TIMES ]
+    lap_cumulative_times = np.cumsum(LAP_TIMES)
+    total_time = sum(LAP_TIMES)
+    frame_count = int(FPS * total_time)
+    errors = 0
+
+    for frame_idx in range(frame_count):
+        current_time_sec = frame_idx / FPS
+
+        # Determine which lap segment the current time is in
+        lap_done_idx = np.searchsorted(lap_cumulative_times, current_time_sec, side='right')
+
+        # Calculate dot x position
+        accum_length = 0
+        for i, lap_time in enumerate(LAP_TIMES):
+            start_time = sum(LAP_TIMES[:i])
+            end_time = start_time + lap_time
+
+            if current_time_sec <= end_time:
+                segment_progress = (current_time_sec - start_time) / lap_time if lap_time > 0 else 0
+                dot_x = int(accum_length + segment_progress * segment_length[i])
+                segment_start_x = int(accum_length)
+                segment_end_x = int(accum_length + segment_length[i])
+                break
+            accum_length += segment_length[i]
+        else:
+            dot_x = WIDTH - 1
+            segment_start_x = int(WIDTH - 1)
+            segment_end_x = int(WIDTH)
+
+        # Check if dot_x is inside the bar segment for lap_done_idx (if lap_done_idx == len(LAP_TIMES), clamp)
+        if lap_done_idx == len(LAP_TIMES):
+            lap_done_idx -= 1
+
+        seg_start = int(sum(segment_length[:lap_done_idx]))
+        seg_end = int(sum(segment_length[:lap_done_idx + 1]))
+
+        if not (seg_start <= dot_x <= seg_end):
+            print(f"Frame {frame_idx}: Dot x={dot_x} outside bar segment [{seg_start}, {seg_end}] for lap {lap_done_idx}")
+            errors += 1
+
+    if errors == 0:
+        print("All frames aligned correctly.")
+    else:
+        print(f"Found {errors} misaligned frames.")
 
 
 
@@ -166,8 +217,6 @@ def save_dot_video_trans(filename, duration_sec):
         writer.write(frame_rgb)
     writer.release()
 
-
-
 def create_dot_overlay_frame_reg(progress):
     radius = 15
     img = Image.new("RGB", (WIDTH, HEIGHT), (0, 0, 0))  # no alpha channel here
@@ -191,6 +240,66 @@ def save_dot_video_reg(filename, duration_sec):
         writer.write(frame_rgb)
     writer.release()
 
+
+def time_to_x_pos_frame(frame_idx, total_frames):
+    total_time = sum(LAP_TIMES)
+    segment_lengths = [(lap / total_time) * WIDTH for lap in LAP_TIMES]
+    lap_cumulative_times = np.cumsum(LAP_TIMES)
+
+    progress = frame_idx / total_frames
+    t = progress * total_time
+
+    lap_idx = np.searchsorted(lap_cumulative_times, t, side='right')
+
+    x_pos = sum(segment_lengths[:lap_idx])
+
+    if lap_idx < len(LAP_TIMES):
+        segment_start_time = lap_cumulative_times[lap_idx - 1] if lap_idx > 0 else 0
+        segment_time = LAP_TIMES[lap_idx]
+        segment_progress = (t - segment_start_time) / segment_time
+        x_pos += segment_progress * segment_lengths[lap_idx]
+
+    return x_pos
+
+
+def vertical_line_overlay(current_time_sec):
+    total_time = sum(LAP_TIMES)
+    
+    # Calculate accumulated pixel lengths (same as bar)
+    segment_length = [ (lap / total_time) * WIDTH for lap in LAP_TIMES ]
+    
+    accum_length = 0
+    for i, lap_time in enumerate(LAP_TIMES):
+        start_time = sum(LAP_TIMES[:i])
+        end_time = start_time + lap_time
+
+        if current_time_sec <= end_time:
+            # Inside this segment, interpolate position
+            segment_progress = (current_time_sec - start_time) / lap_time if lap_time > 0 else 0
+            x_pos = int(accum_length + segment_progress * segment_length[i])
+            break
+        accum_length += segment_length[i]
+    else:
+        # If time exceeds total, put line at the very end
+        x_pos = WIDTH - 1
+    
+    img = Image.new("RGB", (WIDTH, HEIGHT), (0, 0, 0))
+    draw = ImageDraw.Draw(img)
+    draw.line([(x_pos, 0), (x_pos, HEIGHT)], fill=(255, 255, 255), width=2)
+    return np.array(img)
+
+
+
+def save_dot_video_sync(filename, duration_sec):
+    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
+    writer = cv2.VideoWriter(filename, fourcc, FPS, (WIDTH, HEIGHT))
+    frame_count = int(FPS * duration_sec)
+    
+    for frame_idx in tqdm(range(frame_count), desc="Saving dot overlay reg video"):
+        current_time_sec = frame_idx / FPS  # exact current time
+        frame_rgb = vertical_line_overlay(current_time_sec)
+        writer.write(frame_rgb)
+    writer.release()
 
 
 
@@ -222,7 +331,8 @@ print("Creating bar overlay...")
 save_bar_video(bar_file, total_duration_sec)
 
 print("Creating dot overlay...")
-save_dot_video_reg(dot_file_reg, total_duration_sec)
+save_dot_video_sync(dot_file_reg, total_duration_sec)
+# save_dot_video_reg(dot_file_reg, total_duration_sec)
 # save_dot_video_trans(dot_file_trans, total_duration_sec)
 # print("✅ Done — overlays saved to:", OUTPUT_DIR)
 
@@ -240,7 +350,11 @@ def run_ffmpeg_overlay(bar_overlay, dot_overlay, out_file):
         "-i", bar_overlay,
         "-i", dot_overlay,
         "-filter_complex", "[1:v]colorkey=0x000000:0.1:0.0[ckout];[0:v][ckout]overlay=shortest=1",
-        "-c:v", "libx264", "-crf", "18", "-preset", "fast",
+        # "-c:v", "libx264", "-crf", "18", "-preset", "fast",
+        "-c:v", "h264_nvenc",
+        "-preset", "fast",   # NVENC presets
+        "-rc", "vbr",
+        "-cq", "18", 
         out_file
     ]
     print("Running ffmpeg overlay...")
@@ -260,7 +374,12 @@ def run_ffmpeg_concat(concat_txt, out_file):
         FFMPEG_BIN, "-y",
         "-f", "concat", "-safe", "0",
         "-i", concat_txt,
-        "-c:v", "libx264", "-crf", "18", "-preset", "slow",
+        # "-c:v", "libx264", "-crf", "18", "-preset", "slow",
+
+        "-c:v", "h264_nvenc",
+        "-preset", "fast",   # NVENC presets
+        "-rc", "vbr",
+        "-cq", "18", 
         out_file
     ]
     print("Running ffmpeg concat...")

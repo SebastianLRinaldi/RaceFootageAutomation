@@ -16,6 +16,10 @@ import os
 # Add the root directory of your project to the sys.path
 # sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
+"""
+python -m MakeSegmentOverlay.SegmentOverlay_v0 
+"""
+
 from application.FrontEnd.E_combiner.PageController import *
 from application.apps.mediaView.mediaViewConnections import MediaViewConnections
 from application.apps.raceStats.raceStatsConnections import RaceStatsConnections

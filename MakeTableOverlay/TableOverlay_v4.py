@@ -19,7 +19,7 @@ CANVAS_HEIGHT = 1080
 FPS = 59.94
 USE_GPU = True
 START_DURATION = 5
-END_DURATION = 5
+END_DURATION = 15
 OUTPUT_VIDEO_FILE = "Race_2_Table_Overlay_(5-30-25).mp4"
 
 
@@ -27,9 +27,12 @@ OUTPUT_VIDEO_FILE = "Race_2_Table_Overlay_(5-30-25).mp4"
 FONTPATH = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"
 FONT_SIZE = 64
 
+# from application.apps.raceStats.functions.racerTimersStats import get_racer_times, best_lap_deltas
 
-from application.apps.raceStats.functions.racerTimersStats import get_racer_times, best_lap_deltas
-times = get_racer_times("EpicX18 GT9")
+from GatherRaceTimes.anaylsis_of_a_racers_times import get_racer_times, best_lap_deltas
+
+times = get_racer_times("Race_2_(5-30-25).csv", "EpicX18 GT9")
+
 LAP_TIMES = best_lap_deltas(times)
 
 

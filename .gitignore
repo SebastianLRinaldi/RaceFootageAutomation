@@ -251,3 +251,12 @@ overlays/
 Race_2_(5-30-25).csv
 Race_2_MainCam_(5-30-25).mp4
 Race_2_RearCam_(5-30-25).mp4
+Race_2_Table_Overlay_(5-30-25).mp4
+.gitignore
+timer_temp.mp4
+Race_2_Timer_Overlay_(5-30-25).mp4
+WorkFlowStepsAndConsiderations.txt
+concat_list_timer_overlay.txt
+concat_list_table_overlay.txt
+Race_2_(5-30-25)/bar_overlay1.mp4
+*.mp4

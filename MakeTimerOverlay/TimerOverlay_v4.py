@@ -27,9 +27,10 @@ OUTPUT_COUNTUP_TIMER = "timer_temp.mp4"
 FONT_PATH = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"
 FONT_SIZE = 64
 
-from application.apps.raceStats.functions.racerTimersStats import get_racer_times
+# from application.apps.raceStats.functions.racerTimersStats import get_racer_times
+from GatherRaceTimes.anaylsis_of_a_racers_times import get_racer_times
 
-LAP_TIMES = get_racer_times("EpicX18 GT9")
+LAP_TIMES = get_racer_times("Race_2_(5-30-25).csv", "EpicX18 GT9")
 
 
 
