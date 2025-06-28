@@ -21,27 +21,23 @@ FPS = 59.94
 USE_GPU = True
 START_DURATION = 5  # seconds blank start screen
 END_DURATION = 15  # seconds hold last frame
-OUTPUT_VIDEO_FILE = "Race_2_Timer_Overlay_(5-30-25).mp4"
+OUTPUT_VIDEO_FILE = "Timer_Overlay_(6-20-25)-R2.mp4"
 OUTPUT_COUNTUP_TIMER = "timer_temp.mp4"
 
 FONT_PATH = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"
 FONT_SIZE = 64
 
-# from application.apps.raceStats.functions.racerTimersStats import get_racer_times
-from GatherRaceTimes.anaylsis_of_a_racers_times import get_racer_times
 
-LAP_TIMES = get_racer_times("Race_2_(5-30-25).csv", "EpicX18 GT9")
+import sys
+sys.path.append("F:/_Small/344 School Python/TrackFootageEditor")
+from GatherRaceTimes.anaylsis_of_a_racers_times import get_racer_times, best_lap_deltas
 
+LAP_TIMES = get_racer_times("F:\\_Small\\344 School Python\\TrackFootageEditor\\RaceStorage\\(6-20-25)-R2\\lap_times(6-20-25)-R2.csv", "EpicX18 GT9")
 
-
-# LAP_TIMES = [23.715, 22.728, 22.784, 22.75, 23.901, 23.076, 22.719, 22.742, 23.345,
-#             22.614, 22.423, 23.725, 22.988, 22.766, 22.386, 22.592, 22.322, 22.796,
-#             22.49, 22.315, 22.473, 22.187, 22.221]
 
 FONT = ImageFont.truetype(FONT_PATH, FONT_SIZE)
 
 DISTANCE_FROM_CENTER = 80
-
 
 
 TEXT_POSITIONS = {
@@ -313,8 +309,47 @@ def main():
         print(f"✅ Timer Overlay Video saved as {OUTPUT_VIDEO_FILE}")
 
 
-if __name__ == "__main__":
-    main()
-    # cProfile.run('main()')
+# if __name__ == "__main__":
+#     main()
+#     # cProfile.run('main()')
 
 
+from PyQt6.QtWidgets import QApplication, QPushButton, QVBoxLayout, QWidget, QLabel
+from PyQt6.QtCore import Qt
+import sys
+
+
+
+class TimerOverlayApp(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Timer Overlay Generator")
+        self.setGeometry(100, 100, 400, 200)
+
+        self.label = QLabel("Click to generate timer overlay", self)
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+
+        self.button = QPushButton("Generate Timer Overlay", self)
+        self.button.clicked.connect(self.run_overlay_generation)
+
+        layout = QVBoxLayout()
+        layout.addWidget(self.label)
+        layout.addWidget(self.button)
+        self.setLayout(layout)
+
+    def run_overlay_generation(self):
+        self.label.setText("Generating... Please wait.")
+        self.button.setEnabled(False)
+        try:
+            main()
+            self.label.setText("✅ Done. Overlay saved.")
+        except Exception as e:
+            self.label.setText(f"❌ Error: {str(e)}")
+        finally:
+            self.button.setEnabled(True)
+
+if __name__ == '__main__':
+    app = QApplication(sys.argv)
+    window = TimerOverlayApp()
+    window.show()
+    sys.exit(app.exec())

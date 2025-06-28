@@ -20,7 +20,7 @@ FPS = 59.94
 USE_GPU = True
 START_DURATION = 5
 END_DURATION = 15
-OUTPUT_VIDEO_FILE = "Race_2_Table_Overlay_(5-30-25).mp4"
+OUTPUT_VIDEO_FILE = "Table_Overlay_(6-20-25)-R2.mp4"
 
 
 
@@ -28,20 +28,13 @@ FONTPATH = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Hei
 FONT_SIZE = 64
 
 # from application.apps.raceStats.functions.racerTimersStats import get_racer_times, best_lap_deltas
-
+import sys
+sys.path.append("F:/_Small/344 School Python/TrackFootageEditor")
 from GatherRaceTimes.anaylsis_of_a_racers_times import get_racer_times, best_lap_deltas
 
-times = get_racer_times("Race_2_(5-30-25).csv", "EpicX18 GT9")
+times = get_racer_times("F:\\_Small\\344 School Python\\TrackFootageEditor\\RaceStorage\\(6-20-25)-R2\\lap_times(6-20-25)-R2.csv", "EpicX18 GT9")
 
 LAP_TIMES = best_lap_deltas(times)
-
-
-# LAP_TIMES = [('23.715', '+1.528'), ('22.728', '+0.541'), ('22.784', '+0.597'), ('22.750', '+0.563'), 
-#             ('23.901', '+1.714'), ('23.076', '+0.889'), ('22.719', '+0.532'), ('22.742', '+0.555'), 
-#             ('23.345', '+1.158'), ('22.614', '+0.427'), ('22.423', '+0.236'), ('23.725', '+1.538'), 
-#             ('22.988', '+0.801'), ('22.766', '+0.579'), ('22.386', '+0.199'), ('22.592', '+0.405'), 
-#             ('22.322', '+0.135'), ('22.796', '+0.609'), ('22.490', '+0.303'), ('22.315', '+0.128'), 
-#             ('22.473', '+0.286'), ('22.187', '+0.000'), ('22.221', '+0.034')]
 
 
 
@@ -354,7 +347,110 @@ def main():
         print(f"✅ Timer Overlay Video saved as {OUTPUT_VIDEO_FILE}")
 
 
+# if __name__ == "__main__":
+#     main()
+#     # cProfile.run('main()')
+
+
+
+
+import sys
+import os
+import subprocess
+import tempfile
+from pathlib import Path
+from PyQt6.QtWidgets import (
+    QApplication, QWidget, QVBoxLayout, QPushButton, QLabel, QFileDialog, QMessageBox, QProgressBar
+)
+from PyQt6.QtCore import Qt, QThread, pyqtSignal
+
+
+
+
+class OverlayThread(QThread):
+    finished = pyqtSignal(str)
+    error = pyqtSignal(str)
+
+    def __init__(self, output_file):
+        super().__init__()
+        self.output_file = output_file
+
+    def run(self):
+        try:
+            OUTPUT_VIDEO_FILE = self.output_file
+            main()
+            self.finished.emit(self.output_file)
+        except Exception as e:
+            self.error.emit(str(e))
+
+
+class OverlayApp(QWidget):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("Lap Table Overlay Generator")
+        self.resize(400, 200)
+
+        layout = QVBoxLayout()
+
+        self.status_label = QLabel("Ready")
+        layout.addWidget(self.status_label)
+
+        self.pick_button = QPushButton("Set Output File")
+        self.pick_button.clicked.connect(self.pick_output_file)
+        layout.addWidget(self.pick_button)
+
+        self.generate_button = QPushButton("Generate Overlay")
+        self.generate_button.clicked.connect(self.generate_overlay)
+        self.generate_button.setEnabled(False)
+        layout.addWidget(self.generate_button)
+
+        self.progress = QProgressBar()
+        self.progress.setRange(0, 0)
+        self.progress.setVisible(False)
+        layout.addWidget(self.progress)
+
+        self.setLayout(layout)
+
+        self.output_file = None
+        self.thread = None
+
+    def pick_output_file(self):
+        suggested_path = Path("F:/GoProExports")
+        default_name = "LapOverlay.mp4"
+
+        path, _ = QFileDialog.getSaveFileName(self, "Choose Output File", str(suggested_path / default_name), "MP4 files (*.mp4)")
+        if path:
+            if not path.lower().endswith(".mp4"):
+                path += ".mp4"
+            self.output_file = path
+            self.status_label.setText(f"Output: {path}")
+            self.generate_button.setEnabled(True)
+
+    def generate_overlay(self):
+        self.status_label.setText("Rendering overlay...")
+        self.generate_button.setEnabled(False)
+        self.progress.setVisible(True)
+
+        self.thread = OverlayThread(self.output_file)
+        self.thread.finished.connect(self.on_done)
+        self.thread.error.connect(self.on_error)
+        self.thread.start()
+
+    def on_done(self, file):
+        self.status_label.setText(f"Done: {file}")
+        self.progress.setVisible(False)
+        self.generate_button.setEnabled(True)
+        QMessageBox.information(self, "Success", f"Overlay saved to: {file}")
+
+    def on_error(self, msg):
+        self.status_label.setText("Error")
+        self.progress.setVisible(False)
+        self.generate_button.setEnabled(True)
+        QMessageBox.critical(self, "Failed", msg)
+
+
 if __name__ == "__main__":
-    main()
-    # cProfile.run('main()')
-    
+    app = QApplication(sys.argv)
+    window = OverlayApp()
+    window.show()
+    sys.exit(app.exec())

@@ -116,6 +116,12 @@ import pandas as pd
 import xml.etree.ElementTree as ET
 import numpy as np
 
+
+"""
+https://goprotelemetryextractor.com/free/#
+- for generating the GPX file
+"""
+
 # 1️⃣ Parse GPX acceleration data with timestamps
 def parse_gpx_accel(gpx_file):
     ns = {'gpxacc': 'http://www.garmin.com/xmlschemas/AccelerationExtension/v1'}
