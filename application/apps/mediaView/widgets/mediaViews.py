@@ -23,6 +23,10 @@ from application.FrontEnd.C_Grouper.widgetGroupFrameworks import *
 from application.FrontEnd.D_WindowFolder.windowConfigureation import *
 
 
+MAIN_VIDEO = r'F:\_Large\DaVinciSaves\Race_2_(5-30-25).mov'
+SECOND_VIDEO = r'F:\_Large\DaVinciSaves\(6-20-25)-R2.mov'
+
+
 class MediaView(LayoutManager):
     def __init__(self):
         super().__init__()
@@ -44,8 +48,8 @@ class MediaView(LayoutManager):
         # file1 = 'main_bg.mp4'   # Background video
         # file2 = 'main_overlay.mp4'   # Overlay video
 
-        file1 = r'Race_2_MainCam_(5-30-25).mp4'
-        file2 = r'Race_2_RearCam_(5-30-25).mp4'
+        file1 = MAIN_VIDEO
+        file2 = SECOND_VIDEO
         self.bgPlayer.setSource(QUrl.fromLocalFile(file1))
         self.overlayPlayer.setSource(QUrl.fromLocalFile(file2))
 
