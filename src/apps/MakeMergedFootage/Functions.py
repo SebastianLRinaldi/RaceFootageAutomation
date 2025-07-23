@@ -48,9 +48,10 @@ class MergeThread(QThread):
 class Logic:
     def __init__(self, ui: Layout):
         self.ui = ui
+        self.output_file_path = None  # Store output path here
 
     def pick_files(self):
-        files, _ = QFileDialog.getOpenFileNames(self, "Select MP4 Files", "", "Video Files (*.mp4)")
+        files, _ = QFileDialog.getOpenFileNames(self.ui, "Select MP4 Files", "", "Video Files (*.mp4)")
         for path in files:
             self.add_video_item(path)
         self.update_default_output_path()
@@ -62,7 +63,7 @@ class Logic:
             base_path = Path.home()  # fallback
 
         default_name = self.output_file_path.name if self.output_file_path else "merged(MM-DD-YY)-R#.mp4"
-        file_dialog = QFileDialog(self, "Select Output File")
+        file_dialog = QFileDialog(self.ui, "Select Output File")
         file_dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
         file_dialog.setNameFilter("MP4 Video (*.mp4)")
         file_dialog.setDirectory(str(base_path))
@@ -80,11 +81,11 @@ class Logic:
     def merge_files(self):
         count = self.ui.list_widget.count()
         if count < 2:
-            QMessageBox.warning(self, "Error", "Add at least 2 videos to merge.")
+            QMessageBox.warning(self.ui, "Error", "Add at least 2 videos to merge.")
             return
 
         if not self.output_file_path:
-            QMessageBox.warning(self, "Error", "Set output file location before merging.")
+            QMessageBox.warning(self.ui, "Error", "Set output file location before merging.")
             return
 
         file_paths = [

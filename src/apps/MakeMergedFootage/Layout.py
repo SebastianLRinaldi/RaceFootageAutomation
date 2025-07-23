@@ -24,15 +24,15 @@ class Layout(UiManager):
 
         layout_data = [
             self.group(orientation="vertical", children=[
-                self.order_label,
-                self.list_widget,
-                self.pick_files_btn,
+                "order_label",
+                "list_widget",
+                "pick_files_btn",
                 self.group(orientation="horizontal", children=[
-                    self.output_label,
-                    self.change_output_btn
+                    "output_label",
+                    "change_output_btn"
                 ]),
-                self.merge_btn,
-                self.progress_bar
+                "merge_btn",
+                "progress_bar"
             ])
         ]
 
