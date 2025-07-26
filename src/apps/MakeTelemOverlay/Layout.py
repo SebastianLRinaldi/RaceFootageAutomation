@@ -8,7 +8,10 @@ from src.core.GUI.UiManager import *
 
 class Layout(UiManager):
 
-    # mywidget : QWidget
+    label: QLabel
+    file_list: QListWidget
+    button_add: QPushButton
+    button_generate: QPushButton
     
     def __init__(self):
         super().__init__()
@@ -17,6 +20,12 @@ class Layout(UiManager):
         self.set_widgets()
 
         layout_data = [
+            self.group("vertical", [
+                "label",
+                "file_list",
+                "button_add",
+                "button_generate"
+            ])
     
         ]
 
@@ -32,5 +41,6 @@ class Layout(UiManager):
         self.setStyleSheet(""" """)
 
     def set_widgets(self):
-        # self.mywidget.setSomething("TEXT")
-        pass
+        self.label.setText("Queued files:")
+        self.button_add.setText("Add GPX File")
+        self.button_generate.setText("Generate All Overlays")

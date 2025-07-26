@@ -4,3 +4,5 @@ class Connections:
     def __init__(self, ui: Layout, logic: Logic):
         self.ui = ui
         self.logic = logic
+
+        self.ui.button.clicked.connect(self.logic.run_overlay_generation)

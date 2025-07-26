@@ -8,7 +8,8 @@ from src.core.GUI.UiManager import *
 
 class Layout(UiManager):
 
-    # mywidget : QWidget
+    status_label: QLabel
+    generate_button: QPushButton
     
     def __init__(self):
         super().__init__()
@@ -17,6 +18,11 @@ class Layout(UiManager):
         self.set_widgets()
 
         layout_data = [
+
+            self.group("vertical", [
+            "status_label",
+            "generate_button"
+            ])
     
         ]
 
@@ -32,5 +38,5 @@ class Layout(UiManager):
         self.setStyleSheet(""" """)
 
     def set_widgets(self):
-        # self.mywidget.setSomething("TEXT")
-        pass
+        self.status_label.setText("Click below to generate segment overlay video.")
+        self.generate_button.setText("Generate Overlay")

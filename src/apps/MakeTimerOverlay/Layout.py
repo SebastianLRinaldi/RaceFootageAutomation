@@ -8,7 +8,8 @@ from src.core.GUI.UiManager import *
 
 class Layout(UiManager):
 
-    # mywidget : QWidget
+    label: QLabel
+    button: QPushButton
     
     def __init__(self):
         super().__init__()
@@ -17,7 +18,10 @@ class Layout(UiManager):
         self.set_widgets()
 
         layout_data = [
-    
+            self.group("vertical", [
+                "label",
+                "button"
+            ])
         ]
 
         self.apply_layout(layout_data)
@@ -32,5 +36,6 @@ class Layout(UiManager):
         self.setStyleSheet(""" """)
 
     def set_widgets(self):
-        # self.mywidget.setSomething("TEXT")
-        pass
+        self.label.setText("Click to generate timer overlay")
+        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.button.setText("Generate Timer Overlay")

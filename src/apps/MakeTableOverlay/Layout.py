@@ -8,7 +8,10 @@ from src.core.GUI.UiManager import *
 
 class Layout(UiManager):
 
-    # mywidget : QWidget
+    status_label: QLabel
+    pick_button: QPushButton
+    generate_button: QPushButton
+    progress: QProgressBar
     
     def __init__(self):
         super().__init__()
@@ -17,6 +20,12 @@ class Layout(UiManager):
         self.set_widgets()
 
         layout_data = [
+            self.group(orientation="vertical", children=[
+                "status_label",
+                "pick_button",
+                "generate_button",
+                "progress"
+            ])
     
         ]
 
@@ -32,5 +41,9 @@ class Layout(UiManager):
         self.setStyleSheet(""" """)
 
     def set_widgets(self):
-        # self.mywidget.setSomething("TEXT")
-        pass
+        self.status_label.setText("Ready")
+        self.pick_button.setText("Set Output File")
+        self.generate_button.setText("Generate Overlay")
+        self.generate_button.setEnabled(False)
+        self.progress.setRange(0, 0)
+        self.progress.setVisible(False)

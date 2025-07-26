@@ -8,7 +8,8 @@ from src.core.GUI.UiManager import *
 
 class Layout(UiManager):
 
-    # mywidget : QWidget
+    btn: QPushButton
+    output: QTextEdit
     
     def __init__(self):
         super().__init__()
@@ -17,6 +18,11 @@ class Layout(UiManager):
         self.set_widgets()
 
         layout_data = [
+
+            self.group("vertical", [
+                "btn",
+                "output"
+            ])
     
         ]
 
@@ -32,5 +38,5 @@ class Layout(UiManager):
         self.setStyleSheet(""" """)
 
     def set_widgets(self):
-        # self.mywidget.setSomething("TEXT")
-        pass
+        self.btn.setText("Select Video File")
+        self.output.setReadOnly(True)
