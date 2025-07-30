@@ -21,6 +21,15 @@ from src.core.GUI.UiManager import *
 from .widgets.customWidget import CustomWidget
 
 
+
+"""
+
+"""
+
+
+
+
+
 class Layout(UiManager):
     
     another_widget:CustomWidget

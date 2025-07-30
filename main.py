@@ -60,7 +60,7 @@ def load_apps():
 
     return pages
 
-
+    
 class Dashboard(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -69,31 +69,29 @@ class Dashboard(QMainWindow):
         self.setup_stylesheets()
 
         self.stack = QStackedWidget()
+        self.apps = {}
+        self.logic = {}
+        self.page_controllers = {}
 
-        # Your dynamic page creation
-        # Define pages with: name, UI class, Logic class, Controller class
+        # Load your app pages (layout, logic, controller classes)
         pages = load_apps()
 
-        # Step 1: Create UIs
-        self.apps = {name: layout_class() for name, layout_class, _, _ in pages}
+        for name, layout_class, logic_class, controller_class in pages:
+            widget = layout_class()
 
-        # Step 2: Create Logic
-        self.logic = {name: logic_class(self.apps[name]) for name, _, logic_class, _ in pages}
+            scroll_area = QScrollArea()
+            scroll_area.setFrameShape(QFrame.Shape.NoFrame)
+            scroll_area.setWidgetResizable(True)
+            scroll_area.setWidget(widget)
 
-        # Step 3: Create Per-Page Controllers
-        self.page_controllers = {
-            name: controller_class(self.apps[name], self.logic[name])
-            for name, _, _, controller_class in pages
-        }
+            self.stack.addWidget(scroll_area)
+            self.apps[name] = widget
+            self.logic[name] = logic_class(widget)
+            self.page_controllers[name] = controller_class(widget, self.logic[name])
 
-        # Add pages to the stack
-        for page in self.apps.values():
-            self.stack.addWidget(page)
-
-        # Create the controller
         self.controller = AppConnector(self.apps, self.logic)
 
-
+        # Menu bar
         menubar = QMenuBar(self)
         app_menu = menubar.addMenu("Apps")
 
@@ -104,7 +102,7 @@ class Dashboard(QMainWindow):
 
         self.setMenuBar(menubar)
 
-        # Main container setup
+        # Layout
         container = QWidget()
         layout = QVBoxLayout(container)
         layout.addWidget(self.stack)
@@ -114,11 +112,15 @@ class Dashboard(QMainWindow):
 
     def switch_to(self, app_name):
         try:
-            self.stack.setCurrentWidget(self.apps[app_name])
+            # Find the scroll area that contains the widget
+            for i in range(self.stack.count()):
+                scroll_area = self.stack.widget(i)
+                if scroll_area.widget() == self.apps[app_name]:
+                    self.stack.setCurrentIndex(i)
+                    break
         except KeyError:
             print(f"Invalid app name: {app_name}")
             print("Valid app names are:", list(self.apps.keys()))
-
 
     def setup_stylesheets(self):
         self.setStyleSheet(""" """)

@@ -26,8 +26,7 @@ class Logic:
             parser = LapDataParser()
             parser.process_and_save_csv(data)
         else:
-            print(f"bad data: {type(data)}")
-
+            QMessageBox.warning(self.ui, "Bad Data", f"{type(data)}")
 
     def get_lap_times(self):
         times = get_racer_times( 'EpicX18 GT9')

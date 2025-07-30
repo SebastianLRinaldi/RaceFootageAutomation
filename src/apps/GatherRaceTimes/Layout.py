@@ -7,7 +7,7 @@ from src.core.GUI.UiManager import *
 # from .widgets.CUSTOMWIDGET import YOURWIDGET
 
 class Layout(UiManager):
-
+    racer_name_input: QLineEdit
     text_area: QTextEdit
     save_button : QPushButton
     
@@ -18,6 +18,7 @@ class Layout(UiManager):
         self.set_widgets()
 
         layout_data = [
+            "racer_name_input",
             "text_area",
             "save_button"
         ]
@@ -34,5 +35,6 @@ class Layout(UiManager):
         self.setStyleSheet(""" """)
 
     def set_widgets(self):
+        self.racer_name_input.setPlaceholderText("Enter Racer Name...")
         self.save_button.setText("Save to CSV")
         self.text_area.setPlaceholderText("Paste raw lap data here...")

@@ -11,7 +11,7 @@ class UiManager(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("App UI")
-        self.resize(1000, 600)
+        # self.resize(1000, 600)
         self.setup_stylesheets()
         self.widget_layout = None
 
@@ -134,6 +134,34 @@ class UiManager(QWidget):
                 container.setLayout(layout)
                 return container
 
+
+            if "form" in data:
+                info = data["form"]
+                layout = QFormLayout()
+                for label, widget_name in info["children"]:
+                    widget = getattr(self, widget_name)
+                    layout.addRow(label, widget)
+                return layout
+
+
+            if "scroll" in data:
+                info = data["scroll"]
+                child_spec = info["child"]
+                w = self.build_layout(child_spec)
+
+                scroll_area = QScrollArea()
+                scroll_area.setFrameShape(QFrame.Shape.NoFrame)
+                scroll_area.setWidgetResizable(True)
+
+                if isinstance(w, QWidget):
+                    scroll_area.setWidget(w)
+                else:
+                    container = QWidget()
+                    container.setLayout(w)
+                    scroll_area.setWidget(container)
+
+                return scroll_area
+
         raise TypeError("Invalid layout data")
 
 
@@ -201,24 +229,20 @@ class UiManager(QWidget):
             }
         }
 
+    def form(self, children: list[tuple[str, str]]):
+        return {
+            "form": {
+                "children": children
+            }
+        }
 
-    # def tabs(self, *children, tab_labels=None):
-    #     return {"tabs": {"children": list(children), "tab_labels": tab_labels}}
+    def scroll(self, child):
+        return {
+            "scroll": {
+                "child": child
+            }
+        }
 
-    # def splitter(self, *children, orientation="horizontal"):
-    #     return {"splitter": {"orientation": orientation, "children": list(children)}}
-
-    # def group(self, *children, orientation="horizontal"):
-    #     return {"group": {"orientation": orientation, "children": list(children)}}
-
-    # def box(self, *children, orientation="horizontal", title=None):
-    #     return {"box": {"title": title, "orientation": orientation, "children": list(children)}}
-
-    # def grid(self, *children, rows=1, columns=1):
-    #     return {"grid": {"rows": rows, "columns": columns, "children": list(children)}}
-
-    # def stacked(self, *children):
-    #     return {"stacked": {"children": list(children)}}
 
 
     def show_window(self):
