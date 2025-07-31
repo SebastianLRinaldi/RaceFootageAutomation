@@ -108,7 +108,7 @@ class Dashboard(QMainWindow):
         layout.addWidget(self.stack)
         self.setCentralWidget(container)
 
-        self.switch_to("Basic")
+        self.switch_to("ProjectBaseScreen")
 
     def switch_to(self, app_name):
         try:
