@@ -27,6 +27,8 @@ class Layout(UiManager):
     file_list: QListWidget
     button_add: QPushButton
     button_generate: QPushButton
+
+    file_tree: QTreeView
     
     def __init__(self):
         super().__init__()
@@ -36,13 +38,15 @@ class Layout(UiManager):
         self.set_widgets()
 
         layout_data = [
-            self.tabs(tab_labels=["GPX Generator", "Settings"], children=[
+            self.tabs(tab_labels=["GPX Generator", "Files", "Settings"], children=[
                 self.group("vertical", [
                     "label",
                     "file_list",
                     "button_add",
                     "button_generate"
                 ]),
+
+                self.box("vertical","Files", ["file_tree"]),
 
                 self.scroll([
                     self.group("vertical", [

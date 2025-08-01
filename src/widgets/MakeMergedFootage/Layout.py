@@ -15,6 +15,8 @@ class Layout(UiManager):
     change_output_btn: QPushButton
     merge_btn: QPushButton
     progress_bar: QProgressBar
+
+    file_tree: QTreeView
     
     def __init__(self):
         super().__init__()
@@ -27,6 +29,7 @@ class Layout(UiManager):
                 "order_label",
                 "list_widget",
                 "pick_files_btn",
+                self.box("vertical","Files", ["file_tree"]),
                 self.group(orientation="horizontal", children=[
                     "output_label",
                     "change_output_btn"

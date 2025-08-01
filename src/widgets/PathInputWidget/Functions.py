@@ -7,5 +7,3 @@ from .Layout import Layout
 class Logic:
     def __init__(self, ui: Layout):
         self.ui = ui
-
-        

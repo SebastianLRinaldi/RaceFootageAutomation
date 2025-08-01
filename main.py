@@ -89,7 +89,7 @@ class Dashboard(QMainWindow):
             self.logic[name] = logic_class(widget)
             self.page_controllers[name] = controller_class(widget, self.logic[name])
 
-        self.controller = AppConnector(self.apps, self.logic)
+        self.controller = AppConnector(self, self.apps, self.logic)
 
         # Menu bar
         menubar = QMenuBar(self)

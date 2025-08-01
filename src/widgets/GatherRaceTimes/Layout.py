@@ -10,6 +10,8 @@ class Layout(UiManager):
     racer_name_input: QLineEdit
     text_area: QTextEdit
     save_button : QPushButton
+
+    file_tree: QTreeView
     
     def __init__(self):
         super().__init__()
@@ -20,7 +22,8 @@ class Layout(UiManager):
         layout_data = [
             "racer_name_input",
             "text_area",
-            "save_button"
+            "save_button",
+            self.box("vertical","Files", ["file_tree"]),
         ]
 
         self.apply_layout(layout_data)

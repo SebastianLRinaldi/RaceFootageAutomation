@@ -6,3 +6,6 @@ class Connections:
         self.ui = ui
         self.logic = logic
 
+        self.ui.pathinputwidget.browse_button.clicked.connect(self.logic.select_directory)
+        self.ui.new_project_btn.clicked.connect(self.logic.open_new_project_dialog)
+        self.ui.project_list.itemSelectionChanged.connect(self.logic.display_project_folder)

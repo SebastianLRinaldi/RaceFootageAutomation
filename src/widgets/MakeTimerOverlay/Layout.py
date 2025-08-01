@@ -30,6 +30,8 @@ class Layout(UiManager):
     # Output settings
     output_video_input: QLineEdit
     output_temp_input: QLineEdit
+
+    file_tree: QTreeView
     
     def __init__(self):
         super().__init__()
@@ -40,12 +42,14 @@ class Layout(UiManager):
 
 
         layout_data = [
-            self.tabs(tab_labels=["Timer Creation", "Settings"], children=[
+            self.tabs(tab_labels=["Timer Creation", "Files", "Settings"], children=[
                 # Main tab
                 self.group("vertical", [
                     "label",
                     "button"
                 ]),
+
+                self.box("vertical","Files", ["file_tree"]),
 
                 # Settings tab
                 self.scroll([

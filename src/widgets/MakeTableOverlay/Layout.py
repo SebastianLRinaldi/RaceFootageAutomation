@@ -34,6 +34,8 @@ class Layout(UiManager):
 
     status_label: QLabel
     generate_button: QPushButton
+
+    file_tree: QTreeView
     
     def __init__(self):
         super().__init__()
@@ -43,7 +45,7 @@ class Layout(UiManager):
         self.set_widgets()
 
         layout_data = [
-            self.tabs(tab_labels=["Table Creation", "Settings"], children=[
+            self.tabs(tab_labels=["Table Creation", "Files","Settings"], children=[
 
             
             self.group(orientation="vertical", children=[
@@ -52,6 +54,8 @@ class Layout(UiManager):
                 "generate_button",
                 "progress"
             ]),
+
+            self.box("vertical","Files", ["file_tree"]),
 
             self.scroll([
                     self.group("vertical", [

@@ -2,6 +2,9 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import * 
 from PyQt6.QtGui import *
 
+import os
+import sys
+
 from .Layout import Layout
 
 from .functions.lapDataParser import LapDataParser
@@ -20,6 +23,7 @@ keyframes - https://www.youtube.com/watch?v=vcnsA38xDx4
 class Logic:
     def __init__(self, ui: Layout):
         self.ui = ui
+    
 
     def process_and_save(self, data:str):
         if isinstance(data, str):
