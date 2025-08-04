@@ -41,7 +41,7 @@ FONT_SIZE = 64
 # from application.apps.raceStats.functions.racerTimersStats import get_racer_times, best_lap_deltas
 import sys
 sys.path.append("F:/_Small/344 School Python/TrackFootageEditor")
-from GatherRaceTimes.anaylsis_of_a_racers_times import get_racer_times, best_lap_deltas
+# from GatherRaceTimes.anaylsis_of_a_racers_times import get_racer_times, best_lap_deltas
 
 
 

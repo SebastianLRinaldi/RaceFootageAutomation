@@ -3,6 +3,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 import os
+import shutil
 
 from .layout import Layout
 from src.components import *
@@ -11,22 +12,84 @@ from src.helpers import *
 class Logic:
     def __init__(self, ui: Layout):
         self.ui = ui
-        self.directory = None
+
+        self.settings = QSettings("TrackFootage", "project_base_screen")
+        self.directory = self.settings.value("last_dir", "")  # fallback is empty string
+
         self.tree_model = QFileSystemModel()
+        self.tree_model.setReadOnly(False)
         self.tree_model.setRootPath('C:/')  # Or whatever folder you want
+        self.ui.project_tree.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop )
+        self.ui.project_tree.setDefaultDropAction(Qt.DropAction.MoveAction)
+        self.ui.project_tree.setDragEnabled(True)
+        self.ui.project_tree.setAcceptDrops(True)
+        
+
+        
+        
+        self.load_folders()
+        self.ui.project_list.setCurrentRow(0)
+        self.display_project_folder()
+
+    def on_double_click(self, index):
+        path = self.tree_model.filePath(index)
+        if QFileInfo(path).isFile():
+            QDesktopServices.openUrl(QUrl.fromLocalFile(path))
+
+
+    # Delete currently selected file/folder
+    def delete_selected(self):
+        index = self.ui.project_tree.currentIndex()
+        if not index.isValid():
+            return
+        path = self.tree_model.filePath(index)
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+        else:
+            os.remove(path)
+        # self.tree_model.refresh()
+
+    # Create new file inside selected directory
+    def create_file(self, filename="new_file.txt"):
+        index = self.ui.project_tree.currentIndex()
+        dir_path = self.tree_model.filePath(index)
+        if not os.path.isdir(dir_path):
+            dir_path = os.path.dirname(dir_path)
+        full_path = os.path.join(dir_path, filename)
+        with open(full_path, "w") as f:
+            f.write("")
+        # self.tree_model.refresh()
+
+    # Create new folder inside selected directory
+    def create_folder(self, foldername="New Folder"):
+        index = self.ui.project_tree.currentIndex()
+        dir_path = self.tree_model.filePath(index)
+        if not os.path.isdir(dir_path):
+            dir_path = os.path.dirname(dir_path)
+        os.makedirs(os.path.join(dir_path, foldername), exist_ok=True)
+        # self.tree_model.refresh()
+
+    # Optional: handle rename events
+    def on_renamed(self, path, old_name, new_name):
+        print(f"Renamed {old_name} to {new_name} in {path}")
+
 
     def select_directory(self):
+        
         directory = QFileDialog.getExistingDirectory(self.ui, "Select Directory")
+        
         if directory:
             self.directory = directory
-            self.ui.project_root_input.setText(directory)
             self.load_folders()
 
 
     def load_folders(self):
+        self.ui.directory_search.line_edit.setText(self.directory)
+        self.settings.setValue("last_dir", self.directory)
+        
         self.ui.project_list.clear()
         try:
-            for name in os.listdir(self.directory ):
+            for name in os.listdir(self.directory):
                 path = os.path.join(self.directory, name)
                 if os.path.isdir(path):
                     self.ui.project_list.addItem(name)

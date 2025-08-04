@@ -47,7 +47,7 @@ FONT = ImageFont.truetype(FONT_PATH, FONT_SIZE)
 # Lap times
 import sys
 sys.path.append("F:/_Small/344 School Python/TrackFootageEditor")
-from GatherRaceTimes.anaylsis_of_a_racers_times import get_racer_times
+# from GatherRaceTimes.anaylsis_of_a_racers_times import get_racer_times
 
 # LAP_TIMES = get_racer_times("F:\\_Small\\344 School Python\\TrackFootageEditor\\RaceStorage\\(6-20-25)-R2\\lap_times(6-20-25)-R2.csv", "EpicX18 GT9")
 
