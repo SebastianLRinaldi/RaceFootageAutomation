@@ -9,7 +9,7 @@ from pathlib import Path
 
 from .layout import Layout
 from src.components import *
-
+from src.helpers import *
 
 class MergeThread(QThread):
     finished = pyqtSignal(str)

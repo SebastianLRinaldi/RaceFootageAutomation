@@ -20,7 +20,7 @@ import cProfile
 
 from .layout import Layout
 from src.components import *
-
+from src.helpers import *
 
 
 # Config

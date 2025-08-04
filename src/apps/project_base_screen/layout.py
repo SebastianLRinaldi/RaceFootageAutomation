@@ -34,7 +34,7 @@ class Layout(UiManager):
     add_overlay_btn: QPushButton
     add_asset_btn: QPushButton
     add_template_btn: QPushButton
-    pathinputwidget: PathInputWidgetLayout
+    src_project_btn: PathInputWidgetLayout
 
     project_tree: QTreeView
 
@@ -49,11 +49,11 @@ class Layout(UiManager):
                 "horizontal",
                 [
                     self.box("vertical", "Projects",[
-                        # self.form([("Project Dir", "add_overlay_btn")]),
+                        # self.form([("Project Dir", "project_root_label")]),
                         "project_list",
                         "new_project_btn",
                         "open_project_btn",
-                        self.box("horizontal", "Current Directory",["pathinputwidget"]),
+                        self.box("horizontal", "Current Directory",["src_project_btn"]),
                         
                     ]),
 

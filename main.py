@@ -39,10 +39,13 @@ def load_apps():
             continue
 
         try:
-            mod = importlib.import_module(f"{base}.{name}")
-            widgets[name] = mod.Component()
+            comp = importlib.import_module(f"{base}.{name}").Component()
+            for attr in comp.__class__.__annotations__:
+                if not hasattr(comp, attr):
+                    raise AttributeError(f"{base}.{name}.Component missing '{attr}'")
+            widgets[name] = comp
         except Exception as e:
-            print(f"Failed to load {name}: {e}")
+            raise RuntimeError(f"Error in {base}.{name}: {e}")
 
     return widgets
 
@@ -67,7 +70,7 @@ class Dashboard(QMainWindow):
 
         self.controller = AppConnector(self, self.apps)
 
-        self.switch_to("ProjectBaseScreen")
+        self.switch_to("project_base_screen")
 
     def setup_menu(self):
         menubar = QMenuBar(self)

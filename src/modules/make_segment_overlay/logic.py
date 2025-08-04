@@ -11,8 +11,8 @@ from PIL import ImageFont, ImageDraw, Image
 from tqdm import tqdm
 
 from .layout import Layout
-from src.components import *
-
+# from src.components import YourNeededLayoutLogicConnection
+from src.helpers import *
 
 
 # Config

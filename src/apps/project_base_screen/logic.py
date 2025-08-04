@@ -6,6 +6,7 @@ import os
 
 from .layout import Layout
 from src.components import *
+from src.helpers import *
 
 class Logic:
     def __init__(self, ui: Layout):

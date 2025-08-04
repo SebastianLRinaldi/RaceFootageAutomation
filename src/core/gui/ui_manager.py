@@ -162,7 +162,7 @@ class UiManager(QWidget):
 
                 return scroll_area
 
-        raise TypeError("Invalid layout data")
+        raise TypeError("Invalid layout data (Check for self.widgetName)")
 
 
 
@@ -179,6 +179,7 @@ class UiManager(QWidget):
             layout_or_widget.setContentsMargins(0, 0, 0, 0)
             # layout_or_widget.setSpacing(0)
             self.setLayout(layout_or_widget)
+            
 
     def group(self, orientation: Orientation = None, children: list | None = None):
         return {

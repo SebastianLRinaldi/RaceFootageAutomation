@@ -6,12 +6,14 @@ from src.core.gui.ui_manager import *
 from src.components import *
 
 
+
 class Layout(UiManager):
 
     width_input: QSpinBox  # set max > config WIDTH (e.g. 10000)
     height_input: QSpinBox  # set max > config HEIGHT (e.g. 10000)
     fps_input: QDoubleSpinBox  # range 0.1–120.0, decimals=2
 
+    
     output_dir_input: PathInputWidgetLayout  # custom widget with QLineEdit + directory browse button
     bar_file_input: PathInputWidgetLayout  # custom widget with QLineEdit + file browse button (filter for video)
     dot_file_input: PathInputWidgetLayout  # same as above
@@ -99,6 +101,7 @@ class Layout(UiManager):
 
     def init_widgets(self):
         annotations = getattr(self.__class__, "__annotations__", {})
+        # print(f"annotations: {annotations}")
         for name, widget_type in annotations.items():
             widget = widget_type()
             setattr(self, name, widget)

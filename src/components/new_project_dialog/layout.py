@@ -15,7 +15,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 from src.core.gui.ui_manager import *
-from src.components import *
+# from src.components import YourNeededLayoutLogicConnection
 
 
 class Layout(QDialog):
