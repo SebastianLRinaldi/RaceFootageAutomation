@@ -23,7 +23,7 @@ class Layout(UiManager):
     open_project_btn: QPushButton
     new_project_btn: QPushButton
 
-    directory_search: PathInputWidgetLayout
+    directory_search: PathInputWidget
 
     project_tree: QTreeView
 
@@ -41,7 +41,7 @@ class Layout(UiManager):
                         "project_list",
                         "new_project_btn",
                         "open_project_btn",
-                        self.box("horizontal", "Current Directory",["directory_search"]),
+                        self.box("horizontal", "Current Directory",[self.directory_search.layout]),
                         
                     ]),
 

@@ -7,6 +7,7 @@ import shutil
 
 from .layout import Layout
 from src.components import *
+from src.modules import *
 from src.helpers import *
 
 class Logic:
@@ -84,7 +85,7 @@ class Logic:
 
 
     def load_folders(self):
-        self.ui.directory_search.line_edit.setText(self.directory)
+        self.ui.directory_search.logic.setText(self.directory)
         self.settings.setValue("last_dir", self.directory)
         
         self.ui.project_list.clear()
@@ -121,7 +122,7 @@ class Logic:
 
 
     def open_new_project_dialog(self):
-        dialog = NewProjectDialogLayout(self.ui)
+        dialog = NewProjectDialog().layout
         
         def on_create_clicked():
             date = dialog.date_input.text().strip()

@@ -6,7 +6,7 @@ import sys
 import subprocess
 
 from .layout import Layout
-# from src.components import YourNeededLayoutLogicConnection
+from src.components import *
 from src.helpers import *
 
 class Logic:

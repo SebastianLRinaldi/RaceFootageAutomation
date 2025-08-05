@@ -14,18 +14,18 @@ class Layout(UiManager):
     fps_input: QDoubleSpinBox  # range 0.1–120.0, decimals=2
 
     
-    output_dir_input: PathInputWidgetLayout  # custom widget with QLineEdit + directory browse button
-    bar_file_input: PathInputWidgetLayout  # custom widget with QLineEdit + file browse button (filter for video)
-    dot_file_input: PathInputWidgetLayout  # same as above
-    dot_avi_file_input: PathInputWidgetLayout  # same
-    segment_overlay_file_input: PathInputWidgetLayout  # same
+    output_dir_input: PathInputWidget  # custom widget with QLineEdit + directory browse button
+    bar_file_input: PathInputWidget  # custom widget with QLineEdit + file browse button (filter for video)
+    dot_file_input: PathInputWidget  # same as above
+    dot_avi_file_input: PathInputWidget  # same
+    segment_overlay_file_input: PathInputWidget  # same
 
     end_duration_input: QSpinBox  # range 1–600 seconds
 
-    font_path_input: PathInputWidgetLayout  # file browse with font file filter (.ttf, .otf)
+    font_path_input: PathInputWidget  # file browse with font file filter (.ttf, .otf)
     font_size_input: QSpinBox  # range 8–72
 
-    ffmpeg_bin_input: PathInputWidgetLayout  # file browse for executable
+    ffmpeg_bin_input: PathInputWidget  # file browse for executable
 
     
 
@@ -65,29 +65,29 @@ class Layout(UiManager):
                             
                             self.box("vertical", "File Paths", [
                                     self.form([
-                                        ("Bar File", "bar_file_input"),
-                                        ("Dot File", "dot_file_input"),
-                                        ("Dot AVI File", "dot_avi_file_input"),
-                                        ("Segment Overlay File", "segment_overlay_file_input"),
+                                        ("Bar File", self.bar_file_input.layout),
+                                        ("Dot File", self.dot_file_input.layout),
+                                        ("Dot AVI File", self.dot_avi_file_input.layout),
+                                        ("Segment Overlay File", self.segment_overlay_file_input.layout),
                                     ])
                                 ]),
                             
                             self.box("vertical", "Output Settings", [
                                     self.form([
-                                        ("Output Directory", "output_dir_input"),
+                                        ("Output Directory", self.output_dir_input.layout),
                                     ])
                                 ]),
                             
                             self.box("vertical", "Font Settings", [
                                     self.form([
-                                        ("Font Path", "font_path_input"),
+                                        ("Font Path", self.font_path_input.layout),
                                         ("Font Size", "font_size_input"),
                                     ])
                                 ]),
                             
                             self.box("vertical", "FFmpeg", [
                                     self.form([
-                                        ("FFmpeg Binary", "ffmpeg_bin_input"),
+                                        ("FFmpeg Binary", self.ffmpeg_bin_input.layout),
                                     ])
                                 ]),
                         ])

@@ -10,7 +10,7 @@ from src.components import *
 class Layout(UiManager):
 
     # GPX settings
-    gpx_dir_input: PathInputWidgetLayout  # folder picker for GPX file directory
+    gpx_dir_input: PathInputWidget  # folder picker for GPX file directory
 
     fps_input: QDoubleSpinBox
     duration_input: QDoubleSpinBox
@@ -54,7 +54,7 @@ class Layout(UiManager):
 
                         self.box("vertical", "General", [
                             self.form([
-                                ("GPX Directory", "gpx_dir_input"),
+                                ("GPX Directory", self.gpx_dir_input.layout),
                                 ("FPS", "fps_input"),
                                 ("Duration (sec)", "duration_input"),
                             ])
@@ -112,7 +112,7 @@ class Layout(UiManager):
         self.button_generate.setText("Generate All Overlays")
 
         # Config values from your logic
-        self.gpx_dir_input.setText("F:/_Small/344 School Python/TrackFootageEditor/RaceStorage/(6-20-25)-R2")
+        self.gpx_dir_input.logic.setText("F:/_Small/344 School Python/TrackFootageEditor/RaceStorage/(6-20-25)-R2")
         self.fps_input.setValue(59.94)
         self.duration_input.setValue(0)  # leave 0 = auto from file
 

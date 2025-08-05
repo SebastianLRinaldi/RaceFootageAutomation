@@ -23,7 +23,7 @@ class Layout(UiManager):
     end_duration_input: QDoubleSpinBox
 
     # Font/text settings
-    font_path_input: PathInputWidgetLayout
+    font_path_input: PathInputWidget
     font_size_input: QSpinBox
     center_offset_input: QSpinBox
 
@@ -71,7 +71,7 @@ class Layout(UiManager):
                         ]),
                         self.box("vertical", "Text Style Settings", [
                             self.form([
-                                ("Font Path", "font_path_input"),
+                                ("Font Path", self.font_path_input.layout),
                                 ("Font Size", "font_size_input"),
                                 ("Center Offset", "center_offset_input"),
                             ])
@@ -126,7 +126,7 @@ class Layout(UiManager):
         self.start_duration_input.setValue(5)
         self.end_duration_input.setValue(15)
 
-        self.font_path_input.setText("C:/Users/epics/AppData/Local/Microsoft/Windows/Fonts/NIS-Heisei-Mincho-W9-Condensed.TTF")
+        self.font_path_input.logic.setText("C:/Users/epics/AppData/Local/Microsoft/Windows/Fonts/NIS-Heisei-Mincho-W9-Condensed.TTF")
         self.font_size_input.setValue(64)
         self.center_offset_input.setValue(80)
 

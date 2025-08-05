@@ -3,22 +3,21 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 from .layout import Layout
-# from src.components import YourNeededLayoutLogicConnection
 from src.helpers import *
 
 class Logic:
     def __init__(self, ui: Layout):
         self.ui = ui
         
-    # def browse(self):
-    #     # Customize filter as needed
-    #     path, _ = QFileDialog.getExistingDirectory(self, "Select Directory")  
-    #     # or QFileDialog.getOpenFileName for files
-    #     if path:
-    #         self.ui.line_edit.setText(path)
+    def browse(self):
+        # Customize filter as needed
+        path, _ = QFileDialog.getExistingDirectory(self, "Select Directory")  
+        # or QFileDialog.getOpenFileName for files
+        if path:
+            self.ui.line_edit.setText(path)
 
-    # def text(self):
-    #     return self.ui.line_edit.text()
+    def text(self):
+        return self.ui.line_edit.text()
 
-    # def setText(self, text):
-    #     self.ui.line_edit.setText(text)
+    def setText(self, text):
+        self.ui.line_edit.setText(text)

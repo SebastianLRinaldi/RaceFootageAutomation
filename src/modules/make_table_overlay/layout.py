@@ -27,9 +27,9 @@ class Layout(UiManager):
     start_duration_input: QSpinBox
     end_duration_input: QSpinBox
 
-    output_video_file_input: PathInputWidgetLayout
+    output_video_file_input: PathInputWidget
 
-    font_path_input: PathInputWidgetLayout
+    font_path_input: PathInputWidget
     font_size_input: QSpinBox
 
     status_label: QLabel
@@ -81,13 +81,13 @@ class Layout(UiManager):
 
                         self.box("vertical", "Output Settings", [
                             self.form([
-                                ("Output Video File", "output_video_file_input"),
+                                ("Output Video File", self.output_video_file_input.layout),
                             ])
                         ]),
 
                         self.box("vertical", "Font Settings", [
                             self.form([
-                                ("Font Path", "font_path_input"),
+                                ("Font Path", self.font_path_input.layout),
                                 ("Font Size", "font_size_input"),
                             ])
                         ]),
@@ -148,6 +148,6 @@ class Layout(UiManager):
         self.start_duration_input.setValue(5)
         self.end_duration_input.setValue(15)
 
-        self.output_video_file_input.line_edit.setText("Table_Overlay_(6-20-25)-R2.mp4")
-        self.font_path_input.line_edit.setText("C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF")
+        self.output_video_file_input.logic.setText("Table_Overlay_(6-20-25)-R2.mp4")
+        self.font_path_input.logic.setText("C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF")
         self.font_size_input.setValue(64)

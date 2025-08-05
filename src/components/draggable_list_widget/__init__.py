@@ -8,3 +8,5 @@ class Component():
         self.layout = Layout()
         self.logic = Logic(self.layout)
         self.connection = Connections(self.layout, self.logic)
+
+

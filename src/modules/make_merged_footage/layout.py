@@ -9,7 +9,7 @@ from src.components import *
 class Layout(UiManager):
 
     order_label: QLabel
-    list_widget: DraggableListWidgetLayout
+    list_widget: DraggableListWidget
     pick_files_btn: QPushButton
     output_label: QLabel
     change_output_btn: QPushButton
@@ -27,7 +27,7 @@ class Layout(UiManager):
         layout_data = [
             self.group(orientation="vertical", children=[
                 "order_label",
-                "list_widget",
+                self.list_widget.layout,
                 "pick_files_btn",
                 self.box("vertical","Files", ["file_tree"]),
                 self.group(orientation="horizontal", children=[
@@ -52,7 +52,7 @@ class Layout(UiManager):
 
     def set_widgets(self):
         self.order_label.setText("Drag MP4 files here in the order to merge")
-        self.list_widget.setMaximumHeight(180)
+        self.list_widget.layout.setMaximumHeight(180)
         self.pick_files_btn.setText("Pick Files")
         self.output_label.setText("Output file: (none)")
         self.change_output_btn.setText("Change Output Location")
