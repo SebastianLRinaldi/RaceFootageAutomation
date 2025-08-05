@@ -7,6 +7,14 @@ from typing import Literal
 Orientation = Literal["horizontal", "vertical"]
 LayoutType = Literal["group", "splitter", "tabs", "grid", "stacked"]
 
+# class Component():
+#     def __init__(self):
+#         super().__init__()
+#         self.layout = Layout()
+#         self.logic = Logic(self.layout)
+#         self.connection = Connections(self.layout, self.logic)
+
+
 class UiManager(QWidget):
     def __init__(self):
         super().__init__()
@@ -16,8 +24,13 @@ class UiManager(QWidget):
         self.widget_layout = None
 
     def build_layout(self, data) -> QWidget | QLayout:
-        if isinstance(data, str):
-            return getattr(self, data)  # user widgets expected here
+        # if isinstance(data, str):
+        #     return getattr(self, data)  # user widgets expected here
+        if isinstance(data, QWidget):
+            return data
+        elif isinstance(data, str):
+            return getattr(self, data)
+
 
         if isinstance(data, list):
             layout = QVBoxLayout()
@@ -139,7 +152,8 @@ class UiManager(QWidget):
                 info = data["form"]
                 layout = QFormLayout()
                 for label, widget_name in info["children"]:
-                    widget = getattr(self, widget_name)
+                    # widget = getattr(self, widget_name)
+                    widget = self.build_layout(widget_name)
                     layout.addRow(label, widget)
                 return layout
 

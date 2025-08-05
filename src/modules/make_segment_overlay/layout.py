@@ -40,7 +40,6 @@ class Layout(UiManager):
         self.setup_stylesheets()
         self.set_properties()
         self.set_widgets()
-        self.load_settings()  
 
         layout_data = [
             self.tabs(tab_labels=["Segment Creation", "Files", "Settings"], children=[
@@ -101,7 +100,6 @@ class Layout(UiManager):
 
     def init_widgets(self):
         annotations = getattr(self.__class__, "__annotations__", {})
-        # print(f"annotations: {annotations}")
         for name, widget_type in annotations.items():
             widget = widget_type()
             setattr(self, name, widget)
@@ -121,56 +119,75 @@ class Layout(UiManager):
         self.status_label.setText("Click below to generate segment overlay video.")
         self.generate_button.setText("Generate Overlay")
 
-        # self.width_input.setValue(1920)
-        # self.height_input.setValue(120)
-        # self.fps_input.setValue(59.94)
-        # self.output_dir_input.setText("SegmentOverlayFiles(MM-DD-YY)")
-        # self.bar_file_input.setText("bar_overlay.mp4")
-        # self.dot_file_input.setText("dot_overlay.mp4")
-        # self.dot_avi_file_input.setText("dot_overlay.avi")
-        # self.segment_overlay_file_input.setText("SegmentOverlayFiles(MM-DD-YY)/Segment_Overlay_(6-20-25)-R2.mp4")
-        # self.end_duration_input.setValue(15)
-        # self.font_path_input.setText("C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF")
-        # self.font_size_input.setValue(24)
-        # self.ffmpeg_bin_input.setText("ffmpeg")
 
 
-    def save_settings(self):
-        settings = QSettings("MyCompany", "SegmentOverlayApp")
-
-        settings.setValue("width", self.width_input.value())
-        settings.setValue("height", self.height_input.value())
-        settings.setValue("fps", self.fps_input.value())
-        settings.setValue("output_dir", self.output_dir_input.text())
-        settings.setValue("bar_file", self.bar_file_input.text())
-        settings.setValue("dot_file", self.dot_file_input.text())
-        settings.setValue("dot_avi_file", self.dot_avi_file_input.text())
-        settings.setValue("segment_overlay_file", self.segment_overlay_file_input.text())
-        settings.setValue("end_duration", self.end_duration_input.value())
-        settings.setValue("font_path", self.font_path_input.text())
-        settings.setValue("font_size", self.font_size_input.value())
-        settings.setValue("ffmpeg_bin", self.ffmpeg_bin_input.text())
-
-    def load_settings(self):
-        settings = QSettings("MyCompany", "SegmentOverlayApp")
-
-        self.width_input.setValue(int(settings.value("width", 1920)))
-        self.height_input.setValue(int(settings.value("height", 1080)))
-        self.fps_input.setValue(float(settings.value("fps", 59.94)))
-        self.output_dir_input.setText(settings.value("output_dir", ""))
-        self.bar_file_input.setText(settings.value("bar_file", ""))
-        self.dot_file_input.setText(settings.value("dot_file", ""))
-        self.dot_avi_file_input.setText(settings.value("dot_avi_file", ""))
-        self.segment_overlay_file_input.setText(settings.value("segment_overlay_file", ""))
-        self.end_duration_input.setValue(int(settings.value("end_duration", 15)))
-        self.font_path_input.setText(settings.value("font_path", ""))
-        self.font_size_input.setValue(int(settings.value("font_size", 24)))
-        self.ffmpeg_bin_input.setText(settings.value("ffmpeg_bin", "ffmpeg"))
 
 
-    def closeEvent(self, event):
-        self.save_settings()
-        super().closeEvent(event)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    # def save_setting(self, key, value):
+    #     settings = QSettings("MyCompany", "SegmentOverlayApp")
+    #     settings.setValue(key, value)
+
+    # def connect_settings_autosave(self):
+    #     settings_fields = {
+    #         self.width_input: lambda: self.save_setting("width", self.width_input.value()),
+    #         self.height_input: lambda: self.save_setting("height", self.height_input.value()),
+    #         self.fps_input: lambda: self.save_setting("fps", self.fps_input.value()),
+    #         self.output_dir_input: lambda: self.save_setting("output_dir", self.output_dir_input.text()),
+    #         self.bar_file_input: lambda: self.save_setting("bar_file", self.bar_file_input.text()),
+    #         self.dot_file_input: lambda: self.save_setting("dot_file", self.dot_file_input.text()),
+    #         self.dot_avi_file_input: lambda: self.save_setting("dot_avi_file", self.dot_avi_file_input.text()),
+    #         self.segment_overlay_file_input: lambda: self.save_setting("segment_overlay_file", self.segment_overlay_file_input.text()),
+    #         self.end_duration_input: lambda: self.save_setting("end_duration", self.end_duration_input.value()),
+    #         self.font_path_input: lambda: self.save_setting("font_path", self.font_path_input.text()),
+    #         self.font_size_input: lambda: self.save_setting("font_size", self.font_size_input.value()),
+    #         self.ffmpeg_bin_input: lambda: self.save_setting("ffmpeg_bin", self.ffmpeg_bin_input.text()),
+    #     }
+
+    #     for widget, handler in settings_fields.items():
+    #         if hasattr(widget, 'valueChanged'):
+    #             print("SAVED")
+    #             widget.valueChanged.connect(handler)
+    #         elif hasattr(widget, 'textChanged'):
+    #             print("SAVED1")
+    #             widget.textChanged.connect(handler)
+
+    # def load_settings(self):
+    #     settings = QSettings("MyCompany", "SegmentOverlayApp")
+
+    #     self.width_input.setValue(int(settings.value("width", 1920)))
+    #     self.height_input.setValue(int(settings.value("height", 1080)))
+    #     self.fps_input.setValue(float(settings.value("fps", 59.94)))
+    #     self.output_dir_input.setText(settings.value("output_dir", ""))
+    #     self.bar_file_input.setText(settings.value("bar_file", ""))
+    #     self.dot_file_input.setText(settings.value("dot_file", ""))
+    #     self.dot_avi_file_input.setText(settings.value("dot_avi_file", ""))
+    #     self.segment_overlay_file_input.setText(settings.value("segment_overlay_file", ""))
+    #     self.end_duration_input.setValue(int(settings.value("end_duration", 15)))
+    #     self.font_path_input.setText(settings.value("font_path", ""))
+    #     self.font_size_input.setValue(int(settings.value("font_size", 24)))
+    #     self.ffmpeg_bin_input.setText(settings.value("ffmpeg_bin", "ffmpeg"))
+
+
 
 
 

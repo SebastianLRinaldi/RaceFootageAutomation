@@ -5,6 +5,7 @@ from main import Dashboard
 from src.apps import * 
 from src.helpers import *
 
+
 # class AppConnector:
 #     projectbasescreen: ProjectBaseScreen
 
@@ -20,7 +21,11 @@ from src.helpers import *
 #         for name, wrapper in self.apps.items():
 #             setattr(self, name.lower(), wrapper)
 
+
+
+
 class AppConnector:
+    
     project_base_screen: ProjectBaseScreen
     project_editor: ProjectEditor
 
@@ -28,10 +33,10 @@ class AppConnector:
     def __init__(self, main: Dashboard, apps: dict[str, object]):
         self.main = main
         self.apps = apps
+
         self.init_connections()
-
         self.project_base_screen.layout.open_project_btn.clicked.connect(self.load_project_into_editor)
-
+    
     def init_connections(self):
         for name, wrapper in self.apps.items():
             setattr(self, name.lower(), wrapper)
@@ -63,12 +68,11 @@ class AppConnector:
 
         for name, subpath in targets:
             sub_ui = getattr(self.project_editor.layout, name)
-            tree = getattr(sub_ui, "file_tree")
-            path = os.path.join(full_path , subpath)
+            tree = getattr(sub_ui.layout, "file_tree")
+            path = os.path.join(full_path, subpath)
             fileTreeLoader(tree, path)
 
-        
-
-
-        
         self.main.switch_to("project_editor")
+
+
+

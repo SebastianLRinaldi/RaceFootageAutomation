@@ -3,6 +3,7 @@ import os
 BASE_DIRS = [
     # os.path.join("src", "apps"),
     os.path.join("src", "components"),
+    os.path.join("src", "modules"),
 ]
 
 IMPORTABLES = ["layout", "logic", "connections"]

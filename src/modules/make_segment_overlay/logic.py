@@ -13,6 +13,7 @@ from tqdm import tqdm
 from .layout import Layout
 # from src.components import YourNeededLayoutLogicConnection
 from src.helpers import *
+from src.components import *
 
 
 # Config
@@ -296,6 +297,31 @@ class OverlayWorker(QThread):
 class Logic:
     def __init__(self, ui: Layout):
         self.ui = ui
+
+        self.SETTINGS_FIELDS = [
+            ("width", "width_input", int, 1920),
+            ("height", "height_input", int, 1080),
+            ("fps", "fps_input", float, 59.94),
+            ("output_dir", "output_dir_input", str, ""),
+            ("bar_file", "bar_file_input", str, ""),
+            ("dot_file", "dot_file_input", str, ""),
+            ("dot_avi_file", "dot_avi_file_input", str, ""),
+            ("segment_overlay_file", "segment_overlay_file_input", str, ""),
+            ("end_duration", "end_duration_input", int, 15),
+            ("font_path", "font_path_input", str, ""),
+            ("font_size", "font_size_input", int, 24),
+            ("ffmpeg_bin", "ffmpeg_bin_input", str, "ffmpeg"),
+        ]
+
+
+        # In __init__ or setup:
+        self.settings_handler = SettingsHandler(self.ui, self.SETTINGS_FIELDS, app="SegmentOverlayApp")
+        self.settings_handler.load()
+        self.settings_handler.connect_autosave()
+
+
+
+        
     def generate_overlay(self):
         self.ui.generate_button.setEnabled(False)
         self.ui.status_label.setText("Processing...")
@@ -313,3 +339,4 @@ class Logic:
         QMessageBox.critical(self, "Error", msg)
         self.ui.status_label.setText("❌ Failed")
         self.ui.generate_button.setEnabled(True)
+

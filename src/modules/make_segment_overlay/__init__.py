@@ -1,3 +1,9 @@
+
+from PyQt6.QtCore import *
+from PyQt6.QtWidgets import * 
+from PyQt6.QtGui import *
+
+
 from .layout import Layout
 from .logic import Logic
 from .connections import Connections
