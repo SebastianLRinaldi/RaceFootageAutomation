@@ -134,20 +134,21 @@ class Layout(UiManager):
         self.progress.setRange(0, 0)
         self.progress.setVisible(False)
 
-        self.canvas_width_input.setValue(1920)
-        self.canvas_height_input.setValue(1080)
+        # self.canvas_width_input.setValue(1920)
+        # self.canvas_height_input.setValue(1080)
 
-        self.padding_top_input.setValue(10)
-        self.padding_bottom_input.setValue(10)
-        self.padding_left_input.setValue(10)
-        self.padding_right_input.setValue(10)
+        # self.padding_top_input.setValue(10)
+        # self.padding_bottom_input.setValue(10)
+        # self.padding_left_input.setValue(10)
+        # self.padding_right_input.setValue(10)
 
-        self.fps_input.setValue(59.94)
-        self.use_gpu_checkbox.setChecked(True)
+        # self.fps_input.setValue(59.94)
+        # self.use_gpu_checkbox.setChecked(True)
 
-        self.start_duration_input.setValue(5)
-        self.end_duration_input.setValue(15)
+        # self.start_duration_input.setValue(5)
+        # self.end_duration_input.setValue(15)
 
-        self.output_video_file_input.logic.setText("Table_Overlay_(6-20-25)-R2.mp4")
-        self.font_path_input.logic.setText("C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF")
-        self.font_size_input.setValue(64)
+        # self.output_video_file_input.logic.setText("Table_Overlay_(6-20-25)-R2.mp4")
+        # self.font_path_input.logic.setText("C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF")
+        # self.font_size_input.setValue(64)
+

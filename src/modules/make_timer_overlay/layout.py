@@ -116,19 +116,19 @@ class Layout(UiManager):
         self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.button.setText("Generate Timer Overlay")
 
-        # Defaults from your logic
-        self.width_input.setValue(800)
-        self.height_input.setValue(600)
-        self.fps_input.setValue(59.94)
-        self.use_gpu_input.setChecked(True)
+        # # Defaults from your logic
+        # self.width_input.setValue(800)
+        # self.height_input.setValue(600)
+        # self.fps_input.setValue(59.94)
+        # self.use_gpu_input.setChecked(True)
 
-        self.max_time_input.setValue(25.0)
-        self.start_duration_input.setValue(5)
-        self.end_duration_input.setValue(15)
+        # self.max_time_input.setValue(25.0)
+        # self.start_duration_input.setValue(5)
+        # self.end_duration_input.setValue(15)
 
-        self.font_path_input.logic.setText("C:/Users/epics/AppData/Local/Microsoft/Windows/Fonts/NIS-Heisei-Mincho-W9-Condensed.TTF")
-        self.font_size_input.setValue(64)
-        self.center_offset_input.setValue(80)
+        # self.font_path_input.logic.setText("C:/Users/epics/AppData/Local/Microsoft/Windows/Fonts/NIS-Heisei-Mincho-W9-Condensed.TTF")
+        # self.font_size_input.setValue(64)
+        # self.center_offset_input.setValue(80)
 
-        self.output_video_input.setText("Timer_Overlay_(6-20-25)-R2.mp4")
-        self.output_temp_input.setText("timer_temp.mp4")
+        # self.output_video_input.setText("Timer_Overlay_(6-20-25)-R2.mp4")
+        # self.output_temp_input.setText("timer_temp.mp4")

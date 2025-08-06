@@ -111,15 +111,15 @@ class Layout(UiManager):
         self.button_add.setText("Add GPX File")
         self.button_generate.setText("Generate All Overlays")
 
-        # Config values from your logic
-        self.gpx_dir_input.logic.setText("F:/_Small/344 School Python/TrackFootageEditor/RaceStorage/(6-20-25)-R2")
-        self.fps_input.setValue(59.94)
-        self.duration_input.setValue(0)  # leave 0 = auto from file
+        # # Config values from your logic
+        # self.gpx_dir_input.logic.setText("F:/_Small/344 School Python/TrackFootageEditor/RaceStorage/(6-20-25)-R2")
+        # self.fps_input.setValue(59.94)
+        # self.duration_input.setValue(0)  # leave 0 = auto from file
 
-        self.frame_width_input.setValue(640)
-        self.frame_height_input.setValue(480)
+        # self.frame_width_input.setValue(640)
+        # self.frame_height_input.setValue(480)
 
-        self.radius_input.setValue(200)
-        self.scale_input.setValue(200)
+        # self.radius_input.setValue(200)
+        # self.scale_input.setValue(200)
 
-        self.max_val_input.setValue(2.0)
+        # self.max_val_input.setValue(2.0)

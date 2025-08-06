@@ -15,7 +15,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 from src.core.gui.ui_manager import *
-
+from src.helpers import *
 
 class Layout(QWidget):
     def __init__(self, initial_path="", parent=None):
@@ -24,7 +24,6 @@ class Layout(QWidget):
         self.line_edit = QLineEdit(self)
         self.line_edit.setText(initial_path)
         self.browse_button = QPushButton("Browse", self)
-        # self.browse_button.clicked.connect(self.browse)
         self.layout.addWidget(self.line_edit)
         self.layout.addWidget(self.browse_button)
 

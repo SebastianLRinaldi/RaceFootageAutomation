@@ -11,7 +11,7 @@ class Logic:
         
     def browse(self):
         # Customize filter as needed
-        path, _ = QFileDialog.getExistingDirectory(self, "Select Directory")  
+        path, _ = QFileDialog.getExistingDirectory(self.ui, "Select Directory")  
         # or QFileDialog.getOpenFileName for files
         if path:
             self.ui.line_edit.setText(path)

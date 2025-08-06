@@ -41,6 +41,25 @@ class Logic:
     def __init__(self, ui: Layout):
         self.ui = ui
 
+        SETTINGS_FIELDS = [
+            ("gpx_dir", self.ui.gpx_dir_input.logic, str, "F:/_Small/344 School Python/TrackFootageEditor/RaceStorage/(6-20-25)-R2"),
+            ("fps", self.ui.fps_input, float, 59.94),
+            ("duration", self.ui.duration_input, int, 0),  # 0 = auto from file
+
+            ("frame_width", self.ui.frame_width_input, int, 640),
+            ("frame_height", self.ui.frame_height_input, int, 480),
+
+            ("radius", self.ui.radius_input, int, 200),
+            ("scale", self.ui.scale_input, int, 200),
+
+            ("max_val", self.ui.max_val_input, float, 2.0),
+        ]
+
+        
+        self.settings_handler = SettingsHandler(SETTINGS_FIELDS, app="make_telem_overlay")
+        self.settings_handler.load()
+        self.settings_handler.connect_autosave()
+
 
     # 1️⃣ Parse GPX acceleration data with timestamps
     def parse_gpx_accel(gpx_file):

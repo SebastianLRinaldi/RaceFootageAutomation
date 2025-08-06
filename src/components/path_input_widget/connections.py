@@ -6,3 +6,5 @@ class Connections:
         self.ui = ui
         self.logic = logic
 
+        self.ui.browse_button.clicked.connect(self.logic.browse)
+

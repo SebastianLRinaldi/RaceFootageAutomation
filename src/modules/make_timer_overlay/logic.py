@@ -64,6 +64,31 @@ class Logic:
     def __init__(self, ui: Layout):
         self.ui = ui
 
+
+
+        SETTINGS_FIELDS = [
+            ("width", self.ui.width_input, int, 800),
+            ("height", self.ui.height_input, int, 600),
+            ("fps", self.ui.fps_input, float, 59.94),
+            ("use_gpu", self.ui.use_gpu_input, bool, True),
+
+            ("max_time", self.ui.max_time_input, float, 25.0),
+            ("start_duration", self.ui.start_duration_input, int, 5),
+            ("end_duration", self.ui.end_duration_input, int, 15),
+
+            ("font_path", self.ui.font_path_input.logic, str, "C:/Users/epics/AppData/Local/Microsoft/Windows/Fonts/NIS-Heisei-Mincho-W9-Condensed.TTF"),
+            ("font_size", self.ui.font_size_input, int, 64),
+            ("center_offset", self.ui.center_offset_input, int, 80),
+
+            ("output_video", self.ui.output_video_input, str, "Timer_Overlay_(6-20-25)-R2.mp4"),
+            ("output_temp", self.ui.output_temp_input, str, "timer_temp.mp4"),
+        ]
+
+        
+        self.settings_handler = SettingsHandler(SETTINGS_FIELDS, app="make_timer_overlay")
+        self.settings_handler.load()
+        self.settings_handler.connect_autosave()
+
     def draw_centered_text(draw, text, pos=TEXT_POSITIONS):
         fill = pos["fill"]
         x = pos.get("x", WIDTH // 2)

@@ -298,24 +298,23 @@ class Logic:
     def __init__(self, ui: Layout):
         self.ui = ui
 
-        self.SETTINGS_FIELDS = [
-            ("width", "width_input", int, 1920),
-            ("height", "height_input", int, 1080),
-            ("fps", "fps_input", float, 59.94),
-            ("output_dir", "output_dir_input", str, ""),
-            ("bar_file", "bar_file_input", str, ""),
-            ("dot_file", "dot_file_input", str, ""),
-            ("dot_avi_file", "dot_avi_file_input", str, ""),
-            ("segment_overlay_file", "segment_overlay_file_input", str, ""),
-            ("end_duration", "end_duration_input", int, 15),
-            ("font_path", "font_path_input", str, ""),
-            ("font_size", "font_size_input", int, 24),
-            ("ffmpeg_bin", "ffmpeg_bin_input", str, "ffmpeg"),
+        SETTINGS_FIELDS = [
+            ("width", self.ui.width_input, int, 1920),
+            ("height", self.ui.height_input, int, 1080),
+            ("fps", self.ui.fps_input, float, 59.94),
+            ("output_dir", self.ui.output_dir_input.layout.line_edit, str, ""),
+            ("bar_file", self.ui.bar_file_input.layout.line_edit, str, ""),
+            ("dot_file", self.ui.dot_file_input.layout.line_edit, str, ""),
+            ("dot_avi_file", self.ui.dot_avi_file_input.layout.line_edit, str, ""),
+            ("segment_overlay_file", self.ui.segment_overlay_file_input.layout.line_edit, str, ""),
+            ("end_duration", self.ui.end_duration_input, int, 15),
+            ("font_path", self.ui.font_path_input.layout.line_edit, str, ""),
+            ("font_size", self.ui.font_size_input, int, 24),
+            ("ffmpeg_bin", self.ui.ffmpeg_bin_input.layout.line_edit, str, "ffmpeg"),
         ]
 
 
-        # In __init__ or setup:
-        self.settings_handler = SettingsHandler(self.ui, self.SETTINGS_FIELDS, app="SegmentOverlayApp")
+        self.settings_handler = SettingsHandler(SETTINGS_FIELDS, app="SegmentOverlayApp")
         self.settings_handler.load()
         self.settings_handler.connect_autosave()
 

@@ -91,6 +91,32 @@ class Logic:
         self.ui = ui
 
 
+        SETTINGS_FIELDS = [
+            ("canvas_width", self.ui.canvas_width_input, int, 1920),
+            ("canvas_height", self.ui.canvas_height_input, int, 1080),
+
+            ("padding_top", self.ui.padding_top_input, int, 10),
+            ("padding_bottom", self.ui.padding_bottom_input, int, 10),
+            ("padding_left", self.ui.padding_left_input, int, 10),
+            ("padding_right", self.ui.padding_right_input, int, 10),
+
+            ("fps", self.ui.fps_input, float, 59.94),
+            ("use_gpu", self.ui.use_gpu_checkbox, bool, True),
+
+            ("start_duration", self.ui.start_duration_input, int, 5),
+            ("end_duration", self.ui.end_duration_input, int, 15),
+
+            ("output_video_file", self.ui.output_video_file_input.logic, str, "Table_Overlay_(6-20-25)-R2.mp4"),
+            ("font_path", self.ui.font_path_input.logic, str, r"C:\Users\epics\AppData\Local\Microsoft\Windows\Fonts\NIS-Heisei-Mincho-W9-Condensed.TTF"),
+            ("font_size", self.ui.font_size_input, int, 64),
+        ]
+
+        # In __init__ or setup:
+        self.settings_handler = SettingsHandler(SETTINGS_FIELDS, app="make_table_overlay")
+        self.settings_handler.load()
+        self.settings_handler.connect_autosave()
+
+
 
     def pick_output_file(self):
         suggested_path = Path("F:/GoProExports")
