@@ -41,6 +41,8 @@ class SettingsHandler:
     def __init__(self, fields, org="MyCompany", app="MyApp"):
         self.fields = fields
         self.settings = QSettings(org, app)
+        self.load()
+        self.connect_autosave()
 
     def _setter(self, w):
         # If it has setChecked method, treat as checkbox
@@ -85,3 +87,4 @@ class SettingsHandler:
                 sig.connect(lambda _, w=widget, k=key, g=getter: self.settings.setValue(k, g()))
             except Exception as e:
                 print(f"[Connect error] {key}: {e}")
+

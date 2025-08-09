@@ -15,7 +15,7 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 from src.core.gui.ui_manager import *
-from src.helpers import *
+from src.helper_functions import *
 
 class Layout(QWidget):
     def __init__(self, initial_path="", parent=None):

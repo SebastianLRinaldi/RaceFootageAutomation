@@ -1,9 +1,10 @@
 import os
 import sys
+import re
 
 from main import Dashboard
 from src.apps import * 
-from src.helpers import *
+from src.helper_functions import *
 
 class AppConnector:
     
@@ -17,43 +18,53 @@ class AppConnector:
 
         self.init_connections()
         self.project_base_screen.layout.open_project_btn.clicked.connect(self.load_project_into_editor)
+
     
     def init_connections(self):
         for name, wrapper in self.apps.items():
             setattr(self, name.lower(), wrapper)
 
-    def load_path_and_name_into_editor(self):
+    def set_project_path_and_name_into_editor(self):
         selected_items = self.project_base_screen.layout.project_list.selectedItems()
         if not selected_items:
             return
         project_name = selected_items[0].text()
-        full_path = os.path.join(self.project_base_screen.logic.directory, project_name)
+        project_path = os.path.join(self.project_base_screen.logic.directory, project_name)
 
         self.project_editor.layout.project_name_label.setText(project_name)
-        self.project_editor.layout.project_path_label.setText(full_path)
+        self.project_editor.layout.project_path_label.setText(project_path)
 
-        return full_path
+        return project_name, project_path
+
+
 
     def load_project_into_editor(self):
-        full_path = self.load_path_and_name_into_editor()
+        project_name, project_path = self.set_project_path_and_name_into_editor()
 
         targets = [
-            ("gatherracetimes", "Race Times/"),
-            ("makestreamviewer", "Raw Footage/"),
-            ("makemergedfootage", "Raw Footage/"),
-            ("makesegmentoverlay", "Segment Overlay/"),
-            ("maketableoverlay", "Table Overlay/"),
-            ("maketelemoverlay", "Telemetry Overlay/"),
-            ("maketimeroverlay", "Timer Overlay/")
+            ("gatherracetimes", "Race Times"),
+            ("makestreamviewer", "Raw Footage"),
+            ("makemergedfootage", "Raw Footage"),
+            ("makesegmentoverlay", "Segment Overlay"),
+            ("maketableoverlay", "Table Overlay"),
+            ("maketelemoverlay", "Telemetry Overlay"),
+            ("maketimeroverlay", "Timer Overlay")
         ]
 
-        for name, subpath in targets:
-            sub_ui = getattr(self.project_editor.layout, name)
-            tree = getattr(sub_ui.layout, "file_tree")
-            path = os.path.join(full_path, subpath)
-            fileTreeLoader(tree, path)
+        for name, module_name in targets:
+            module = getattr(self.project_editor.layout, name)
+
+            tree = getattr(module.layout, "file_tree")
+
+            module_path = os.path.join(project_path, module_name)
+
+
+            fileTreeLoader(tree, module_path)
+
+            if hasattr(module, "logic") and hasattr(module.logic, "project_directory"):
+
+                module.logic.project_directory.set_up_directory(project_name, project_path, module_path)
+
 
         self.main.switch_to("project_editor")
-
-
 

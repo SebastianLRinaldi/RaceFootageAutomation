@@ -6,4 +6,4 @@ class Connections:
         self.ui = ui
         self.logic = logic
 
-        self.ui.save_button.clicked.connect(lambda: self.logic.process_and_save(self.ui.text_area.toHtml()))
+        self.ui.save_button.clicked.connect(self.logic.process_and_store_lap_times)

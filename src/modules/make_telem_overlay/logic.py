@@ -11,8 +11,8 @@ import numpy as np
 
 from .layout import Layout
 from src.components import *
-from src.helpers import *
-
+from src.helper_functions import *
+from src.helper_classes import *
 
 
 
@@ -40,9 +40,10 @@ https://goprotelemetryextractor.com/free/#
 class Logic:
     def __init__(self, ui: Layout):
         self.ui = ui
+        self.project_directory = ProjectDirectory()
 
         SETTINGS_FIELDS = [
-            ("gpx_dir", self.ui.gpx_dir_input.logic, str, "F:/_Small/344 School Python/TrackFootageEditor/RaceStorage/(6-20-25)-R2"),
+            ("gpx_dir", self.ui.gpx_dir_input.layout.line_edit, str, "F:/_Small/344 School Python/TrackFootageEditor/RaceStorage/(6-20-25)-R2"),
             ("fps", self.ui.fps_input, float, 59.94),
             ("duration", self.ui.duration_input, int, 0),  # 0 = auto from file
 

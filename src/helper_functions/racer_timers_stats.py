@@ -3,11 +3,10 @@ import csv
 import statistics 
 
 # 1. Get Racer Times
-def get_racer_times(racer_name):
-    filename, _ = QFileDialog.getSaveFileName(None, "Save CSV", "outputFiles", "CSV Files (*.csv);;All Files (*)")
-    if filename:
+def get_racer_times(racer_name, lap_times_csv_path):
+    if lap_times_csv_path:
     
-        with open(filename, newline='') as csvfile:
+        with open(lap_times_csv_path, newline='') as csvfile:
             reader = csv.DictReader(csvfile)
             if racer_name not in reader.fieldnames:
                 print("Racer name not found")

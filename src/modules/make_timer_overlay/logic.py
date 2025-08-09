@@ -20,8 +20,8 @@ import cProfile
 
 from .layout import Layout
 from src.components import *
-from src.helpers import *
-
+from src.helper_functions import *
+from src.helper_classes import *
 
 # Config
 WIDTH = 800
@@ -63,6 +63,7 @@ TEXT_POSITIONS = {
 class Logic:
     def __init__(self, ui: Layout):
         self.ui = ui
+        self.project_directory = ProjectDirectory()
 
 
 
@@ -76,7 +77,7 @@ class Logic:
             ("start_duration", self.ui.start_duration_input, int, 5),
             ("end_duration", self.ui.end_duration_input, int, 15),
 
-            ("font_path", self.ui.font_path_input.logic, str, "C:/Users/epics/AppData/Local/Microsoft/Windows/Fonts/NIS-Heisei-Mincho-W9-Condensed.TTF"),
+            ("font_path", self.ui.font_path_input.layout.line_edit, str, "C:/Users/epics/AppData/Local/Microsoft/Windows/Fonts/NIS-Heisei-Mincho-W9-Condensed.TTF"),
             ("font_size", self.ui.font_size_input, int, 64),
             ("center_offset", self.ui.center_offset_input, int, 80),
 

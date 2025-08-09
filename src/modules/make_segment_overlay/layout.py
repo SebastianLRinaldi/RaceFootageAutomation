@@ -15,15 +15,17 @@ class Layout(UiManager):
 
     
     output_dir_input: PathInputWidget  # custom widget with QLineEdit + directory browse button
-    bar_file_input: PathInputWidget  # custom widget with QLineEdit + file browse button (filter for video)
-    dot_file_input: PathInputWidget  # same as above
-    dot_avi_file_input: PathInputWidget  # same
-    segment_overlay_file_input: PathInputWidget  # same
+
 
     end_duration_input: QSpinBox  # range 1–600 seconds
 
     font_path_input: PathInputWidget  # file browse with font file filter (.ttf, .otf)
     font_size_input: QSpinBox  # range 8–72
+
+    bar_file_name: QLineEdit  # custom widget with QLineEdit + file browse button (filter for video)
+    dot_file_name: QLineEdit   # same as above
+    dot_avi_file_name: QLineEdit   # same
+    segment_overlay_rendered_name: QLineEdit   # same
 
     ffmpeg_bin_input: PathInputWidget  # file browse for executable
 
@@ -65,10 +67,10 @@ class Layout(UiManager):
                             
                             self.box("vertical", "File Paths", [
                                     self.form([
-                                        ("Bar File", self.bar_file_input.layout),
-                                        ("Dot File", self.dot_file_input.layout),
-                                        ("Dot AVI File", self.dot_avi_file_input.layout),
-                                        ("Segment Overlay File", self.segment_overlay_file_input.layout),
+                                        ("Bar File Name", self.bar_file_name),
+                                        ("Dot File Name", self.dot_file_name),
+                                        ("Dot AVI File Name", self.dot_avi_file_name),
+                                        ("Segment Overlay File Name", self.segment_overlay_rendered_name),
                                     ])
                                 ]),
                             

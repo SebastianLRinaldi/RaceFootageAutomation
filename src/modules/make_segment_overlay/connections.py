@@ -6,8 +6,6 @@ class Connections:
         self.ui = ui
         self.logic = logic
 
-        print("CONNECTIONS ARE ON")
-
 
         self.ui.generate_button.clicked.connect(self.logic.generate_overlay)
         # self.logic.worker.finished.connect(self.logic.on_finished)

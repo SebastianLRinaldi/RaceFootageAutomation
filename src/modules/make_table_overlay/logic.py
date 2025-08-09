@@ -19,7 +19,8 @@ from tqdm import tqdm
 
 from .layout import Layout
 from src.components import *
-from src.helpers import *
+from src.helper_functions import *
+from src.helper_classes import *
 
 
 # Configs
@@ -89,6 +90,7 @@ sys.path.append("F:/_Small/344 School Python/TrackFootageEditor")
 class Logic:
     def __init__(self, ui: Layout):
         self.ui = ui
+        self.project_directory = ProjectDirectory()
 
 
         SETTINGS_FIELDS = [
@@ -106,8 +108,8 @@ class Logic:
             ("start_duration", self.ui.start_duration_input, int, 5),
             ("end_duration", self.ui.end_duration_input, int, 15),
 
-            ("output_video_file", self.ui.output_video_file_input.logic, str, "Table_Overlay_(6-20-25)-R2.mp4"),
-            ("font_path", self.ui.font_path_input.logic, str, r"C:\Users\epics\AppData\Local\Microsoft\Windows\Fonts\NIS-Heisei-Mincho-W9-Condensed.TTF"),
+            ("output_video_file", self.ui.output_video_file_input.layout.line_edit, str, "Table_Overlay_(6-20-25)-R2.mp4"),
+            ("font_path", self.ui.font_path_input.layout.line_edit, str, r"C:\Users\epics\AppData\Local\Microsoft\Windows\Fonts\NIS-Heisei-Mincho-W9-Condensed.TTF"),
             ("font_size", self.ui.font_size_input, int, 64),
         ]
 

@@ -7,11 +7,13 @@ import subprocess
 
 from .layout import Layout
 from src.components import *
-from src.helpers import *
+from src.helper_functions import *
+from src.helper_classes import *
 
 class Logic:
     def __init__(self, ui: Layout):
         self.ui = ui
+        self.project_directory = ProjectDirectory()
 
 
     def open_file_dialog(self):

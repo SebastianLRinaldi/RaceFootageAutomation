@@ -8,7 +8,7 @@ import shutil
 from .layout import Layout
 from src.components import *
 from src.modules import *
-from src.helpers import *
+from src.helper_functions import *
 
 class Logic:
     def __init__(self, ui: Layout):
@@ -19,7 +19,7 @@ class Logic:
 
         self.tree_model = QFileSystemModel()
         self.tree_model.setReadOnly(False)
-        self.tree_model.setRootPath('C:/')  # Or whatever folder you want
+        self.tree_model.setRootPath('C:\\')  # Or whatever folder you want
         self.ui.project_tree.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop )
         self.ui.project_tree.setDefaultDropAction(Qt.DropAction.MoveAction)
         self.ui.project_tree.setDragEnabled(True)
@@ -116,6 +116,12 @@ class Logic:
             subdirs = ["Race Times", "Table Overlay", "Telemetry Overlay", "Timer Overlay", "Segment Overlay", "Final Footage", "Raw Footage", ]
             for sub in subdirs:
                 os.makedirs(os.path.join(path, sub))
+
+            # Create config file: {project_name}.json
+            config_filename = f"{name}.json"
+            config_path = os.path.join(path, config_filename)
+            create_config(config_path, initial_data={"project_name": name})
+
             return path, None
         except Exception as e:
             return None, str(e)
