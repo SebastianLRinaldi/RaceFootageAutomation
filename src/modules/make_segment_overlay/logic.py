@@ -83,57 +83,111 @@ class Logic():
         self.project_directory = ProjectDirectory()
 
 
+        self.width = 1920
+        self.height = 120
+        self.fps = 59.94
+        
+
+        self.end_duration = 15
+        self.font_path = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"
+        self.font_size = 24
+        
+        self.bar_file_name = "bar_overlay.mp4"
+        self.dot_file_name = "dot_overlay.mp4"
+        self.dot_avi_file_name = "dot_overlay.avi"
+        self.rendered_name = f"Segment_Overlay_{self.project_directory.project_name}.mp4"
+
+
+        self.ffmpeg_bin = "ffmpeg"
+
+        self.font = ImageFont.truetype(self.font_path, self.font_size)
+
+
+        
         SETTINGS_FIELDS = [
-            ("width", self.ui.width_input, int, 1920),
-            ("height", self.ui.height_input, int, 1080),
-            ("fps", self.ui.fps_input, float, 59.94),
-            ("output_dir", self.ui.output_dir_input.layout.line_edit, str, f"{self.project_directory.module_path}"),
+            ("width", self.ui.width_input, int, self.width),
+            ("height", self.ui.height_input, int, self.height),
+            ("fps", self.ui.fps_input, float, self.fps),
 
-            ("end_duration", self.ui.end_duration_input, int, 15),
-            ("font_path", self.ui.font_path_input.layout.line_edit, str, "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"),
-            ("font_size", self.ui.font_size_input, int, 24),
+            ("end_duration", self.ui.end_duration_input, int, self.end_duration),
+            ("font_path", self.ui.font_path_input.layout.line_edit, str, self.font_path ),
+            ("font_size", self.ui.font_size_input, int, self.font_size),
             
-            ("bar_file_name", self.ui.bar_file_name, str, "bar_overlay.mp4"),
-            ("dot_file_name", self.ui.dot_file_name, str, "dot_overlay.mp4"),
-            ("dot_avi_file_name", self.ui.dot_avi_file_name, str, "dot_overlay.avi"),
-            ("segment_overlay_rendered_name", self.ui.segment_overlay_rendered_name, str, "Segment_Overlay_Project_Name.mp4"),
+            ("bar_file_name", self.ui.bar_file_name, str, self.bar_file_name),
+            ("dot_file_name", self.ui.dot_file_name, str, self.dot_file_name),
+            ("dot_avi_file_name", self.ui.dot_avi_file_name, str, self.dot_avi_file_name),
+            ("rendered_name", self.ui.rendered_file_name, str, self.rendered_name),
 
-            ("ffmpeg_bin", self.ui.ffmpeg_bin_input.layout.line_edit, str, "ffmpeg"),
+            ("ffmpeg_bin", self.ui.ffmpeg_bin_input.layout.line_edit, str, self.ffmpeg_bin),
         ]
 
 
-        self.settings_handler = SettingsHandler(SETTINGS_FIELDS, app="SegmentOverlayApp")
+        self.settings_handler = SettingsHandler(SETTINGS_FIELDS, target=self, app="SegmentOverlayApp")
 
 
 
-        cfg = read_settings(SETTINGS_FIELDS)
 
-        self.width = int(cfg["width"])
-        self.height = int(cfg["height"])
-        self.fps = float(cfg["fps"])
-        self.project_directory.module_path = cfg["output_dir"]
+        # SETTINGS_FIELDS = [
+        #     ("width", self.ui.width_input, int, 1920),
+        #     ("height", self.ui.height_input, int, 1080),
+        #     ("fps", self.ui.fps_input, float, 59.94),
+        #     ("output_dir", self.ui.output_dir_input.layout.line_edit, str, f"{self.project_directory.module_path}"),
+
+        #     ("end_duration", self.ui.end_duration_input, int, 15),
+        #     ("font_path", self.ui.font_path_input.layout.line_edit, str, "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"),
+        #     ("font_size", self.ui.font_size_input, int, 24),
+            
+        #     ("bar_file_name", self.ui.bar_file_name, str, "bar_overlay.mp4"),
+        #     ("dot_file_name", self.ui.dot_file_name, str, "dot_overlay.mp4"),
+        #     ("dot_avi_file_name", self.ui.dot_avi_file_name, str, "dot_overlay.avi"),
+        #     ("segment_overlay_rendered_name", self.ui.segment_overlay_rendered_name, str, "Segment_Overlay_Project_Name.mp4"),
+
+        #     ("ffmpeg_bin", self.ui.ffmpeg_bin_input.layout.line_edit, str, "ffmpeg"),
+        # ]
+
+
+        # self.settings_handler = SettingsHandler(SETTINGS_FIELDS, app="SegmentOverlayApp")
+
+
+
+        # cfg = read_settings(SETTINGS_FIELDS)
+
+        # self.width = int(cfg["width"])
+        # self.height = int(cfg["height"])
+        # self.fps = float(cfg["fps"])
+        # self.project_directory.module_path = cfg["output_dir"]
         
 
-        self.end_duration = int(cfg["end_duration"])
-        self.font_path = cfg["font_path"]
-        self.font_size = int(cfg["font_size"])
+        # self.end_duration = int(cfg["end_duration"])
+        # self.font_path = cfg["font_path"]
+        # self.font_size = int(cfg["font_size"])
         
-        self.bar_file_name = cfg["bar_file_name"]
-        self.dot_file_name = cfg["dot_file_name"]
-        self.dot_avi_file_name = cfg["dot_avi_file_name"]
-        self.rendered_name = cfg["segment_overlay_rendered_name"]
+        # self.bar_file_name = cfg["bar_file_name"]
+        # self.dot_file_name = cfg["dot_file_name"]
+        # self.dot_avi_file_name = cfg["dot_avi_file_name"]
+        # self.rendered_name = cfg["segment_overlay_rendered_name"]
 
 
-        self.ffmpeg_bin = cfg["ffmpeg_bin"]
+        # self.ffmpeg_bin = cfg["ffmpeg_bin"]
 
-        self.font = ImageFont.truetype(self.font_path, self.font_size)
+        # self.font = ImageFont.truetype(self.font_path, self.font_size)
+
+
+
+
+
+
+
+
+
+
 
     def set_project_name(self, project_name):
         self.project_directory.project_name = project_name
 
     def set_root(self, path):
         self.project_directory.module_path = path
-        set_widget_value(self.ui.output_dir_input.layout.line_edit, self.project_directory.module_path)
+        set_widget_value(self.ui.rendered_path_input.layout.line_edit, self.project_directory.module_path)
         
     def generate_overlay(self):
         self.ui.generate_button.setEnabled(False)
@@ -366,17 +420,27 @@ class Logic():
         writer.release()
 
     def make_dot_and_bar(self):
+        bar_file = self.project_directory.make_asset_path(self.bar_file_name)
+        dot_file = self.project_directory.make_asset_path(self.dot_file_name)
 
-        print("Creating bar overlay...")
-        self.save_bar_video()
-
-        print("Creating dot overlay...")
-        self.save_dot_video_sync()
+        if not os.path.isfile(bar_file):
+            print("Creating bar overlay...")
+            self.save_bar_video()
+        if not os.path.isfile(dot_file):
+            print("Creating dot overlay...")
+            self.save_dot_video_sync()
 
 
     def run_ffmpeg_overlay(self):
-        print(f"TIMES: {self.project_directory.lap_times}")
+        print(self.settings_handler)
+        input("STOP")
+        print(self.settings_handler)
+        input("GO")
         self.make_dot_and_bar()
+
+        print(f"\nNAME: {self.bar_file_name}")
+        print(f"\nNAME: {self.dot_file_name}")
+        print(f"\nNAME: {self.rendered_name}")
         
         cmd = [
             self.ffmpeg_bin, "-y",
@@ -389,9 +453,9 @@ class Logic():
             
             "-rc", "vbr",
             "-cq", "18", 
-            self.project_directory.module_path
+            self.project_directory.make_rendered_path(self.rendered_name),
         ]
         print("Running ffmpeg overlay...")
         subprocess.run(cmd, check=True)
-        print(f"✅ Overlay done: {self.project_directory.module_path}")
+        print(f"✅ Overlay done: {self.project_directory.make_rendered_path(self.rendered_name)}")
 

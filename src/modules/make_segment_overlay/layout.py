@@ -13,10 +13,6 @@ class Layout(UiManager):
     height_input: QSpinBox  # set max > config HEIGHT (e.g. 10000)
     fps_input: QDoubleSpinBox  # range 0.1–120.0, decimals=2
 
-    
-    output_dir_input: PathInputWidget  # custom widget with QLineEdit + directory browse button
-
-
     end_duration_input: QSpinBox  # range 1–600 seconds
 
     font_path_input: PathInputWidget  # file browse with font file filter (.ttf, .otf)
@@ -25,7 +21,7 @@ class Layout(UiManager):
     bar_file_name: QLineEdit  # custom widget with QLineEdit + file browse button (filter for video)
     dot_file_name: QLineEdit   # same as above
     dot_avi_file_name: QLineEdit   # same
-    segment_overlay_rendered_name: QLineEdit   # same
+    rendered_file_name: QLineEdit   # same
 
     ffmpeg_bin_input: PathInputWidget  # file browse for executable
 
@@ -70,13 +66,7 @@ class Layout(UiManager):
                                         ("Bar File Name", self.bar_file_name),
                                         ("Dot File Name", self.dot_file_name),
                                         ("Dot AVI File Name", self.dot_avi_file_name),
-                                        ("Segment Overlay File Name", self.segment_overlay_rendered_name),
-                                    ])
-                                ]),
-                            
-                            self.box("vertical", "Output Settings", [
-                                    self.form([
-                                        ("Output Directory", self.output_dir_input.layout),
+                                        ("Segment Overlay File Name", self.rendered_file_name),
                                     ])
                                 ]),
                             

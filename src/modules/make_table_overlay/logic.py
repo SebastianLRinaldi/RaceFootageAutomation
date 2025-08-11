@@ -109,15 +109,12 @@ class Logic:
             ("end_duration", self.ui.end_duration_input, int, 15),
 
             ("output_video_file", self.ui.output_video_file_input.layout.line_edit, str, "Table_Overlay_(6-20-25)-R2.mp4"),
-            ("font_path", self.ui.font_path_input.layout.line_edit, str, r"C:\Users\epics\AppData\Local\Microsoft\Windows\Fonts\NIS-Heisei-Mincho-W9-Condensed.TTF"),
+            ("font_path", self.ui.font_path_input.layout.line_edit, str, r"C:\\Users\\epics\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"),
             ("font_size", self.ui.font_size_input, int, 64),
         ]
 
         # In __init__ or setup:
         self.settings_handler = SettingsHandler(SETTINGS_FIELDS, app="make_table_overlay")
-        self.settings_handler.load()
-        self.settings_handler.connect_autosave()
-
 
 
     def pick_output_file(self):
