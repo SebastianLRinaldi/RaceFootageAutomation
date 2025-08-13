@@ -8,28 +8,33 @@ from src.components import *
 
 class Layout(UiManager):
 
-    label: QLabel
-    button: QPushButton
+    status_label: QLabel
+    generate_button: QPushButton
 
     # Video settings
     width_input: QSpinBox
     height_input: QSpinBox
     fps_input: QDoubleSpinBox
-    use_gpu_input: QCheckBox
+    use_gpu_checkbox: QCheckBox
+    
 
     # Timing settings
-    max_time_input: QDoubleSpinBox
     start_duration_input: QDoubleSpinBox
     end_duration_input: QDoubleSpinBox
+
+    rendered_file_name: QLineEdit
 
     # Font/text settings
     font_path_input: PathInputWidget
     font_size_input: QSpinBox
-    center_offset_input: QSpinBox
+    
 
-    # Output settings
-    output_video_input: QLineEdit
-    output_temp_input: QLineEdit
+    max_time_input: QDoubleSpinBox
+    center_offset_input: QSpinBox
+    spacing_input : QSpinBox
+    lap_fill_color_input : ColorSelector
+    timer_fill_color_input : ColorSelector
+    stats_fill_color_input : ColorSelector
 
     file_tree: QTreeView
     
@@ -45,8 +50,8 @@ class Layout(UiManager):
             self.tabs(tab_labels=["Timer Creation", "Files", "Settings"], children=[
                 # Main tab
                 self.group("vertical", [
-                    "label",
-                    "button"
+                    "status_label",
+                    "generate_button"
                 ]),
 
                 self.box("vertical","Files", ["file_tree"]),
@@ -59,29 +64,38 @@ class Layout(UiManager):
                                 ("Width", "width_input"),
                                 ("Height", "height_input"),
                                 ("FPS", "fps_input"),
-                                ("Use GPU", "use_gpu_input"),
+                                ("Use GPU", "use_gpu_checkbox"),
                             ])
                         ]),
                         self.box("vertical", "Timing Settings", [
                             self.form([
-                                ("Max Time (sec)", "max_time_input"),
                                 ("Start Duration", "start_duration_input"),
                                 ("End Duration", "end_duration_input"),
                             ])
                         ]),
                         self.box("vertical", "Text Style Settings", [
                             self.form([
-                                ("Font Path", self.font_path_input.layout),
-                                ("Font Size", "font_size_input"),
-                                ("Center Offset", "center_offset_input"),
+                                ("Max Time (sec)", self.max_time_input),
+                                ("Center Offset", self.center_offset_input),
+                                ("Text Spacing", self.spacing_input),
+                                ("Lap Fill Color", self.lap_fill_color_input.layout),
+                                ("Timer Fill Color", self.timer_fill_color_input.layout),
+                                ("Status Fill Color", self.stats_fill_color_input.layout),
                             ])
                         ]),
+
                         self.box("vertical", "Output Settings", [
                             self.form([
-                                ("Final Output Video", "output_video_input"),
-                                ("Timer Temp File", "output_temp_input"),
+                                ("Output Video File", self.rendered_file_name),
                             ])
-                        ])
+                        ]),
+
+                        self.box("vertical", "Font Settings", [
+                            self.form([
+                                ("Font Path", self.font_path_input.layout),
+                                ("Font Size", "font_size_input"),
+                            ])
+                        ]),
                     ])
                 ])
             ])
@@ -112,9 +126,9 @@ class Layout(UiManager):
         self.center_offset_input.setRange(0, 1000)
 
     def set_widgets(self):
-        self.label.setText("Click to generate timer overlay")
-        self.label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.button.setText("Generate Timer Overlay")
+        self.status_label.setText("Click to generate timer overlay")
+        self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.generate_button.setText("Generate Timer Overlay")
 
         # # Defaults from your logic
         # self.width_input.setValue(800)
@@ -131,4 +145,4 @@ class Layout(UiManager):
         # self.center_offset_input.setValue(80)
 
         # self.output_video_input.setText("Timer_Overlay_(6-20-25)-R2.mp4")
-        # self.output_temp_input.setText("timer_temp.mp4")
+

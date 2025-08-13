@@ -101,7 +101,6 @@ class Logic:
         self.ui = ui
         self.project_directory = ProjectDirectory()
 
-
         self.width = 1920
         self.height = 1080
         self.fps = 59.94
@@ -110,17 +109,16 @@ class Logic:
         self.start_duration = 5
         self.end_duration = 15
 
-
-        self.padding_top = 10
-        self.padding_bottom = 10
-        self.padding_left = 10
-        self.padding_right = 10
-
         self.rendered_name = f"Table_Overlay.mp4"
 
         self.font_path = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"
         self.font_size = 64
         self.font = ImageFont.truetype(self.font_path, self.font_size)
+
+        self.padding_top = 10
+        self.padding_bottom = 10
+        self.padding_left = 10
+        self.padding_right = 10
 
 
         # Dynamic headers and column widths - add more columns here

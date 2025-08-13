@@ -6,4 +6,5 @@ class Connections:
         self.ui = ui
         self.logic = logic
 
-        self.ui.generate_button.clicked.connect(self.logic.run_overlay_generation)
+        # self.ui.button.clicked.connect(self.logic.pick_color)
+

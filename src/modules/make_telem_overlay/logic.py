@@ -25,19 +25,6 @@ from src.helper_functions import *
 from src.helper_classes import *
 
 
-
-# class WorkerThread(QThread):
-#     finished = pyqtSignal(str)
-
-#     def __init__(self, gpx_file, logic: 'Logic'):
-#         super().__init__()
-#         self.logic = logic  # store the Logic instance
-
-
-#     def run(self):
-#         self.logic.generate_overlay_video()
-#         self.finished.emit(self.output_file)
-
 class OverlayWorker(QThread):
     finished = pyqtSignal()
     error = pyqtSignal(str, str)
@@ -78,11 +65,7 @@ class Logic:
         self.max_val = 2.0
 
         self.rendered_name = f"Telemetry_Overlay.mp4"
-        self.asset_name = f"Telemetry_Overlay_Section.mp4"
-
-        self.processes = []
-        self.progress_queue = None
-        self.progress_timer = None
+        self.asset_name = f"_Telemetry_Overlay_Section.mp4"
         
 
         SETTINGS_FIELDS = [
@@ -135,38 +118,6 @@ class Logic:
 
         return df
 
-
-
-
-
-    # def parse_gpx_accel_streaming(gpx_file):
-    #     ns_gpx = 'http://www.topografix.com/GPX/1/1'
-    #     ns_acc = 'http://www.garmin.com/xmlschemas/AccelerationExtension/v1'
-
-    #     times, x_vals, y_vals, z_vals = [], [], [], []
-
-    #     # Setup iterparse to only pull trkpt elements, avoid full tree load
-    #     context = etree.iterparse(gpx_file, events=('end',), tag=f'{{{ns_gpx}}}trkpt')
-
-    #     for event, elem in context:
-    #         time_elem = elem.find(f'{{{ns_gpx}}}time')
-    #         acc_elem = elem.find(f'.//{{{ns_acc}}}accel')
-
-    #         if time_elem is not None and acc_elem is not None:
-    #             times.append(time_elem.text)
-    #             x_vals.append(float(acc_elem.get('x')))
-    #             y_vals.append(float(acc_elem.get('y')))
-    #             z_vals.append(float(acc_elem.get('z')))
-
-    #         # Free memory for processed element
-    #         elem.clear()
-    #         while elem.getprevious() is not None:
-    #             del elem.getparent()[0]
-
-    #     times = pd.to_datetime(times)
-    #     df = pd.DataFrame({'time': times, 'x': x_vals, 'y': y_vals, 'z': z_vals})
-    #     df['time_sec'] = (df['time'] - df['time'].iloc[0]).dt.total_seconds()
-    #     return df
 
 
     # 2️⃣ EMA smoothing
@@ -256,14 +207,6 @@ class Logic:
         print(f"Saved overlay video: {output_file}")
 
 
-
-
-    # def add_file(self):
-    #     files, _ = QFileDialog.getOpenFileNames(self.ui, "Select GPX Files", "", "GPX Files (*.gpx)")
-    #     for file in files:
-    #         if file and file not in [self.ui.file_list.item(i).text() for i in range(self.ui.file_list.count())]:
-    #             self.ui.file_list.addItem(file)
-
     def add_file(self):
         files, _ = QFileDialog.getOpenFileNames(self.ui, "Select GPX Files - Will Move to Assets Folder", "", "GPX Files (*.gpx)")
         target_dir = self.project_directory.asset_path
@@ -291,7 +234,7 @@ class Logic:
         self.ui.generate_button.setEnabled(False)
 
     def on_finished(self):
-        QMessageBox.information(self.ui, "Overlay Done", f"Generated: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
+        QMessageBox.information(self.ui, "Overlay Done", f"Generated: {self.project_directory.make_asset_file_path(self.asset_name)}")
         self.ui.status_label.setText(f"✅ Done: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
 
         if all(not t.isRunning() for t in self.threads):
@@ -305,112 +248,3 @@ class Logic:
         self.ui.status_label.setText(f"❌ Failed: {err_type}")
         self.ui.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.ui.generate_button.setEnabled(True)
-
-#     def generate_all(self):
-#         gpx_files = [
-#             f for f in os.listdir(self.project_directory.asset_path)
-#             if f.lower().endswith(".gpx")
-#         ]
-#         if not gpx_files:
-#             QMessageBox.warning(self.ui, "No .gpx Files",
-#                 "Add some GPX files first to Telemetry Assets Folder.")
-#             return
-
-#         self.processes = []
-#         self.progress_queue = Queue()
-
-#         for gpx_file in gpx_files:
-#             full_path = os.path.join(self.project_directory.asset_path, gpx_file)
-#             p = Process(
-#                 target=generate_overlay_video_process,
-#                 args=(full_path, self.asset_name, self.fps, self.progress_queue)
-#             )
-#             p.start()
-#             self.processes.append(p)
-
-#         self.progress_timer = QTimer()
-#         self.progress_timer.timeout.connect(self.check_progress)
-#         self.progress_timer.start(200)
-
-#         self.ui.status_label.setText("Generating overlays...")
-#         self.ui.generate_button.setEnabled(False)
-
-#     def check_progress(self):
-#         while not self.progress_queue.empty():
-#             event, gpx_file, data = self.progress_queue.get()
-
-#             if event == "progress":
-#                 percent = int(data * 100)
-#                 self.ui.status_label.setText(
-#                     f"{os.path.basename(gpx_file)}: {percent}%"
-#                 )
-
-#             elif event == "done":
-#                 self.ui.status_label.setText(
-#                     f"✅ Done: {os.path.basename(gpx_file)}"
-#                 )
-
-#             elif event == "error":
-#                 self.ui.status_label.setText(
-#                     f"❌ Error in {os.path.basename(gpx_file)}"
-#                 )
-#                 print(data)
-
-#         # stop when all processes done
-#         if all(not p.is_alive() for p in self.processes):
-#             self.progress_timer.stop()
-#             self.ui.generate_button.setEnabled(True)
-#             QMessageBox.information(self.ui, "Done",
-#                 "All overlay videos generated.")
-
-#     # src/overlay_process.py
-# def generate_overlay_video_process(gpx_file, asset_name, fps, progress_queue):
-#     try:
-#         ns = {'gpxacc': 'http://www.garmin.com/xmlschemas/AccelerationExtension/v1'}
-#         tree = ET.parse(gpx_file)
-#         root = tree.getroot()
-
-#         times, x_vals, y_vals, z_vals = [], [], [], []
-#         for trkpt in root.findall('.//{http://www.topografix.com/GPX/1/1}trkpt'):
-#             time_elem = trkpt.find('{http://www.topografix.com/GPX/1/1}time')
-#             acc_elem = trkpt.find('.//gpxacc:accel', ns)
-#             if time_elem is not None and acc_elem is not None:
-#                 times.append(pd.to_datetime(time_elem.text))
-#                 x_vals.append(float(acc_elem.attrib['x']))
-#                 y_vals.append(float(acc_elem.attrib['y']))
-#                 z_vals.append(float(acc_elem.attrib['z']))
-
-#         df = pd.DataFrame({'time': times, 'x': x_vals, 'y': y_vals, 'z': z_vals})
-#         df['time_sec'] = (df['time'] - df['time'].iloc[0]).dt.total_seconds()
-
-#         output_file = gpx_file.replace(".gpx", asset_name)
-#         frame_width, frame_height = 640, 480
-#         center_x, center_y = frame_width // 2, frame_height // 2
-#         radius = 200
-#         total_duration = 30
-#         total_frames = int(total_duration * fps)
-
-#         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-#         out = cv2.VideoWriter(output_file, fourcc, fps, (frame_width, frame_height))
-
-#         time_points = np.linspace(0, total_duration, total_frames)
-#         x_interp = np.interp(time_points, df['time_sec'], df['x'])
-#         y_interp = np.interp(time_points, df['time_sec'], df['y'])
-#         z_interp = np.interp(time_points, df['time_sec'], df['z'])
-
-#         for i in range(total_frames):
-#             frame = np.zeros((frame_height, frame_width, 3), dtype=np.uint8)
-#             cv2.circle(frame, (center_x, center_y), radius, (255, 255, 255), 2)
-#             dot_x = int(center_x + x_interp[i] * 200)
-#             dot_y = int(center_y - y_interp[i] * 200)
-#             cv2.circle(frame, (dot_x, dot_y), 15, (0, 255, 0), -1)
-#             out.write(frame)
-
-#             if i % 200 == 0:
-#                 progress_queue.put(("progress", gpx_file, i / total_frames))
-
-#         out.release()
-#         progress_queue.put(("done", gpx_file, output_file))
-
-#     except Exception:
-#         progress_queue.put(("error", gpx_file, traceback.format_exc()))

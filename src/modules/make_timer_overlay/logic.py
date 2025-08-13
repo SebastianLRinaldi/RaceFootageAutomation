@@ -17,45 +17,44 @@ from tqdm import tqdm
 
 import cProfile
 
-
 from .layout import Layout
 from src.components import *
 from src.helper_functions import *
 from src.helper_classes import *
 
-# Config
-WIDTH = 800
-HEIGHT = 600
-MAX_TIME = 25.000  # seconds
+# # Config
+# WIDTH = 800
+# HEIGHT = 600
+# MAX_TIME = 25.000  # seconds
 
-FPS = 59.94
-USE_GPU = True
-START_DURATION = 5  # seconds blank start screen
-END_DURATION = 15  # seconds hold last frame
-OUTPUT_VIDEO_FILE = "Timer_Overlay_(6-20-25)-R2.mp4"
-OUTPUT_COUNTUP_TIMER = "timer_temp.mp4"
+# FPS = 59.94
+# USE_GPU = True
+# START_DURATION = 5  # seconds blank start screen
+# END_DURATION = 15  # seconds hold last frame
+# OUTPUT_VIDEO_FILE = "Timer_Overlay_(6-20-25)-R2.mp4"
+# OUTPUT_COUNTUP_TIMER = "timer_temp.mp4"
 
-FONT_PATH = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"
-FONT_SIZE = 64
+# FONT_PATH = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"
+# FONT_SIZE = 64
 
 
-import sys
-sys.path.append("F:/_Small/344 School Python/TrackFootageEditor")
+# import sys
+# sys.path.append("F:/_Small/344 School Python/TrackFootageEditor")
 # from GatherRaceTimes.anaylsis_of_a_racers_times import get_racer_times, best_lap_deltas
 
 # LAP_TIMES = get_racer_times("F:\\_Small\\344 School Python\\TrackFootageEditor\\RaceStorage\\(6-20-25)-R2\\lap_times(6-20-25)-R2.csv", "EpicX18 GT9")
 
 
-FONT = ImageFont.truetype(FONT_PATH, FONT_SIZE)
+# FONT = ImageFont.truetype(FONT_PATH, FONT_SIZE)
 
-DISTANCE_FROM_CENTER = 80
+# DISTANCE_FROM_CENTER = 80
 
 
-TEXT_POSITIONS = {
-    "lap": {"x": WIDTH // 2, "y": HEIGHT // 2 - DISTANCE_FROM_CENTER, "fill": (255, 255, 255)},
-    "timer": {"x": WIDTH // 2, "y": HEIGHT // 2 , "fill": (0, 255, 0)},
-    "stats": {"start_y": HEIGHT // 2-DISTANCE_FROM_CENTER, "spacing": 70, "fill": (0, 255, 0)},
-}
+# TEXT_POSITIONS = {
+#     "lap": {"x": WIDTH // 2, "y": HEIGHT // 2 - DISTANCE_FROM_CENTER, "fill": (255, 255, 255)},
+#     "timer": {"x": WIDTH // 2, "y": HEIGHT // 2 , "fill": (0, 255, 0)},
+#     "stats": {"start_y": HEIGHT // 2-DISTANCE_FROM_CENTER, "spacing": 70, "fill": (0, 255, 0)},
+# }
 
 
 
@@ -65,49 +64,75 @@ class Logic:
         self.ui = ui
         self.project_directory = ProjectDirectory()
 
+        self.width = 800
+        self.height = 600
+        self.fps = 59.94
+        self.use_gpu = True
+
+        self.start_duration = 5
+        self.end_duration = 15
+
+        self.rendered_name = f"Timer_Overlay.mp4"
+        self.asset_name = f"timer_temp.mp4"
+
+        self.font_path = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"
+        self.font_size = 64
+        self.font = ImageFont.truetype(self.font_path, self.font_size)
+
+
+        self.max_time = 25.000
+        self.distance_from_center = 80
+        self.spacing = 70
+        self.lap_fill_color = (255, 255, 255)
+        self.timer_fill_color = (0, 255, 0)
+        self.stats_fill_color = (0, 255, 0)
+
 
 
         SETTINGS_FIELDS = [
-            ("width", self.ui.width_input, int, 800),
-            ("height", self.ui.height_input, int, 600),
-            ("fps", self.ui.fps_input, float, 59.94),
-            ("use_gpu", self.ui.use_gpu_input, bool, True),
+            ("width", self.ui.width_input, int, self.width),
+            ("height", self.ui.height_input, int, self.height),
+            ("fps", self.ui.fps_input, float, self.fps),
+            ("use_gpu", self.ui.use_gpu_checkbox, bool, self.use_gpu),
 
-            ("max_time", self.ui.max_time_input, float, 25.0),
-            ("start_duration", self.ui.start_duration_input, int, 5),
-            ("end_duration", self.ui.end_duration_input, int, 15),
+            ("start_duration", self.ui.start_duration_input, int, self.start_duration),
+            ("end_duration", self.ui.end_duration_input, int, self.end_duration),
 
-            ("font_path", self.ui.font_path_input.layout.line_edit, str, "C:/Users/epics/AppData/Local/Microsoft/Windows/Fonts/NIS-Heisei-Mincho-W9-Condensed.TTF"),
-            ("font_size", self.ui.font_size_input, int, 64),
-            ("center_offset", self.ui.center_offset_input, int, 80),
+            ("rendered_name", self.ui.rendered_file_name, str, self.rendered_name),
+            
+            ("font_path", self.ui.font_path_input.layout.line_edit, str, self.font_path ),
+            ("font_size", self.ui.font_size_input, int, self.font_size),
+            ("center_offset", self.ui.center_offset_input, int, self.distance_from_center),
 
-            ("output_video", self.ui.output_video_input, str, "Timer_Overlay_(6-20-25)-R2.mp4"),
-            ("output_temp", self.ui.output_temp_input, str, "timer_temp.mp4"),
+            ("Max Time (sec)", self.ui.max_time_input, float, self.max_time),
+            ("Center Offset", self.ui.center_offset_input, int, self.distance_from_center),
+            ("Text Spacing", self.ui.spacing_input, int, self.spacing),
+            ("Lap Fill Color", self.ui.lap_fill_color_input.layout, tuple[int, int, int], self.lap_fill_color),
+            ("Timer Fill Color", self.ui.timer_fill_color_input.layout, tuple[int, int, int], self.timer_fill_color),
+            ("Status Fill Color", self.ui.stats_fill_color_input.layout, tuple[int, int, int], self.stats_fill_color),
         ]
-
         
         self.settings_handler = SettingsHandler(SETTINGS_FIELDS, app="make_timer_overlay")
-        self.settings_handler.load()
-        self.settings_handler.connect_autosave()
 
-    def draw_centered_text(draw, text, pos=TEXT_POSITIONS):
-        fill = pos["fill"]
-        x = pos.get("x", WIDTH // 2)
+
+    # def draw_centered_text(draw, text, pos=TEXT_POSITIONS):
+    #     fill = pos["fill"]
+    #     x = pos.get("x", WIDTH // 2)
         
-        if isinstance(text, list):
-            start_y = pos["start_y"]
-            spacing = pos["spacing"]
-            for i, text in enumerate(text):
-                text_bbox = FONT.getbbox(text)
-                text_w = text_bbox[2] - text_bbox[0]
-                text_h = text_bbox[3] - text_bbox[1]
-                y = start_y + i * spacing
-                draw.text((x - text_w // 2, y), text, font=FONT, fill=fill)
-        else:
-            text_bbox = FONT.getbbox(text)
-            text_w = text_bbox[2] - text_bbox[0]
-            y = pos["y"]
-            draw.text((x - text_w // 2, y), text, font=FONT, fill=fill)
+    #     if isinstance(text, list):
+    #         start_y = pos["start_y"]
+    #         spacing = pos["spacing"]
+    #         for i, text in enumerate(text):
+    #             text_bbox = FONT.getbbox(text)
+    #             text_w = text_bbox[2] - text_bbox[0]
+    #             text_h = text_bbox[3] - text_bbox[1]
+    #             y = start_y + i * spacing
+    #             draw.text((x - text_w // 2, y), text, font=FONT, fill=fill)
+    #     else:
+    #         text_bbox = FONT.getbbox(text)
+    #         text_w = text_bbox[2] - text_bbox[0]
+    #         y = pos["y"]
+    #         draw.text((x - text_w // 2, y), text, font=FONT, fill=fill)
 
     def draw_center_cross_hair(draw):
         # Red crosshair lines
@@ -354,11 +379,11 @@ class Logic:
 
     def run_overlay_generation(self):
         self.ui.label.setText("Generating... Please wait.")
-        self.ui.button.setEnabled(False)
+        self.ui.generate_button.setEnabled(False)
         try:
             main()
             self.ui.label.setText("✅ Done. Overlay saved.")
         except Exception as e:
             self.ui.label.setText(f"❌ Error: {str(e)}")
         finally:
-            self.ui.button.setEnabled(True)
+            self.ui.generate_button.setEnabled(True)

@@ -117,18 +117,30 @@ class SettingsHandler:
     def _setter(self, w):
         if hasattr(w, "setChecked"):
             return "setChecked"
-        return "setValue" if hasattr(w, "setValue") else "setText"
+        if hasattr(w, "setValue"):
+            return "setValue"
+        if hasattr(w, "setText"):
+            return "setText"
+        raise AttributeError(f"No compatible setter found for {type(w).__name__}")
 
     def _getter(self, w):
         if hasattr(w, "isChecked"):
             return "isChecked"
-        return "value" if hasattr(w, "valueChanged") else "text"
+        if hasattr(w, "valueChanged"):
+            return "value"
+        if hasattr(w, "text"):
+            return "text"
+        raise AttributeError(f"No compatible getter found for {type(w).__name__}")
 
     def _signal(self, w):
         if hasattr(w, "stateChanged"):
             return w.stateChanged
-        return w.valueChanged if hasattr(w, "valueChanged") else w.textChanged
-
+        if hasattr(w, "valueChanged"):
+            return w.valueChanged
+        if hasattr(w, "textChanged"):
+            return w.textChanged
+        raise AttributeError(f"No compatible signal found for {type(w).__name__}")
+    
     def load(self):
         for key, widget, cast, default in self.fields:
             if not widget:
