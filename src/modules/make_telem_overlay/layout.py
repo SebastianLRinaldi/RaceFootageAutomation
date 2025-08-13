@@ -9,25 +9,24 @@ from src.components import *
 
 class Layout(UiManager):
 
-    # GPX settings
-    gpx_dir_input: PathInputWidget  # folder picker for GPX file directory
 
     fps_input: QDoubleSpinBox
-    duration_input: QDoubleSpinBox
 
     # Overlay appearance
-    frame_width_input: QSpinBox
-    frame_height_input: QSpinBox
+    width_input: QSpinBox
+    height_input: QSpinBox
+
+    rendered_file_name: QLineEdit
     scale_input: QSpinBox
     radius_input: QSpinBox
 
     max_val_input: QDoubleSpinBox
 
     # UI
-    label: QLabel
-    file_list: QListWidget
+    status_label: QLabel
+
     button_add: QPushButton
-    button_generate: QPushButton
+    generate_button: QPushButton
 
     file_tree: QTreeView
     
@@ -41,10 +40,9 @@ class Layout(UiManager):
         layout_data = [
             self.tabs(tab_labels=["GPX Generator", "Files", "Settings"], children=[
                 self.group("vertical", [
-                    "label",
-                    "file_list",
+                    "status_label",
                     "button_add",
-                    "button_generate"
+                    "generate_button"
                 ]),
 
                 self.box("vertical","Files", ["file_tree"]),
@@ -54,16 +52,20 @@ class Layout(UiManager):
 
                         self.box("vertical", "General", [
                             self.form([
-                                ("GPX Directory", self.gpx_dir_input.layout),
                                 ("FPS", "fps_input"),
-                                ("Duration (sec)", "duration_input"),
                             ])
                         ]),
 
                         self.box("vertical", "Video Frame", [
                             self.form([
-                                ("Frame Width", "frame_width_input"),
-                                ("Frame Height", "frame_height_input"),
+                                ("Frame Width", "width_input"),
+                                ("Frame Height", "height_input"),
+                            ])
+                        ]),
+
+                        self.box("vertical", "Output Settings", [
+                            self.form([
+                                ("Output Video File", self.rendered_file_name),
                             ])
                         ]),
 
@@ -93,11 +95,9 @@ class Layout(UiManager):
     def set_properties(self):
         self.fps_input.setRange(0.1, 240.0)
         self.fps_input.setDecimals(2)
-        self.duration_input.setRange(0.0, 600.0)
-        self.duration_input.setDecimals(2)
 
-        self.frame_width_input.setMaximum(10000)
-        self.frame_height_input.setMaximum(10000)
+        self.width_input.setMaximum(10000)
+        self.height_input.setMaximum(10000)
 
         self.scale_input.setMaximum(10000)
         self.radius_input.setMaximum(10000)
@@ -107,9 +107,9 @@ class Layout(UiManager):
 
     def set_widgets(self):
         # Main UI
-        self.label.setText("Queued files:")
+        self.status_label.setText("Queued files:")
         self.button_add.setText("Add GPX File")
-        self.button_generate.setText("Generate All Overlays")
+        self.generate_button.setText("Generate All Overlays")
 
         # # Config values from your logic
         # self.gpx_dir_input.logic.setText("F:/_Small/344 School Python/TrackFootageEditor/RaceStorage/(6-20-25)-R2")

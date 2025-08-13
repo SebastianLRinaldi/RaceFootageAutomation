@@ -11,6 +11,7 @@ class ProjectDirectory():
         self.config_path: str = ""
         self.lap_times: list = []
         self.lap_times_csv = None
+        self.lap_time_deltas = None
 
         self.rendered_path : str = ""
         self.asset_path: str = ""
@@ -34,14 +35,25 @@ class ProjectDirectory():
     def update_lap_times(self):
         self.lap_times_csv = get_config_value(self.config_path, "lap_time_csv")
         self.lap_times = get_config_value(self.config_path, "lap_time_list")
+        self.lap_time_deltas = get_config_value(self.config_path, "lap_time_deltas")
         
 
-    def make_asset_path(self, filename: str) -> str:
+    def make_asset_file_path(self, filename: str) -> str:
         if not os.path.exists(self.asset_path):
             os.makedirs(self.asset_path, exist_ok=True)
         return os.path.join(self.asset_path, filename)
 
-    def make_rendered_path(self, filename: str) -> str:
+    def make_rendered_file_path(self, filename: str) -> str:
         if not os.path.exists(self.rendered_path):
             os.makedirs(self.rendered_path, exist_ok=True)
         return os.path.join(self.rendered_path, filename)
+
+    def make_asset_path(self) -> str:
+        if not os.path.exists(self.asset_path):
+            os.makedirs(self.asset_path, exist_ok=True)
+        return self.asset_path
+
+    def make_rendered_path(self) -> str:
+        if not os.path.exists(self.rendered_path):
+            os.makedirs(self.rendered_path, exist_ok=True)
+        return self.rendered_path

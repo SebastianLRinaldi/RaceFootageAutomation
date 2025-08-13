@@ -97,6 +97,11 @@ class SettingsHandler:
         self.load()
         self.connect_autosave()
 
+    def reset_settings(self):
+        self.settings.clear()
+        self.load()
+        
+
 
     def __repr__(self):
         lines = []

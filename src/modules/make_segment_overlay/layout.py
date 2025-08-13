@@ -9,6 +9,8 @@ from src.components import *
 
 class Layout(UiManager):
 
+    reset_segment_settings: QPushButton
+
     width_input: QSpinBox  # set max > config WIDTH (e.g. 10000)
     height_input: QSpinBox  # set max > config HEIGHT (e.g. 10000)
     fps_input: QDoubleSpinBox  # range 0.1–120.0, decimals=2
@@ -51,6 +53,8 @@ class Layout(UiManager):
 
                 
                 self.scroll([
+                    self.reset_segment_settings,
+                    
                     self.group("vertical", [
                             self.box("vertical", "Video Settings", [
                                     self.form([

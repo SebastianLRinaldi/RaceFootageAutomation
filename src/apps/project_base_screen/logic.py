@@ -110,9 +110,16 @@ class Logic:
 
         try:
             os.makedirs(path)
-            subdirs = ["Race Times", "Table Overlay", "Telemetry Overlay", "Timer Overlay", "Segment Overlay", "Final Footage", "Raw Footage", ]
+            subdirs = ["Race Times", "Final Footage", "Raw Footage"] 
             for sub in subdirs:
                 os.makedirs(os.path.normpath(os.path.join(path, sub)))
+                
+            subdirs = ["Table Overlay", "Telemetry Overlay", "Timer Overlay", "Segment Overlay",  ]
+            for sub in subdirs:
+                main_sub_path = os.path.join(path, sub)
+                os.makedirs(main_sub_path)
+                os.makedirs(os.path.join(main_sub_path, "assets"))
+                os.makedirs(os.path.join(main_sub_path, "rendered"))
 
             # Create config file: {project_name}.json
             config_filename = f"{name}.json"

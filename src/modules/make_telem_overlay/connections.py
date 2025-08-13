@@ -8,5 +8,5 @@ class Connections:
 
 
         self.ui.button_add.clicked.connect(self.logic.add_file)
-        self.ui.button_generate.clicked.connect(self.logic.generate_all)
+        self.ui.generate_button.clicked.connect(self.logic.generate_all)
         # self.logic.thread.finished.connect(self.logic.on_finished)

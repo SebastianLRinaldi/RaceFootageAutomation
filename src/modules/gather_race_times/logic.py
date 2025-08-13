@@ -30,6 +30,7 @@ class Logic:
         self.processed_lap_times = None
         self.lap_time_csv_path = None
         self.lap_times = None
+        self.lap_time_deltas = None
     
 
     def process_lap_times(self): 
@@ -62,6 +63,9 @@ class Logic:
         set_config_value(self.project_directory.config_path, "lap_time_csv", self.lap_time_csv_path)
         self.lap_times = get_racer_times('EpicX18 GT9', self.lap_time_csv_path)
         set_config_value(self.project_directory.config_path, "lap_time_list", self.lap_times)
+        self.lap_time_deltas = best_lap_deltas(self.lap_times)
+        
+        set_config_value(self.project_directory.config_path, "lap_time_deltas", self.lap_time_deltas)
 
     def process_and_store_lap_times(self):
         self.process_lap_times()

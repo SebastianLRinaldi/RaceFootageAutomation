@@ -9,12 +9,11 @@ from src.components import *
 class Layout(UiManager):
 
     status_label: QLabel
-    pick_button: QPushButton
     generate_button: QPushButton
     progress: QProgressBar
 
-    canvas_width_input: QSpinBox
-    canvas_height_input: QSpinBox
+    width_input: QSpinBox
+    height_input: QSpinBox
 
     padding_top_input: QSpinBox
     padding_bottom_input: QSpinBox
@@ -27,7 +26,7 @@ class Layout(UiManager):
     start_duration_input: QSpinBox
     end_duration_input: QSpinBox
 
-    output_video_file_input: PathInputWidget
+    rendered_file_name: QLineEdit
 
     font_path_input: PathInputWidget
     font_size_input: QSpinBox
@@ -50,7 +49,6 @@ class Layout(UiManager):
             
             self.group(orientation="vertical", children=[
                 "status_label",
-                "pick_button",
                 "generate_button",
                 "progress"
             ]),
@@ -61,12 +59,13 @@ class Layout(UiManager):
                     self.group("vertical", [
                         self.box("vertical", "Canvas Settings", [
                             self.form([
-                                ("Canvas Width", "canvas_width_input"),
-                                ("Canvas Height", "canvas_height_input"),
+                                ("Width", "width_input"),
+                                ("Height", "height_input"),
                                 ("FPS", "fps_input"),
-                                ("Use GPU", "use_gpu_checkbox"),
                                 ("Start Duration", "start_duration_input"),
                                 ("End Duration", "end_duration_input"),
+                                ("Use GPU", "use_gpu_checkbox"),
+
                             ])
                         ]),
 
@@ -81,7 +80,7 @@ class Layout(UiManager):
 
                         self.box("vertical", "Output Settings", [
                             self.form([
-                                ("Output Video File", self.output_video_file_input.layout),
+                                ("Output Video File", self.rendered_file_name),
                             ])
                         ]),
 
@@ -110,8 +109,8 @@ class Layout(UiManager):
 
     def set_properties(self):
         # Reasonable ranges from your config or assumptions
-        self.canvas_width_input.setMaximum(10000)
-        self.canvas_height_input.setMaximum(10000)
+        self.width_input.setMaximum(10000)
+        self.height_input.setMaximum(10000)
 
         self.padding_top_input.setRange(0, 100)
         self.padding_bottom_input.setRange(0, 100)
@@ -128,9 +127,7 @@ class Layout(UiManager):
 
     def set_widgets(self):
         self.status_label.setText("Ready")
-        self.pick_button.setText("Set Output File")
         self.generate_button.setText("Generate Overlay")
-        self.generate_button.setEnabled(False)
         self.progress.setRange(0, 0)
         self.progress.setVisible(False)
 

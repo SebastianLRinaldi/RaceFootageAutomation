@@ -18,7 +18,7 @@ class AppConnector:
 
         self.init_connections()
         self.project_base_screen.layout.open_project_btn.clicked.connect(self.load_project_into_editor)
-
+        self.project_editor.layout.gatherracetimes.layout.save_button.clicked.connect(self.load_project_into_editor)
     
     def init_connections(self):
         for name, wrapper in self.apps.items():
@@ -40,6 +40,7 @@ class AppConnector:
 
     def load_project_into_editor(self):
         project_name, project_path = self.set_project_path_and_name_into_editor()
+
 
         targets = [
             ("gatherracetimes", "Race Times"),
@@ -64,7 +65,7 @@ class AppConnector:
             if hasattr(module, "logic") and hasattr(module.logic, "project_directory"):
 
                 module.logic.project_directory.set_up_directory(project_name, project_path, module_path)
-
+                # print(f"AFTER-SETUP {module_name}: {module.logic.project_directory}")
 
         self.main.switch_to("project_editor")
 
