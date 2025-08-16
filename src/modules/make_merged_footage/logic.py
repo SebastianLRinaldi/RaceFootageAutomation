@@ -10,6 +10,7 @@ from pathlib import Path
 from .layout import Layout
 from src.components import *
 from src.helper_functions import *
+from src.helper_classes import *
 
 class MergeThread(QThread):
     finished = pyqtSignal(str)
@@ -47,7 +48,26 @@ class MergeThread(QThread):
 class Logic:
     def __init__(self, ui: Layout):
         self.ui = ui
-        self.output_file_path = None  # Store output path here
+        self.project_directory = ProjectDirectory()
+
+        self.use_gpu = True
+
+        self.rendered_name = f"merged_footage.mp4"
+
+        self.external_source_dirs = []
+
+        SETTINGS_FIELDS = [
+            ("use_gpu", self.ui.use_gpu_checkbox, bool, self.use_gpu),
+            ("rendered_name", self.ui.rendered_file_name, str, self.rendered_name),
+            ("external_source_dirs", self.ui.external_source_dirs_input, str, self.external_source_dirs),
+        ]
+        
+        self.settings_handler = SettingsHandler(SETTINGS_FIELDS, target=self, app="merge_footage")
+
+
+
+
+        
 
     def pick_files(self):
         files, _ = QFileDialog.getOpenFileNames(self.ui, "Select MP4 Files", "", "Video Files (*.mp4)")
@@ -56,17 +76,17 @@ class Logic:
         self.update_default_output_path()
 
     def change_output_location(self):
-        base_path = Path("F:\\_Small\\344 School Python\\TrackFootageEditor\\RaceStorage")  # ← your preferred default folder
+        # base_path = Path("F:\\_Small\\344 School Python\\TrackFootageEditor\\RaceStorage")  # ← your preferred default folder
 
-        if not base_path.exists():
-            base_path = Path.home()  # fallback
+        # if not base_path.exists():
+        #     base_path = Path.home()  # fallback
 
-        default_name = self.output_file_path.name if self.output_file_path else "merged(MM-DD-YY)-R#.mp4"
-        file_dialog = QFileDialog(self.ui, "Select Output File")
-        file_dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
-        file_dialog.setNameFilter("MP4 Video (*.mp4)")
-        file_dialog.setDirectory(str(base_path))
-        file_dialog.selectFile(default_name)
+        # default_name = self.output_file_path.name if self.output_file_path else "merged(MM-DD-YY)-R#.mp4"
+        # file_dialog = QFileDialog(self.ui, "Select Output File")
+        # file_dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
+        # file_dialog.setNameFilter("MP4 Video (*.mp4)")
+        # file_dialog.setDirectory(str(base_path))
+        # file_dialog.selectFile(default_name)
 
         if file_dialog.exec():
             selected_files = file_dialog.selectedFiles()
@@ -83,9 +103,9 @@ class Logic:
             QMessageBox.warning(self.ui, "Error", "Add at least 2 videos to merge.")
             return
 
-        if not self.output_file_path:
-            QMessageBox.warning(self.ui, "Error", "Set output file location before merging.")
-            return
+        # if not self.output_file_path:
+        #     QMessageBox.warning(self.ui, "Error", "Set output file location before merging.")
+        #     return
 
         file_paths = [
             self.ui.list_widget.item(i).data(Qt.ItemDataRole.UserRole)
