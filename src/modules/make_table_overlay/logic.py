@@ -169,7 +169,7 @@ class Logic:
         ]
 
         # In __init__ or setup:
-        self.settings_handler = SettingsHandler(SETTINGS_FIELDS, app="make_table_overlay")
+        self.settings_handler = SettingsHandler(SETTINGS_FIELDS, target=self, app="make_table_overlay")
 
     def generate_overlay(self):
         self.ui.generate_button.setEnabled(False)
@@ -399,10 +399,10 @@ class Logic:
             self.create_blank_video(self.start_duration, start_blank)
             # create_headers_video(END_DURATION, filename)
             
-            print(f"lap_timed{self.project_directory.lap_times}")
-            print(f"lap_time_deltas{self.project_directory.lap_time_deltas}")
+            # print(f"lap_timed{self.project_directory.lap_times}")
+            # print(f"lap_time_deltas{self.project_directory.lap_time_deltas}")
 
-            print(f"len(lap_time_deltas)={len(self.project_directory.lap_time_deltas)} | len(lap_times)={len(self.project_directory.lap_times)}")
+            # print(f"len(lap_time_deltas)={len(self.project_directory.lap_time_deltas)} | len(lap_times)={len(self.project_directory.lap_times)}")
             last_lap_video = self.create_last_lap_table(len(self.project_directory.lap_times), temp_dir)
             # 2. Render laps in parallel
             lap_videos = [last_lap_video]

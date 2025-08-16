@@ -81,7 +81,7 @@ class Logic:
             ("max_val", self.ui.max_val_input, float, self.max_val),
         ]
 
-        self.settings_handler = SettingsHandler(SETTINGS_FIELDS, app="make_telem_overlay")
+        self.settings_handler = SettingsHandler(SETTINGS_FIELDS, target=self, app="make_telem_overlay")
 
         self.threads = []
     # 1️⃣ Parse GPX acceleration data with timestamps

@@ -38,14 +38,54 @@ def load_apps():
         if not os.path.isdir(full_path):
             continue
 
+        # try:
+        #     comp = importlib.import_module(f"{base}.{name}").Component()
+        #     for attr in comp.__class__.__annotations__:
+        #         if not hasattr(comp, attr):
+        #             raise AttributeError(f"{base}.{name}.Component missing '{attr}'")
+        #     widgets[name] = comp
+        # except Exception as e:
+        #     raise RuntimeError(f"Error in {base}.{name}: {e}")
+
         try:
             comp = importlib.import_module(f"{base}.{name}").Component()
-            for attr in comp.__class__.__annotations__:
+            # Check all annotated attributes
+            for attr in getattr(comp.__class__, "__annotations__", {}):
                 if not hasattr(comp, attr):
-                    raise AttributeError(f"{base}.{name}.Component missing '{attr}'")
+                    # Minimal error with file info
+                    raise AttributeError(
+                        f"{name}.Component missing attribute '{attr}' "
+                        f"(defined in {__file__})"
+                    )
             widgets[name] = comp
+
+        # except Exception as e:
+        # #     # Wrap in concise RuntimeError
+        #     # raise RuntimeError(f"{base}.{name} failed to load: {e}") from None
+
+
+        # except Exception as e:
+        #     # Grab the frame where the exception actually occurred
+        #     tb = e.__traceback__
+        #     while tb.tb_next:  # drill down to innermost frame
+        #         tb = tb.tb_next
+        #     exc_file = tb.tb_frame.f_code.co_filename
+        #     exc_line = tb.tb_lineno
+
+        #     raise RuntimeError(
+        #         f"{base}.{name} failed to load: {e}\n"
+        #         f'  File "{exc_file}", line {exc_line}'
+        #     ) from None
+            # Grab frame of the exception itself (no tb navigation)
         except Exception as e:
-            raise RuntimeError(f"Error in {base}.{name}: {e}")
+            exc_file = e.__traceback__.tb_frame.f_code.co_filename
+            exc_line = e.__traceback__.tb_lineno
+
+            raise RuntimeError(
+                f"{base}.{name} failed to load: \n"
+                f'  File "{exc_file}", line {exc_line}\n'
+                f'{e}'
+            ) from None
 
     return widgets
 

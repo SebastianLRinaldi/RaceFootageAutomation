@@ -14,6 +14,7 @@ from math import ceil
 from PIL import ImageFont, ImageDraw, Image
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from tqdm import tqdm
+import traceback
 
 import cProfile
 
@@ -56,7 +57,22 @@ from src.helper_classes import *
 #     "stats": {"start_y": HEIGHT // 2-DISTANCE_FROM_CENTER, "spacing": 70, "fill": (0, 255, 0)},
 # }
 
+class OverlayWorker(QThread):
+    finished = pyqtSignal()
+    error = pyqtSignal(str, str)
 
+    def __init__(self, logic: 'Logic'):
+        super().__init__()
+        self.logic = logic  # store the Logic instance
+
+    def run(self):
+        try:
+            self.logic.make_timer_overlay()  # call the instance method
+            self.finished.emit()
+        except Exception as e:
+            err_type = type(e).__name__
+            tb_str = traceback.format_exc()
+            self.error.emit(err_type, tb_str)
 
 
 class Logic:
@@ -65,7 +81,7 @@ class Logic:
         self.project_directory = ProjectDirectory()
 
         self.width = 800
-        self.height = 600
+        self.height  = 600
         self.fps = 59.94
         self.use_gpu = True
 
@@ -88,6 +104,13 @@ class Logic:
         self.stats_fill_color = (0, 255, 0)
 
 
+        # self.text_positions = {
+        #     "lap": {"x": self.width // 2, "y": self.width  // 2 - self.distance_from_center, "fill": self.lap_fill_color},
+        #     "timer": {"x": self.width  // 2, "y": self.width  // 2 , "fill": self.timer_fill_color},
+        #     "stats": {"start_y": self.width  // 2-self.distance_from_center, "spacing": 70, "fill": self.stats_fill_color},
+        # }
+
+
 
         SETTINGS_FIELDS = [
             ("width", self.ui.width_input, int, self.width),
@@ -102,48 +125,92 @@ class Logic:
             
             ("font_path", self.ui.font_path_input.layout.line_edit, str, self.font_path ),
             ("font_size", self.ui.font_size_input, int, self.font_size),
-            ("center_offset", self.ui.center_offset_input, int, self.distance_from_center),
+            
 
-            ("Max Time (sec)", self.ui.max_time_input, float, self.max_time),
-            ("Center Offset", self.ui.center_offset_input, int, self.distance_from_center),
-            ("Text Spacing", self.ui.spacing_input, int, self.spacing),
-            ("Lap Fill Color", self.ui.lap_fill_color_input.layout, tuple[int, int, int], self.lap_fill_color),
-            ("Timer Fill Color", self.ui.timer_fill_color_input.layout, tuple[int, int, int], self.timer_fill_color),
-            ("Status Fill Color", self.ui.stats_fill_color_input.layout, tuple[int, int, int], self.stats_fill_color),
+            ("max_time", self.ui.max_time_input, float, self.max_time),
+            ("distance_from_center", self.ui.center_offset_input, int, self.distance_from_center),
+            ("spacing", self.ui.spacing_input, int, self.spacing),
+            ("lap_fill_color", self.ui.lap_fill_color_input.logic, tuple[int, int, int], self.lap_fill_color),
+            ("timer_fill_color", self.ui.timer_fill_color_input.logic, tuple[int, int, int], self.timer_fill_color),
+            ("stats_fill_color", self.ui.stats_fill_color_input.logic, tuple[int, int, int], self.stats_fill_color),
         ]
         
-        self.settings_handler = SettingsHandler(SETTINGS_FIELDS, app="make_timer_overlay")
+        self.settings_handler = SettingsHandler(SETTINGS_FIELDS, target=self, app="make_timer_overlay")
 
+    # def __str__(self):
+    #     attrs = vars(self)
+    #     return "\n".join(f"{key}: {value}" for key, value in attrs.items())
 
-    # def draw_centered_text(draw, text, pos=TEXT_POSITIONS):
-    #     fill = pos["fill"]
-    #     x = pos.get("x", WIDTH // 2)
+    def __str__(self):
+        lines = []
+        for key, widget, cast, default in self.settings_handler.fields:
+            # Logic's attribute value
+            attr_val = getattr(self, key, "<no attr>")
+            
+            # Widget's current value
+            try:
+                getter_name = self.settings_handler._getter(widget)
+                widget_val = getattr(widget, getter_name)()
+            except Exception as e:
+                widget_val = f"<error: {e}>"
+            
+            lines.append(
+                f"{key}: Logic='{attr_val}' | Widget='{widget_val}'"
+            )
+        return "\n".join(lines)
+
+    
+
+    def generate_overlay(self):
+        self.ui.generate_button.setEnabled(False)
+        self.ui.status_label.setText("Generating Timer Overlay...")
+        self.ui.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.worker = OverlayWorker(self)
+        self.worker.finished.connect(self.on_finished)
+        self.worker.error.connect(self.on_error)
+        self.worker.start()
+
+    def on_finished(self):
+        self.ui.status_label.setText(f"✅ Done: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
+        self.ui.generate_button.setEnabled(True)
+
+    def on_error(self, err_type: str, tb_str: str):
+        msg = f"Exception type: {err_type}\n\nTraceback:\n{tb_str}"
+        print(msg)
+        QMessageBox.critical(self.ui, "Error", msg)
+        self.ui.status_label.setText(f"❌ Failed: {err_type}")
+        self.ui.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.ui.generate_button.setEnabled(True)
+
+    def draw_centered_text(self, draw, text, pos):
+        fill = pos["fill"]
+        x = pos.get("x", self.width // 2)
         
-    #     if isinstance(text, list):
-    #         start_y = pos["start_y"]
-    #         spacing = pos["spacing"]
-    #         for i, text in enumerate(text):
-    #             text_bbox = FONT.getbbox(text)
-    #             text_w = text_bbox[2] - text_bbox[0]
-    #             text_h = text_bbox[3] - text_bbox[1]
-    #             y = start_y + i * spacing
-    #             draw.text((x - text_w // 2, y), text, font=FONT, fill=fill)
-    #     else:
-    #         text_bbox = FONT.getbbox(text)
-    #         text_w = text_bbox[2] - text_bbox[0]
-    #         y = pos["y"]
-    #         draw.text((x - text_w // 2, y), text, font=FONT, fill=fill)
+        if isinstance(text, list):
+            start_y = pos["start_y"]
+            spacing = pos["spacing"]
+            for i, text in enumerate(text):
+                text_bbox = self.font.getbbox(text)
+                text_w = text_bbox[2] - text_bbox[0]
+                text_h = text_bbox[3] - text_bbox[1]
+                y = start_y + i * spacing
+                draw.text((x - text_w // 2, y), text, font=self.font, fill=fill)
+        else:
+            text_bbox = self.font.getbbox(text)
+            text_w = text_bbox[2] - text_bbox[0]
+            y = pos["y"]
+            draw.text((x - text_w // 2, y), text, font=self.font, fill=fill)
 
-    def draw_center_cross_hair(draw):
+    def draw_center_cross_hair(self, draw):
         # Red crosshair lines
         red = (255, 0, 0)
-        center_x = WIDTH // 2
-        center_y = HEIGHT // 2
+        center_x = self.width // 2
+        center_y = self.height // 2
         # Horizontal line
-        draw.line([(0, center_y), (WIDTH, center_y)], fill=red, width=5)
+        draw.line([(0, center_y), (self.width, center_y)], fill=red, width=5)
 
         # Vertical line
-        draw.line([(center_x, 0), (center_x, HEIGHT)], fill=red, width=5)
+        draw.line([(center_x, 0), (center_x, self.height)], fill=red, width=5)
 
         # Middle dot
         dot_radius = 5
@@ -154,28 +221,30 @@ class Logic:
 
 
 
-    def generate_timer_video():
-        total_frames = int(MAX_TIME * FPS)
+    def generate_timer_video(self):
+        total_frames = int(self.max_time * self.fps)
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        out = cv2.VideoWriter(OUTPUT_COUNTUP_TIMER, fourcc, FPS, (WIDTH, HEIGHT), True)
+        out = cv2.VideoWriter(self.asset_name, fourcc, self.fps, (self.width, self.height), True)
 
         for frame in tqdm(range(total_frames), desc="Rendering timer video"):
-            time_elapsed = frame / FPS
+            time_elapsed = frame / self.fps
             time_text = f"{time_elapsed:.3f} sec"
             # time_text = f"{time_elapsed:06.3f} sec"
 
-            img = Image.new("RGB", (WIDTH, HEIGHT), (0, 0, 0))  # Black background
+            img = Image.new("RGB", (self.width, self.height), (0, 0, 0))  # Black background
             draw = ImageDraw.Draw(img)
 
-            draw_centered_text(draw, time_text, TEXT_POSITIONS["timer"])
+            txt_pos = {"x": self.width  // 2, "y": self.width  // 2 , "fill": self.timer_fill_color}
+
+            self.draw_centered_text(draw, time_text, txt_pos)
 
             frame_bgr = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
             out.write(frame_bgr)
 
         out.release()
 
-    def preload_timer_frames():
-        cap = cv2.VideoCapture(OUTPUT_COUNTUP_TIMER)
+    def preload_timer_frames(self):
+        cap = cv2.VideoCapture(self.asset_name)
         frames = []
         while True:
             ret, frame = cap.read()
@@ -189,13 +258,15 @@ class Logic:
     """
     v3 7-20sec
     """
-    def create_lap_overlay(lap_number):
+    def create_lap_overlay(self, lap_number):
         lap_text = f"Lap {lap_number:02}"
 
-        img = Image.new("RGB", (WIDTH, HEIGHT), (0, 0, 0))  # black bg
+        img = Image.new("RGB", (self.width, self.height), (0, 0, 0))  # black bg
         draw = ImageDraw.Draw(img)
 
-        draw_centered_text(draw, lap_text, TEXT_POSITIONS["lap"])
+        txt_info = {"x": self.width // 2, "y": self.width  // 2 - self.distance_from_center, "fill": self.lap_fill_color}
+
+        self.draw_centered_text(draw, lap_text, txt_info)
         
         # Convert once to numpy BGR for direct overlay
         overlay = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
@@ -203,13 +274,13 @@ class Logic:
 
 
 
-    def create_lap_overlay_and_mask(lap_number):
-        lap_overlay = create_lap_overlay(lap_number)
+    def create_lap_overlay_and_mask(self, lap_number):
+        lap_overlay = self.create_lap_overlay(lap_number)
         lap_mask = np.any(lap_overlay != 0, axis=2).astype(np.uint8) * 255  # mask 0 or 255 for OpenCV
         return lap_overlay, lap_mask
 
-    def render_frame(lap_overlay, lap_mask, time_elapsed, timer_frames):
-        frame_idx = int(time_elapsed * FPS)
+    def render_frame(self, lap_overlay, lap_mask, time_elapsed, timer_frames):
+        frame_idx = int(time_elapsed * self.fps)
         if frame_idx >= len(timer_frames):
             frame_idx = len(timer_frames) - 1
 
@@ -220,32 +291,32 @@ class Logic:
 
         return base_frame
 
-    def render_lap_video(lap_number, lap_time, temp_dir, timer_frames):
+    def render_lap_video(self, lap_number, lap_time, temp_dir, timer_frames):
         filename = os.path.join(temp_dir, f"lap_{lap_number:02}.mp4")
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        writer = cv2.VideoWriter(filename, fourcc, FPS, (WIDTH, HEIGHT))
+        writer = cv2.VideoWriter(filename, fourcc, self.fps, (self.width, self.height))
 
-        lap_overlay, lap_mask = create_lap_overlay_and_mask(lap_number)
+        lap_overlay, lap_mask = self.create_lap_overlay_and_mask(lap_number)
 
-        frame_count = math.floor(FPS * lap_time) + 1
+        frame_count = math.floor(self.fps * lap_time) + 1
         for f in tqdm(range(frame_count), desc=f"Rendering Lap {lap_number}"):
-            t = f / FPS
-            frame = render_frame(lap_overlay, lap_mask, t, timer_frames)
+            t = f / self.fps
+            frame = self.render_frame(lap_overlay, lap_mask, t, timer_frames)
             writer.write(frame)
 
         writer.release()
         return filename
 
 
-    def create_end_stats(duration, filename):
-        frame_count = int(duration * FPS)
+    def create_end_stats(self, duration, filename):
+        frame_count = int(duration * self.fps)
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        writer = cv2.VideoWriter(filename, fourcc, FPS, (WIDTH, HEIGHT), True)
+        writer = cv2.VideoWriter(filename, fourcc, self.fps, (self.width, self.height), True)
 
         # Create a styled stats frame using PIL
-        img = Image.new("RGB", (WIDTH, HEIGHT), (0, 0, 0))
+        img = Image.new("RGB", (self.width, self.height), (0, 0, 0))
         draw = ImageDraw.Draw(img)
-        draw_stats(draw)
+        self.draw_stats(draw)
 
         frame_bgr = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
@@ -255,10 +326,10 @@ class Logic:
         writer.release()
 
 
-    def draw_stats(draw):
-        avg = sum(LAP_TIMES) / len(LAP_TIMES)
-        best = min(LAP_TIMES)
-        worst = max(LAP_TIMES)
+    def draw_stats(self, draw):
+        avg = sum(self.project_directory.lap_times) / len(self.project_directory.lap_times)
+        best = min(self.project_directory.lap_times)
+        worst = max(self.project_directory.lap_times)
         diff = worst - best
 
         stats = [
@@ -268,15 +339,17 @@ class Logic:
             f"Δ:     {diff:.3f} sec"
         ]
 
-        draw_centered_text(draw, stats, TEXT_POSITIONS["stats"])
+        txt_pos = {"start_y": self.width  // 2-self.distance_from_center, "spacing": self.spacing, "fill": self.stats_fill_color}
+
+        self.draw_centered_text(draw, stats, txt_pos)
 
 
 
-    def create_blank_video(duration, filename):
+    def create_blank_video(self, duration, filename):
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        writer = cv2.VideoWriter(filename, fourcc, FPS, (WIDTH, HEIGHT))
-        blank = np.zeros((HEIGHT, WIDTH, 3), dtype=np.uint8)
-        frame_count = int(FPS* duration)
+        writer = cv2.VideoWriter(filename, fourcc, self.fps, (self.width, self.height))
+        blank = np.zeros((self.height, self.width, 3), dtype=np.uint8)
+        frame_count = int(self.fps* duration)
         for _ in range(frame_count):
             writer.write(blank)
         writer.release()
@@ -284,7 +357,7 @@ class Logic:
 
 
 
-    def get_ffmpeg_cmd(concat_txt):
+    def get_ffmpeg_cmd(self, concat_txt):
         base_cmd = [
             "ffmpeg",
             "-y",
@@ -292,12 +365,12 @@ class Logic:
             "-safe", "0",
             "-i", concat_txt,
             "-fps_mode", "cfr",
-            "-r", str(FPS),
+            "-r", str(self.fps),
             "-pix_fmt", "yuv420p",
-            OUTPUT_VIDEO_FILE
+            self.project_directory.make_rendered_file_path(self.rendered_name)
         ]
 
-        if USE_GPU:
+        if self.use_gpu:
             gpu_opts = [
                 "-c:v", "h264_nvenc",
                 "-preset", "fast",   # NVENC presets
@@ -317,48 +390,54 @@ class Logic:
 
 
 
-    def concat_videos(file_list, output_file):
+    def concat_videos(self, file_list, output_file):
         # Create concat text file for ffmpeg
         concat_txt = os.path.join(os.path.dirname(output_file), "concat_list_timer_overlay.txt")
+        if concat_txt is None:
+            raise AttributeError(f"EMPTY CONCAT TEXT")
+
+        
         with open(concat_txt, "w") as f:
             for file in file_list:
                 f.write(f"file '{file}'\n")
 
         # Usage example:
-        cmd = get_ffmpeg_cmd(concat_txt=concat_txt)
+        cmd = self.get_ffmpeg_cmd(concat_txt=concat_txt)
         subprocess.run(cmd, check=True)
 
 
-    def main():
+    def make_timer_overlay(self):
         # rerender_input = input("Rerender: Timer Counter? [Y/n]: ")
         # if rerender_input.strip().lower() in ('y', 'yes', ''):
-        generate_timer_video()
+        print(self)
+        
+        self.generate_timer_video()
 
         # Setup once
-        timer_frames = preload_timer_frames()
+        timer_frames = self.preload_timer_frames()
 
         with tempfile.TemporaryDirectory() as temp_dir:
             # 1. Create start blank video
             start_blank = os.path.join(temp_dir, "start_blank.mp4")
             print("Creating Blank")
-            create_blank_video(START_DURATION, start_blank)
+            self.create_blank_video(self.start_duration, start_blank)
 
             end_stats = os.path.join(temp_dir, "end_stats.mp4")
             print("Creating STATS")
-            create_end_stats(END_DURATION, end_stats)
+            self.create_end_stats(self.end_duration, end_stats)
 
             # 2. Render laps in parallel
             lap_videos = []
             render_single = False
             
             if render_single:
-                lap_video = render_lap_video(1, LAP_TIMES[1], temp_dir, timer_frames)
+                lap_video = self.render_lap_video(1, self.project_directory.lap_times[1], temp_dir, timer_frames)
                 lap_videos.append(lap_video)
             else:
                 with ThreadPoolExecutor() as executor:
                     futures = {
-                                executor.submit(render_lap_video, i + 1, lap_time, temp_dir, timer_frames): i + 1
-                                for i, lap_time in enumerate(LAP_TIMES)
+                                executor.submit(self.render_lap_video, i + 1, lap_time, temp_dir, timer_frames): i + 1
+                                for i, lap_time in enumerate(self.project_directory.lap_times)
                             }
 
                     for future in tqdm(as_completed(futures), total=len(futures), desc="Rendering laps in parallel"):
@@ -371,19 +450,19 @@ class Logic:
             lap_videos.sort(key=lambda x: int(os.path.basename(x).split('_')[1].split('.')[0]))
 
             # 3. Concatenate all videos: start_blank + lap videos
-            concat_videos(lap_videos + [end_stats], OUTPUT_VIDEO_FILE)
+            self.concat_videos(lap_videos + [end_stats], self.rendered_name)
 
             # Temp files deleted automatically on context exit
-            print(f"✅ Timer Overlay Video saved as {OUTPUT_VIDEO_FILE}")
+            print(f"✅ Timer Overlay Video saved as {self.rendered_name}")
 
 
-    def run_overlay_generation(self):
-        self.ui.label.setText("Generating... Please wait.")
-        self.ui.generate_button.setEnabled(False)
-        try:
-            main()
-            self.ui.label.setText("✅ Done. Overlay saved.")
-        except Exception as e:
-            self.ui.label.setText(f"❌ Error: {str(e)}")
-        finally:
-            self.ui.generate_button.setEnabled(True)
+    # def run_overlay_generation(self):
+    #     self.ui.label.setText("Generating... Please wait.")
+    #     self.ui.generate_button.setEnabled(False)
+    #     try:
+    #         main()
+    #         self.ui.label.setText("✅ Done. Overlay saved.")
+    #     except Exception as e:
+    #         self.ui.label.setText(f"❌ Error: {str(e)}")
+    #     finally:
+    #         self.ui.generate_button.setEnabled(True)

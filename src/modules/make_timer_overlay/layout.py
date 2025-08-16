@@ -11,6 +11,8 @@ class Layout(UiManager):
     status_label: QLabel
     generate_button: QPushButton
 
+    reset_settings_btn: QPushButton
+
     # Video settings
     width_input: QSpinBox
     height_input: QSpinBox
@@ -58,6 +60,7 @@ class Layout(UiManager):
 
                 # Settings tab
                 self.scroll([
+                    self.reset_settings_btn,
                     self.group("vertical", [
                         self.box("vertical", "Video Settings", [
                             self.form([

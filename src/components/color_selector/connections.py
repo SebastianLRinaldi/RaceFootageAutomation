@@ -6,5 +6,7 @@ class Connections:
         self.ui = ui
         self.logic = logic
 
-        # self.ui.button.clicked.connect(self.logic.pick_color)
+        
+        self.logic.valueChanged.connect(self.logic.update_label_color)
+        self.ui.button.clicked.connect(self.logic.open_dialog)
 
