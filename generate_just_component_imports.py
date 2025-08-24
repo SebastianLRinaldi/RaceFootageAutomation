@@ -1,7 +1,8 @@
 import os
 
 # APPS_DIR = os.path.join("src", "components")
-APPS_DIR = os.path.join("src", "modules")
+APPS_DIR = os.path.join("src", "features")
+# APPS_DIR = os.path.join("src", "modules")
 # APPS_DIR = os.path.join("src", "apps")
 
 INIT_FILE = os.path.join(APPS_DIR, "__init__.py")

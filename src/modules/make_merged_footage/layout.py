@@ -10,29 +10,24 @@ class Layout(UiManager):
 
 
     # Main interactions
+    drive_selector_input: DriveSelector
+    file_selector_input:FileSelector
+
     merge_btn: QPushButton
-    # generate_button: QPushButton
-    pick_files_btn: QPushButton
-    list_widget: DraggableListWidget
-    # order_label: QLabel
+    
+
 
 
     # # Indicators
     status_label: QLabel
     progress_bar: QProgressBar
-    # output_label: QLabel
-
 
     # Files 
     file_tree: QTreeView
 
-
     # Settings
     reset_settings_btn: QPushButton
-    
     use_gpu_checkbox: QCheckBox
-    external_source_dirs_input: QLineEdit
-
     rendered_file_name: QLineEdit
 
 
@@ -45,27 +40,13 @@ class Layout(UiManager):
         self.setup_stylesheets()
         self.set_widgets()
 
-        # layout_data = [
-        #     # self.group(orientation="vertical", children=[
-        #     #     "order_label",
-        #     #     self.list_widget.layout,
-        #     #     "pick_files_btn",
-        #     #     self.box("vertical","Files", ["file_tree"]),
-        #     #     self.group(orientation="horizontal", children=[
-        #     #         "output_label",
-        #     #         "change_output_btn"
-        #     #     ]),
-        #     #     "merge_btn",
-        #     #     "progress_bar"
-        #     # ])
-        # ]
-
-
         layout_data = [
             self.tabs(tab_labels=["Footage Merger", "Files", "Settings"], children=[
                 # Main tab
                 self.group("vertical", [
                     self.status_label,
+                    self.drive_selector_input.layout,
+                    self.file_selector_input.layout,
                     self.merge_btn
                 ]),
 
@@ -81,11 +62,6 @@ class Layout(UiManager):
                             ])
                         ]),
 
-                        self.box("vertical", "External Footage Settings", [
-                            self.form([
-                                ("External Footage Paths", self.external_source_dirs_input),
-                            ])
-                        ]),
 
                         self.box("vertical", "Output Settings", [
                             self.form([
@@ -110,12 +86,8 @@ class Layout(UiManager):
         self.setStyleSheet(""" """)
 
     def set_widgets(self):
-        pass
         self.status_label.setText("Drag MP4 files here in the order to merge")
-        self.list_widget.layout.setMaximumHeight(180)
-        self.pick_files_btn.setText("Pick Files")
-        # self.output_label.setText("Output file: (none)")
-        # self.change_output_btn.setText("Change Output Location")
+
         self.merge_btn.setText("Merge")
         self.progress_bar.setRange(0, 0)
         self.progress_bar.setVisible(False)

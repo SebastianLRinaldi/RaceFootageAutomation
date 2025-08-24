@@ -261,7 +261,7 @@ class SettingsHandler:
             print(f"[DEBUG] _on_change: key='{key}', new value='{val}'")
             self.settings.setValue(key, val)
             if self.target:
-                print(f"[DEBUG] Setting attribute '{key}' on target to '{val}'")
+                # print(f"[DEBUG] Setting attribute '{key}' on target to '{val}'")
                 setattr(self.target, key, val)
         except Exception as e:
             # print(f"[ERROR] _on_change failed '{key}': {e}")
