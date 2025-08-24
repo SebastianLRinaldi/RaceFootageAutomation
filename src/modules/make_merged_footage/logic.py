@@ -74,6 +74,8 @@ class Logic:
 
         self.rendered_name = f"merged_footage.mp4"
 
+        self.raw_footage_paths = []
+
         self.footage_dirs = []
         self.last_footage_dir_selected = ""
 
@@ -108,8 +110,34 @@ class Logic:
         self.ui.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.ui.merge_btn.setEnabled(True)
 
+    def handle_paths(self, paths):
+        print("Got paths:", paths)  # or do your custom stuff
+        for path in paths:
+            self.add_video_item(path)
+
+
     def make_merged_footage(self):
-        pass
+        try:
+            with open("files.txt", "w") as f:
+                for path in self.files:
+                    f.write(f"file '{path}'\n")
+        except Exception as e:
+            self.error.emit(f"Failed to write files.txt: {e}")
+            return
+
+        cmd = ["ffmpeg", "-f", "concat", "-safe", "0", "-i", "files.txt", "-c", "copy", self.rendered_name]
+
+        # try:
+        #     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        #     _, stderr = process.communicate()
+
+        #     if process.returncode != 0:
+        #         self.error.emit(f"ffmpeg error (code {process.returncode}):\n{stderr}")
+        #         return
+
+        #     self.finished.emit(self.output_file)
+        # except Exception as e:
+        #     self.error.emit(str(e))
 
 
         
@@ -148,9 +176,6 @@ class Logic:
     #         QMessageBox.warning(self.ui, "Error", "Add at least 2 videos to merge.")
     #         return
 
-    #     # if not self.output_file_path:
-    #     #     QMessageBox.warning(self.ui, "Error", "Set output file location before merging.")
-    #     #     return
 
     #     file_paths = [
     #         self.ui.list_widget.item(i).data(Qt.ItemDataRole.UserRole)
@@ -160,10 +185,10 @@ class Logic:
     #     self.ui.merge_btn.setEnabled(False)
     #     self.ui.progress_bar.setVisible(True)
 
-    #     self.merge_thread = MergeThread(file_paths, str(self.output_file_path))
-    #     self.merge_thread.finished.connect(self.merge_done)
-    #     self.merge_thread.error.connect(self.merge_error)
-    #     self.merge_thread.start()
+    #     # self.merge_thread = MergeThread(file_paths, str(self.output_file_path))
+    #     # self.merge_thread.finished.connect(self.merge_done)
+    #     # self.merge_thread.error.connect(self.merge_error)
+    #     # self.merge_thread.start()
 
     # def merge_done(self, output_file):
     #     self.ui.progress_bar.setVisible(False)
@@ -175,23 +200,23 @@ class Logic:
     #     self.ui.merge_btn.setEnabled(True)
     #     QMessageBox.critical(self, "Merge Error", error_msg)
 
-    # def add_video_item(self, file_path):
-    #     existing_paths = [self.ui.list_widget.item(i).data(Qt.ItemDataRole.UserRole) for i in range(self.ui.list_widget.count())]
-    #     if file_path in existing_paths:
-    #         return  # skip duplicates
+    def add_video_item(self, file_path):
+        # existing_paths = [self.ui.file_selector_input.layout.selected_files.item(i).data(Qt.ItemDataRole.UserRole) for i in range(self.ui.file_selector_input.layout.selected_files.count())]
+        # if file_path in existing_paths:
+        #     return  # skip duplicates
 
-        # thumb_path = self.create_thumbnail(file_path)
-        # item = QListWidgetItem(QIcon(thumb_path), os.path.basename(file_path))
-        # item.setData(Qt.ItemDataRole.UserRole, file_path)
-        # self.ui.list_widget.addItem(item)
+        thumb_path = self.create_thumbnail(file_path)
+        item = QListWidgetItem(QIcon(thumb_path), os.path.basename(file_path))
+        item.setData(Qt.ItemDataRole.UserRole, file_path)
+        self.ui.file_selector_input.layout.selected_files.addItem(item)
 
-    # def create_thumbnail(self, file_path):
-    #     thumb = file_path + "_thumb.png"
-    #     if not os.path.exists(thumb):
-    #         subprocess.run([
-    #             "ffmpeg", "-y", "-i", file_path, "-vf", "thumbnail,scale=128:72", "-frames:v", "1", thumb
-    #         ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    #     return thumb
+    def create_thumbnail(self, file_path):
+        thumb = file_path + "_thumb.png"
+        if not os.path.exists(thumb):
+            subprocess.run([
+                "ffmpeg", "-y", "-i", file_path, "-vf", "thumbnail,scale=128:72", "-frames:v", "1", thumb
+            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        return thumb
 
     # def update_default_output_path(self):
     #     count = self.ui.list_widget.count()
@@ -214,13 +239,13 @@ class Logic:
     #         self.output_file_path = default_path
     #         self.ui.output_label.setText(f"Output file: {self.output_file_path}")
 
-    # def dragEnterEvent(self, event):
-    #     if event.mimeData().hasUrls():
-    #         event.acceptProposedAction()
+    def dragEnterEvent(self, event):
+        if event.mimeData().hasUrls():
+            event.acceptProposedAction()
 
-    # def dropEvent(self, event):
-    #     paths = [u.toLocalFile() for u in event.mimeData().urls()]
-    #     mp4s = [p for p in paths if p.lower().endswith(".mp4")]
-    #     for path in mp4s:
-    #         self.add_video_item(path)
-    #     self.update_default_output_path()
+    def dropEvent(self, event):
+        paths = [u.toLocalFile() for u in event.mimeData().urls()]
+        mp4s = [p for p in paths if p.lower().endswith(".mp4")]
+        for path in mp4s:
+            self.add_video_item(path)
+        # self.update_default_output_path()

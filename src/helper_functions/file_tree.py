@@ -6,6 +6,20 @@ from PyQt6.QtGui import *
 import os
 import sys
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 class fileTreeLoader():
     def __init__(self, file_tree: QTreeView, directory: str):
         self.file_tree = file_tree
@@ -15,7 +29,7 @@ class fileTreeLoader():
         self.tree_model.setRootPath(self.directory)
         self.file_tree.setModel(self.tree_model)
         self.file_tree.setRootIndex(self.tree_model.index(self.directory))
-
+        self.file_tree.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
 
     def set_directory(self, path: str):
         if not path.strip():  # ignore empty or whitespace-only
@@ -58,3 +72,6 @@ class fileTreeLoader():
         """
         self.tree_model.setNameFilters(extensions)
         self.tree_model.setNameFilterDisables(False)  # hide everything else
+
+
+        

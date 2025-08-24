@@ -105,16 +105,8 @@ from src.core.gui.ui_manager import *
 
 
 class Layout(UiManager):
-
-    # drive_selector : DriveSelector
-
-    available_files : QListWidget
-
     selected_files : QListWidget
-
     drive_file_tree: QTreeView
-
-    
     
     def __init__(self):
         super().__init__()
