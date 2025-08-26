@@ -17,7 +17,7 @@ class Logic:
 
 
     def open_file_dialog(self):
-        file_path, _ = QFileDialog.getOpenFileName(self, "Open Video File", "", "Video Files (*.mp4 *.mov *.mkv)")
+        file_path, _ = QFileDialog.getOpenFileName(self.ui, "Open Video File", "", "Video Files (*.mp4 *.mov *.mkv)")
         if file_path:
             self.run_ffprobe(file_path)
 

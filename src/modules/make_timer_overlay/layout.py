@@ -38,7 +38,7 @@ class Layout(UiManager):
     timer_fill_color_input : ColorSelector
     stats_fill_color_input : ColorSelector
 
-    file_tree: QTreeView
+    file_tree: FilesView
     
     def __init__(self):
         super().__init__()
@@ -56,7 +56,7 @@ class Layout(UiManager):
                     "generate_button"
                 ]),
 
-                self.box("vertical","Files", ["file_tree"]),
+                self.box("vertical","Files", [self.file_tree.layout]),
 
                 # Settings tab
                 self.scroll([

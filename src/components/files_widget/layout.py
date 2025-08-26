@@ -17,29 +17,23 @@ from PyQt6.QtGui import *
 from src.core.gui.ui_manager import *
 
 class Layout(UiManager):
-    drive_combo: QComboBox
-    browse_btn: QPushButton
-    delete_btn: QPushButton
-
+    files_widget : QTreeWidget
     
     def __init__(self):
         super().__init__()
         self.init_widgets()
         self.setup_stylesheets()
         self.set_widgets()
-        
 
         layout_data = [
-            # Drive selector row
-            self.box("vertical", "Drive Selection", [
-                self.group("horizontal", [
-                    self.drive_combo,
-                    self.browse_btn,
-                    ]),
-                self.delete_btn,
-                ]),
                 
+            # Selected / Ordered files
+            self.box("vertical", "Selected Files", [
+                self.files_widget,
+            ]),
+
         ]
+
 
         self.apply_layout(layout_data)
 
@@ -53,6 +47,10 @@ class Layout(UiManager):
         self.setStyleSheet(""" """)
         
     def set_widgets(self):
-        self.drive_combo.setEditable(True)
-        self.browse_btn.setText("Browse...")
-        self.delete_btn.setText("Remove Path")
+        self.files_widget.setDragEnabled(True)
+        self.files_widget.setAcceptDrops(True)
+        self.files_widget.setDropIndicatorShown(True)
+        self.files_widget.setDragDropMode(QTreeWidget.DragDropMode.InternalMove)
+        self.files_widget.setColumnCount(2)
+        self.files_widget.setHeaderLabels(["Name", "Full Path"])  
+        self.files_widget.setIconSize(QSize(256, 144))

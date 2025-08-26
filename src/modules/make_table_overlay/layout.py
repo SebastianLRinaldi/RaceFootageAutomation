@@ -34,7 +34,7 @@ class Layout(UiManager):
     status_label: QLabel
     generate_button: QPushButton
 
-    file_tree: QTreeView
+    file_tree: FilesView
     
     def __init__(self):
         super().__init__()
@@ -53,7 +53,7 @@ class Layout(UiManager):
                 "progress"
             ]),
 
-            self.box("vertical","Files", ["file_tree"]),
+            self.box("vertical","Files", [self.file_tree.layout]),
 
             self.scroll([
                     self.group("vertical", [

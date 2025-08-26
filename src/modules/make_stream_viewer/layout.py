@@ -10,7 +10,7 @@ class Layout(UiManager):
     btn: QPushButton
     output: QTextEdit
 
-    file_tree: QTreeView
+    file_tree: FilesView
     
     def __init__(self):
         super().__init__()
@@ -22,7 +22,7 @@ class Layout(UiManager):
 
             self.group("vertical", [
                 "btn",
-                self.box("vertical","Files", ["file_tree"]),
+                self.box("vertical","Files", [self.file_tree.layout]),
                 "output"
             ])
     

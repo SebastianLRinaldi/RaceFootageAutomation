@@ -69,11 +69,11 @@ class UiManager(QWidget):
                 for item in children:
                     w = self.build_layout(item)
                     if isinstance(w, QWidget):
-                        layout.addWidget(w,  stretch=1)
+                        layout.addWidget(w) # bloats space --> layout.addWidget(w,  stretch=1)
                     else:
                         container = QWidget()
                         container.setLayout(w)
-                        layout.addWidget(container, stretch=1)
+                        layout.addWidget(container) # bloats space --> layout.addWidget(container, stretch=1)
 
                 # layout.setContentsMargins(0, 0, 0, 0)
                 # layout.setSpacing(0)

@@ -6,7 +6,6 @@ class Connections:
         self.ui = ui
         self.logic = logic
 
-        
         # connections
         self.ui.browse_btn.clicked.connect(self.logic.browse_directory)
         self.ui.delete_btn.clicked.connect(self.logic.delete_selected)

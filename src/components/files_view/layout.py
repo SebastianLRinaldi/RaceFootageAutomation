@@ -1,20 +1,46 @@
-import os
-import sys
-import time
-import re
-
-import threading
-from threading import Thread
-from enum import Enum
-from queue import Queue
-from typing import List
-from datetime import timedelta
-
 from PyQt6.QtCore import *
 from PyQt6.QtWidgets import * 
 from PyQt6.QtGui import *
 
 from src.core.gui.ui_manager import *
+
+class Layout():
+    def __init__(self):
+        super().__init__()
+
+
+class Layout(UiManager):
+    files_view : QTreeView
+    
+    def __init__(self):
+        super().__init__()
+        self.init_widgets()
+        self.setup_stylesheets()
+        self.set_widgets()
+
+        layout_data = [
+                
+            # Selected / Ordered files
+            self.box("vertical", "Footage Files", [
+                self.files_view,
+            ]),
+
+        ]
+
+
+        self.apply_layout(layout_data)
+
+    def init_widgets(self):
+        annotations = getattr(self.__class__, "__annotations__", {})
+        for name, widget_type in annotations.items():
+            widget = widget_type()
+            setattr(self, name, widget)
+            
+    def setup_stylesheets(self):
+        self.setStyleSheet(""" """)
+        
+    def set_widgets(self):
+        self.files_view.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)
 
 
 # from PyQt6.QtWidgets import (
@@ -99,66 +125,6 @@ from src.core.gui.ui_manager import *
 
 
 
-
-
-
-
-
-class Layout(UiManager):
-    selected_files : QListWidget
-    drive_file_tree: QTreeView
-    
-    def __init__(self):
-        super().__init__()
-        self.init_widgets()
-        self.setup_stylesheets()
-        self.set_widgets()
-
-        layout_data = [
-            
-            # # Drive selector row
-            # self.box("vertical", "Drive Selection", [
-            #     self.drive_selector,
-            #     ]),
-                
-            self.group("horizontal", [
-                    # Selected / Ordered files
-                    self.box("vertical", "Selected Files", [
-                        self.selected_files,
-                    ]),
-                    # Available files
-                    self.box("vertical", "Available Files", [
-
-                        self.drive_file_tree
-                    ]),
-                ]),
-
-        ]
-
-
-        self.apply_layout(layout_data)
-
-    def init_widgets(self):
-        annotations = getattr(self.__class__, "__annotations__", {})
-        for name, widget_type in annotations.items():
-            widget = widget_type()
-            setattr(self, name, widget)
-            
-    def setup_stylesheets(self):
-        self.setStyleSheet(""" """)
-        
-    def set_widgets(self):
-        pass
-        # --- Drive selection ---
-        # self.drive_combo.addItems(["C:/", "D:/", "E:/"])   # example drives
-
-
-
-        # # --- Optional sizing / behavior ---
-        # self.available_files.setSelectionMode(QListWidget.SelectionMode.ExtendedSelection)
-        # self.selected_files.setSelectionMode(QListWidget.SelectionMode.SingleSelection)
-
-
 # import sys
 # import os
 # from PyQt6.QtWidgets import (
@@ -235,3 +201,4 @@ class Layout(UiManager):
 #     w.resize(400, 500)
 #     w.show()
 #     sys.exit(app.exec())
+

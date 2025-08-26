@@ -7,6 +7,7 @@ import subprocess
 import os
 from pathlib import Path
 import traceback
+import tempfile
 
 from .layout import Layout
 from src.components import *
@@ -46,6 +47,25 @@ from src.helper_classes import *
 #             self.error.emit(str(e))
 
 
+"""
+Some code from streamer view for viewing progress
+"""
+"""
+    def run_ffprobe(self, file_path):
+        try:
+            result = subprocess.run(
+                ["ffprobe", "-v", "error", "-show_streams", file_path],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                check=True
+            )
+            self.ui.output.setPlainText(result.stdout)
+        except subprocess.CalledProcessError as e:
+            self.ui.output.setPlainText(f"ffprobe error:\n{e.stderr}")
+"""
+
+
 class MergeWorker(QThread):
     finished = pyqtSignal()
     error = pyqtSignal(str, str)
@@ -74,8 +94,6 @@ class Logic:
 
         self.rendered_name = f"merged_footage.mp4"
 
-        self.raw_footage_paths = []
-
         self.footage_dirs = []
         self.last_footage_dir_selected = ""
 
@@ -83,7 +101,7 @@ class Logic:
             ("use_gpu", self.ui.use_gpu_checkbox, bool, self.use_gpu),
             ("rendered_name", self.ui.rendered_file_name, str, self.rendered_name),
             ("footage_dirs", self.ui.drive_selector_input.logic, list, self.footage_dirs),
-            ("last_footage_dir_selected",  self.ui.file_selector_input.logic, str,self.last_footage_dir_selected),
+            ("last_footage_dir_selected",  self.ui.source_footage_view.logic, str, self.last_footage_dir_selected),
         ]
         
         self.settings_handler = SettingsHandler(SETTINGS_FIELDS, target=self, app="merge_footage")
@@ -110,22 +128,102 @@ class Logic:
         self.ui.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.ui.merge_btn.setEnabled(True)
 
-    def handle_paths(self, paths):
-        print("Got paths:", paths)  # or do your custom stuff
-        for path in paths:
-            self.add_video_item(path)
+    def handle_file_items(self, file_items: list[FileItem]):
+        print("Got paths:", file_items)  # or do your custom stuff
+        self.ui.choosen_footage_viewer.layout.files_widget.addTopLevelItems(file_items)
+        
+
+    def add_video_item(self, file_item: FileItem):
+        pass
+        # existing_paths = [self.ui.file_selector_input.layout.selected_files.item(i).data(Qt.ItemDataRole.UserRole) for i in range(self.ui.file_selector_input.layout.selected_files.count())]
+        # if file_path in existing_paths:
+        #     return  # skip duplicates
+
+        # thumb_path = self.create_thumbnail(file_path)
+        # item = QListWidgetItem(QIcon(thumb_path), os.path.basename(file_path))
+        # item.setData(Qt.ItemDataRole.UserRole, file_path)
+        # self.ui.file_selector_input.layout.selected_files.addItem(item)
+
+        # self.ui.file_selector_input.layout.selected_files.addTopLevelItems() addItem(file_item)
+
+    # def create_thumbnail(self, file_path):
+    #     thumb = file_path + "_thumb.png"
+    #     if not os.path.exists(thumb):
+    #         subprocess.run([
+    #             "ffmpeg", "-y", "-i", file_path, "-vf", "thumbnail,scale=128:72", "-frames:v", "1", thumb
+    #         ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    #     return thumb
+
+    def get_ffmpeg_cmd(self, concat_txt):
+        base_cmd = [
+            "ffmpeg",
+            "-y",
+            "-f", "concat",
+            "-safe", "0",
+            "-i", concat_txt,
+            # "-fps_mode", "cfr",
+            # # "-r", str(self.fps),
+            # "-pix_fmt", "yuv420p",
+            "-c", "copy",
+            self.project_directory.make_rendered_file_path(self.rendered_name)
+        ]
+
+        if self.use_gpu:
+            gpu_opts = [
+                "-c:v", "h264_nvenc",
+                "-preset", "fast",   # NVENC presets
+                "-rc", "vbr",
+                "-cq", "18"
+            ]
+            # Insert GPU options before output_file
+            return base_cmd[:-1] + gpu_opts + [base_cmd[-1]]
+        else:
+            cpu_opts = [
+                "-c:v", "libx264",
+                "-crf", "18",
+                "-preset", "slow"
+            ]
+            # Insert CPU options before output_file
+            return base_cmd[:-1] + cpu_opts + [base_cmd[-1]]
 
 
     def make_merged_footage(self):
-        try:
-            with open("files.txt", "w") as f:
-                for path in self.files:
-                    f.write(f"file '{path}'\n")
-        except Exception as e:
-            self.error.emit(f"Failed to write files.txt: {e}")
-            return
+        # Create concat text file for ffmpeg
+        with tempfile.TemporaryDirectory() as temp_dir:
+            concat_txt = os.path.join(os.path.dirname(temp_dir), "concat_list_merged_footage.txt")
+            print(f"concat_txt_path: {concat_txt} | self.rendered_name:{self.rendered_name} | self.project_directory.asset_path: {self.project_directory.asset_path}")
+            if concat_txt is None:
+                raise AttributeError(f"EMPTY CONCAT TEXT")
 
-        cmd = ["ffmpeg", "-f", "concat", "-safe", "0", "-i", "files.txt", "-c", "copy", self.rendered_name]
+            file_item_widget: QTreeWidget = self.ui.choosen_footage_viewer.layout.files_widget
+
+            files = []
+            for i in range(file_item_widget.topLevelItemCount()):
+                item: FileItem = file_item_widget.topLevelItem(i)
+                files.append(item.filePath())
+                
+
+
+            with open(concat_txt, "w") as f:
+                for file in files:
+                    f.write(f"file '{file}'\n")
+
+            # Usage example:
+            cmd = self.get_ffmpeg_cmd(concat_txt=concat_txt)
+            subprocess.run(cmd, check=True)
+
+
+
+    # def make_merged_footage(self):
+    #     try:
+    #         with open("files.txt", "w") as f:
+    #             for path in self.files:
+    #                 f.write(f"file '{path}'\n")
+    #     except Exception as e:
+    #         self.error.emit(f"Failed to write files.txt: {e}")
+    #         return
+
+    #     cmd = ["ffmpeg", "-f", "concat", "-safe", "0", "-i", "files.txt", "-c", "copy", self.rendered_name]
 
         # try:
         #     process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
@@ -200,23 +298,6 @@ class Logic:
     #     self.ui.merge_btn.setEnabled(True)
     #     QMessageBox.critical(self, "Merge Error", error_msg)
 
-    def add_video_item(self, file_path):
-        # existing_paths = [self.ui.file_selector_input.layout.selected_files.item(i).data(Qt.ItemDataRole.UserRole) for i in range(self.ui.file_selector_input.layout.selected_files.count())]
-        # if file_path in existing_paths:
-        #     return  # skip duplicates
-
-        thumb_path = self.create_thumbnail(file_path)
-        item = QListWidgetItem(QIcon(thumb_path), os.path.basename(file_path))
-        item.setData(Qt.ItemDataRole.UserRole, file_path)
-        self.ui.file_selector_input.layout.selected_files.addItem(item)
-
-    def create_thumbnail(self, file_path):
-        thumb = file_path + "_thumb.png"
-        if not os.path.exists(thumb):
-            subprocess.run([
-                "ffmpeg", "-y", "-i", file_path, "-vf", "thumbnail,scale=128:72", "-frames:v", "1", thumb
-            ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        return thumb
 
     # def update_default_output_path(self):
     #     count = self.ui.list_widget.count()

@@ -5,35 +5,25 @@ from PyQt6.QtGui import *
 from src.core.gui.ui_manager import *
 from src.components import *
 
-
 class Layout(UiManager):
-
-
     # Main interactions
     drive_selector_input: DriveSelector
-    file_selector_input:FileSelector
-
+    source_footage_view:FilesView
+    choosen_footage_viewer:FilesWidget
     merge_btn: QPushButton
-    
-
-
 
     # # Indicators
     status_label: QLabel
     progress_bar: QProgressBar
 
     # Files 
-    file_tree: QTreeView
+    file_tree: FilesView
 
     # Settings
     reset_settings_btn: QPushButton
     use_gpu_checkbox: QCheckBox
     rendered_file_name: QLineEdit
 
-
-
-    
-    
     def __init__(self):
         super().__init__()
         self.init_widgets()
@@ -44,13 +34,21 @@ class Layout(UiManager):
             self.tabs(tab_labels=["Footage Merger", "Files", "Settings"], children=[
                 # Main tab
                 self.group("vertical", [
-                    self.status_label,
-                    self.drive_selector_input.layout,
-                    self.file_selector_input.layout,
-                    self.merge_btn
+                    
+                    self.group("horizontal", [
+                        self.drive_selector_input.layout,
+                        self.box("vertical", "Merge Files",[
+                            self.status_label,
+                            self.merge_btn,
+                        ]),
+                    ]),
+                    
+                    self.group("horitontal", [                    
+                        self.source_footage_view.layout,
+                        self.choosen_footage_viewer.layout,])
                 ]),
 
-                self.box("vertical","Files", ["file_tree"]),
+                self.box("vertical","Files", [self.file_tree.layout]),
 
                 # Settings tab
                 self.scroll([
@@ -91,3 +89,7 @@ class Layout(UiManager):
         self.merge_btn.setText("Merge")
         self.progress_bar.setRange(0, 0)
         self.progress_bar.setVisible(False)
+        self.source_footage_view.logic.set_med_icons()
+        self.source_footage_view.logic.set_file_filter(["*.mp4"])
+
+        

@@ -4,6 +4,7 @@ import re
 
 from main import Dashboard
 from src.apps import * 
+from src.components import *
 from src.helper_functions import *
 
 class AppConnector:
@@ -55,12 +56,14 @@ class AppConnector:
         for name, module_name in targets:
             module = getattr(self.project_editor.layout, name)
 
-            tree = getattr(module.layout, "file_tree")
-
             module_path = os.path.join(project_path, module_name)
 
+            tree = getattr(module.layout, "file_tree")
+            tree.logic.set_directory(module_path)
+            tree.logic.set_med_icons()
 
-            fileTreeLoader(tree, module_path)
+
+            # fileTreeLoader(tree, module_path)
 
             if hasattr(module, "logic") and hasattr(module.logic, "project_directory"):
 
