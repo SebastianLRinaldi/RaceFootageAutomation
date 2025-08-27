@@ -1,0 +1,191 @@
+from PyQt6.QtCore import *
+from PyQt6.QtWidgets import * 
+from PyQt6.QtGui import *
+
+from src.core.gui.ui_manager import *
+from src.components import *
+
+
+
+class Layout(UiManager):
+
+    reset_segment_settings: QPushButton
+
+    width_input: QSpinBox  # set max > config WIDTH (e.g. 10000)
+    height_input: QSpinBox  # set max > config HEIGHT (e.g. 10000)
+    fps_input: QDoubleSpinBox  # range 0.1–120.0, decimals=2
+
+    end_duration_input: QSpinBox  # range 1–600 seconds
+
+    font_path_input: PathInputWidget  # file browse with font file filter (.ttf, .otf)
+    font_size_input: QSpinBox  # range 8–72
+
+    bar_file_name: QLineEdit  # custom widget with QLineEdit + file browse button (filter for video)
+    dot_file_name: QLineEdit   # same as above
+    dot_avi_file_name: QLineEdit   # same
+    rendered_file_name: QLineEdit   # same
+
+    ffmpeg_bin_input: PathInputWidget  # file browse for executable
+
+    
+
+    status_label: QLabel
+    generate_button: QPushButton
+
+    file_tree: FilesView
+    
+    def __init__(self):
+        super().__init__()
+        self.init_widgets()
+        self.setup_stylesheets()
+        self.set_properties()
+        self.set_widgets()
+
+        layout_data = [
+            self.tabs(tab_labels=["Segment Creation", "Files", "Settings"], children=[
+
+                self.group("vertical", [
+                    "status_label",
+                    "generate_button",
+                    ]),
+
+                self.box("vertical","Files", [self.file_tree.layout]),
+
+                
+                self.scroll([
+                    self.reset_segment_settings,
+                    
+                    self.group("vertical", [
+                            self.box("vertical", "Video Settings", [
+                                    self.form([
+                                        ("Width", "width_input"),
+                                        ("Height", "height_input"),
+                                        ("FPS", "fps_input"),
+                                        ("End Duration", "end_duration_input"),
+                                    ])
+                                ]),
+                            
+                            self.box("vertical", "File Paths", [
+                                    self.form([
+                                        ("Bar File Name", self.bar_file_name),
+                                        ("Dot File Name", self.dot_file_name),
+                                        ("Dot AVI File Name", self.dot_avi_file_name),
+                                        ("Segment Overlay File Name", self.rendered_file_name),
+                                    ])
+                                ]),
+                            
+                            self.box("vertical", "Font Settings", [
+                                    self.form([
+                                        ("Font Path", self.font_path_input.layout),
+                                        ("Font Size", "font_size_input"),
+                                    ])
+                                ]),
+                            
+                            self.box("vertical", "FFmpeg", [
+                                    self.form([
+                                        ("FFmpeg Binary", self.ffmpeg_bin_input.layout),
+                                    ])
+                                ]),
+                        ])
+                    ])
+                ]),
+    
+        ]
+
+        self.apply_layout(layout_data)
+
+    def init_widgets(self):
+        annotations = getattr(self.__class__, "__annotations__", {})
+        for name, widget_type in annotations.items():
+            widget = widget_type()
+            setattr(self, name, widget)
+            
+    def setup_stylesheets(self):
+        self.setStyleSheet(""" """)
+
+    def set_properties(self):
+        self.width_input.setMaximum(10000)
+        self.height_input.setMaximum(10000)
+        self.fps_input.setRange(0.1, 240.0)
+        self.fps_input.setDecimals(2)
+        self.end_duration_input.setRange(1, 600)
+        self.font_size_input.setRange(1, 256)
+
+    def set_widgets(self):
+        self.status_label.setText("Click below to generate segment overlay video.")
+        self.generate_button.setText("Generate Overlay")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+
+    # def save_setting(self, key, value):
+    #     settings = QSettings("MyCompany", "SegmentOverlayApp")
+    #     settings.setValue(key, value)
+
+    # def connect_settings_autosave(self):
+    #     settings_fields = {
+    #         self.width_input: lambda: self.save_setting("width", self.width_input.value()),
+    #         self.height_input: lambda: self.save_setting("height", self.height_input.value()),
+    #         self.fps_input: lambda: self.save_setting("fps", self.fps_input.value()),
+    #         self.output_dir_input: lambda: self.save_setting("output_dir", self.output_dir_input.text()),
+    #         self.bar_file_input: lambda: self.save_setting("bar_file", self.bar_file_input.text()),
+    #         self.dot_file_input: lambda: self.save_setting("dot_file", self.dot_file_input.text()),
+    #         self.dot_avi_file_input: lambda: self.save_setting("dot_avi_file", self.dot_avi_file_input.text()),
+    #         self.segment_overlay_file_input: lambda: self.save_setting("segment_overlay_file", self.segment_overlay_file_input.text()),
+    #         self.end_duration_input: lambda: self.save_setting("end_duration", self.end_duration_input.value()),
+    #         self.font_path_input: lambda: self.save_setting("font_path", self.font_path_input.text()),
+    #         self.font_size_input: lambda: self.save_setting("font_size", self.font_size_input.value()),
+    #         self.ffmpeg_bin_input: lambda: self.save_setting("ffmpeg_bin", self.ffmpeg_bin_input.text()),
+    #     }
+
+    #     for widget, handler in settings_fields.items():
+    #         if hasattr(widget, 'valueChanged'):
+    #             print("SAVED")
+    #             widget.valueChanged.connect(handler)
+    #         elif hasattr(widget, 'textChanged'):
+    #             print("SAVED1")
+    #             widget.textChanged.connect(handler)
+
+    # def load_settings(self):
+    #     settings = QSettings("MyCompany", "SegmentOverlayApp")
+
+    #     self.width_input.setValue(int(settings.value("width", 1920)))
+    #     self.height_input.setValue(int(settings.value("height", 1080)))
+    #     self.fps_input.setValue(float(settings.value("fps", 59.94)))
+    #     self.output_dir_input.setText(settings.value("output_dir", ""))
+    #     self.bar_file_input.setText(settings.value("bar_file", ""))
+    #     self.dot_file_input.setText(settings.value("dot_file", ""))
+    #     self.dot_avi_file_input.setText(settings.value("dot_avi_file", ""))
+    #     self.segment_overlay_file_input.setText(settings.value("segment_overlay_file", ""))
+    #     self.end_duration_input.setValue(int(settings.value("end_duration", 15)))
+    #     self.font_path_input.setText(settings.value("font_path", ""))
+    #     self.font_size_input.setValue(int(settings.value("font_size", 24)))
+    #     self.ffmpeg_bin_input.setText(settings.value("ffmpeg_bin", "ffmpeg"))
+
+
+
+
+
+
+

@@ -1,6 +1,7 @@
 """
 pyqt6 - v. 6.7 (G) || 6.9 (G)
 pyqt6-webengine - v. 6.7 (G)
+PyQt6-WebEngine==6.7
 """
 from PyQt6.QtCore import *
 from PyQt6.QtWidgets import *
@@ -8,6 +9,11 @@ from PyQt6.QtGui import *
 from PyQt6.QtPrintSupport import *
 from PyQt6.QtWebEngineWidgets import *
 from PyQt6.QtWebEngineCore import *
+
+import importlib
+import pkgutil
+from pathlib import Path
+
 import sys
 import os
 
@@ -16,51 +22,97 @@ import os
 # Add the root directory of your project to the sys.path
 # sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))
 
-"""
-python -m MakeSegmentOverlay.SegmentOverlay_v0 
-"""
+from src.core.connect.app_connector import *
 
-from application.FrontEnd.E_combiner.PageController import *
-from application.apps.mediaView.mediaViewConnections import MediaViewConnections
-from application.apps.raceStats.raceStatsConnections import RaceStatsConnections
-from application.apps.myThirdWindow.myThirdPageConnections import ThirdPageConnections
+
+def load_apps():
+    base = "src.apps"
+    path = os.path.join(os.path.dirname(__file__), "src", "apps")
+    widgets = {}
+
+    for name in os.listdir(path):
+        if name.startswith("__") or name.lower() == "widgets":
+            continue
+
+        full_path = os.path.join(path, name)
+        if not os.path.isdir(full_path):
+            continue
+
+        # try:
+        #     comp = importlib.import_module(f"{base}.{name}").Component()
+        #     for attr in comp.__class__.__annotations__:
+        #         if not hasattr(comp, attr):
+        #             raise AttributeError(f"{base}.{name}.Component missing '{attr}'")
+        #     widgets[name] = comp
+        # except Exception as e:
+        #     raise RuntimeError(f"Error in {base}.{name}: {e}")
+
+        try:
+            comp = importlib.import_module(f"{base}.{name}").Component()
+            # Check all annotated attributes
+            for attr in getattr(comp.__class__, "__annotations__", {}):
+                if not hasattr(comp, attr):
+                    # Minimal error with file info
+                    raise AttributeError(
+                        f"{name}.Component missing attribute '{attr}' "
+                        f"(defined in {__file__})"
+                    )
+            widgets[name] = comp
+
+        # except Exception as e:
+        # #     # Wrap in concise RuntimeError
+        #     # raise RuntimeError(f"{base}.{name} failed to load: {e}") from None
+
+
+        # except Exception as e:
+        #     # Grab the frame where the exception actually occurred
+        #     tb = e.__traceback__
+        #     while tb.tb_next:  # drill down to innermost frame
+        #         tb = tb.tb_next
+        #     exc_file = tb.tb_frame.f_code.co_filename
+        #     exc_line = tb.tb_lineno
+
+        #     raise RuntimeError(
+        #         f"{base}.{name} failed to load: {e}\n"
+        #         f'  File "{exc_file}", line {exc_line}'
+        #     ) from None
+            # Grab frame of the exception itself (no tb navigation)
+        except Exception as e:
+            exc_file = e.__traceback__.tb_frame.f_code.co_filename
+            exc_line = e.__traceback__.tb_lineno
+
+            raise RuntimeError(
+                f"{base}.{name} failed to load: \n"
+                f'  File "{exc_file}", line {exc_line}\n'
+                f'{e}'
+            ) from None
+
+    return widgets
+
+
+
 
 class Dashboard(QMainWindow):
     def __init__(self):
         super().__init__()
-        self.setWindowTitle("UI")
-        self.resize(1571, 731)
+        self.setWindowTitle("Widget Dashboard")
+        self.resize(800, 600)
 
         self.stack = QStackedWidget()
+        self.setCentralWidget(self.stack)
 
-        # Your dynamic page creation
-        # Define pages with: name, UI class, Logic class, Controller class
-        pages = [
-            ("first", MediaViewLayout, MediaViewLogic, MediaViewConnections),
-            ("second", RaceStatsLayout, RaceStatsLogic, RaceStatsConnections),
-            ("third", My_Third_Page, ThirdPageLogic, ThirdPageConnections),
-        ]
+        self.apps = load_apps()
 
-        # Step 1: Create UIs
-        self.apps = {name: page_class() for name, page_class, *_ in pages}
+        for name, widget in self.apps.items():
+            self.stack.addWidget(widget.layout)
 
-        # Step 2: Create Logic
-        self.logic = {name: logic_class(self.apps[name]) for name, _, logic_class, _ in pages}
+        self.setup_menu()
 
-        # Step 3: Create Per-Page Controllers
-        self.page_controllers = {
-            name: controller_class(self.apps[name], self.logic[name])
-            for name, _, _, controller_class in pages
-        }
+        self.controller = AppConnector(self, self.apps)
 
-        # Add pages to the stack
-        for page in self.apps.values():
-            self.stack.addWidget(page)
+        self.switch_to("project_base_screen")
 
-        # Create the controller
-        self.controller = PageController(self.logic)
-
-
+    def setup_menu(self):
         menubar = QMenuBar(self)
         app_menu = menubar.addMenu("Apps")
 
@@ -71,17 +123,16 @@ class Dashboard(QMainWindow):
 
         self.setMenuBar(menubar)
 
-        # Main container setup
-        container = QWidget()
-        layout = QVBoxLayout(container)
-        layout.addWidget(self.stack)
-        self.setCentralWidget(container)
-
-        self.switch_to("second")
-
     def switch_to(self, app_name):
-        self.stack.setCurrentWidget(self.apps[app_name])
+        widget = self.apps.get(app_name)
+        if widget:
+            self.stack.setCurrentWidget(widget.layout)
+        else:
+            print(f"Invalid app name: {app_name}")
+            print("Valid apps:", list(self.apps.keys()))
 
+    def setup_stylesheets(self):
+        self.setStyleSheet(""" """)
 
 # ----- Entry Point -----
 if __name__ == "__main__":
