@@ -61,20 +61,20 @@ class Logic():
 
         
         SETTINGS_FIELDS = [
-            ("width", self.ui.width_input, int, self.width),
-            ("height", self.ui.height_input, int, self.height),
-            ("fps", self.ui.fps_input, float, self.fps),
+            ("width", self.ui.width_input, self.width),
+            ("height", self.ui.height_input, self.height),
+            ("fps", self.ui.fps_input, self.fps),
 
-            ("end_duration", self.ui.end_duration_input, int, self.end_duration),
-            ("font_path", self.ui.font_path_input.layout.line_edit, str, self.font_path ),
-            ("font_size", self.ui.font_size_input, int, self.font_size),
+            ("end_duration", self.ui.end_duration_input, self.end_duration),
+            ("font_path", self.ui.font_path_input.layout.line_edit, self.font_path ),
+            ("font_size", self.ui.font_size_input, self.font_size),
             
-            ("bar_file_name", self.ui.bar_file_name, str, self.bar_file_name),
-            ("dot_file_name", self.ui.dot_file_name, str, self.dot_file_name),
-            ("dot_avi_file_name", self.ui.dot_avi_file_name, str, self.dot_avi_file_name),
-            ("rendered_name", self.ui.rendered_file_name, str, self.rendered_name),
+            ("bar_file_name", self.ui.bar_file_name, self.bar_file_name),
+            ("dot_file_name", self.ui.dot_file_name, self.dot_file_name),
+            ("dot_avi_file_name", self.ui.dot_avi_file_name, self.dot_avi_file_name),
+            ("rendered_name", self.ui.rendered_file_name, self.rendered_name),
 
-            ("ffmpeg_bin", self.ui.ffmpeg_bin_input.layout.line_edit, str, self.ffmpeg_bin),
+            ("ffmpeg_bin", self.ui.ffmpeg_bin_input.layout.line_edit, self.ffmpeg_bin),
         ]
 
 

@@ -113,26 +113,26 @@ class Logic:
 
 
         SETTINGS_FIELDS = [
-            ("width", self.ui.width_input, int, self.width),
-            ("height", self.ui.height_input, int, self.height),
-            ("fps", self.ui.fps_input, float, self.fps),
-            ("use_gpu", self.ui.use_gpu_checkbox, bool, self.use_gpu),
+            ("width", self.ui.width_input, self.width),
+            ("height", self.ui.height_input, self.height),
+            ("fps", self.ui.fps_input, self.fps),
+            ("use_gpu", self.ui.use_gpu_checkbox,self.use_gpu),
 
-            ("start_duration", self.ui.start_duration_input, int, self.start_duration),
-            ("end_duration", self.ui.end_duration_input, int, self.end_duration),
+            ("start_duration", self.ui.start_duration_input, self.start_duration),
+            ("end_duration", self.ui.end_duration_input, self.end_duration),
 
-            ("rendered_name", self.ui.rendered_file_name, str, self.rendered_name),
+            ("rendered_name", self.ui.rendered_file_name, self.rendered_name),
             
-            ("font_path", self.ui.font_path_input.layout.line_edit, str, self.font_path ),
-            ("font_size", self.ui.font_size_input, int, self.font_size),
+            ("font_path", self.ui.font_path_input.layout.line_edit, self.font_path ),
+            ("font_size", self.ui.font_size_input, self.font_size),
             
 
-            ("max_time", self.ui.max_time_input, float, self.max_time),
-            ("distance_from_center", self.ui.center_offset_input, int, self.distance_from_center),
-            ("spacing", self.ui.spacing_input, int, self.spacing),
-            ("lap_fill_color", self.ui.lap_fill_color_input.logic, tuple[int, int, int], self.lap_fill_color),
-            ("timer_fill_color", self.ui.timer_fill_color_input.logic, tuple[int, int, int], self.timer_fill_color),
-            ("stats_fill_color", self.ui.stats_fill_color_input.logic, tuple[int, int, int], self.stats_fill_color),
+            ("max_time", self.ui.max_time_input, self.max_time),
+            ("distance_from_center", self.ui.center_offset_input, self.distance_from_center),
+            ("spacing", self.ui.spacing_input, self.spacing),
+            ("lap_fill_color", self.ui.lap_fill_color_input.logic, self.lap_fill_color),
+            ("timer_fill_color", self.ui.timer_fill_color_input.logic, self.timer_fill_color),
+            ("stats_fill_color", self.ui.stats_fill_color_input.logic, self.stats_fill_color),
         ]
         
         self.settings_handler = SettingsHandler(SETTINGS_FIELDS, target=self, app="make_timer_overlay")

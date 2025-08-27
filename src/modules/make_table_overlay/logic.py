@@ -150,22 +150,22 @@ class Logic:
 
 
         SETTINGS_FIELDS = [
-            ("width", self.ui.width_input, int, self.width),
-            ("height", self.ui.height_input, int, self.height),
-            ("fps", self.ui.fps_input, float, self.fps),
-            ("use_gpu", self.ui.use_gpu_checkbox, bool, self.use_gpu),
+            ("width", self.ui.width_input, self.width),
+            ("height", self.ui.height_input, self.height),
+            ("fps", self.ui.fps_input, self.fps),
+            ("use_gpu", self.ui.use_gpu_checkbox, self.use_gpu),
 
-            ("padding_top", self.ui.padding_top_input, int, self.padding_top),
-            ("padding_bottom", self.ui.padding_bottom_input, int, self.padding_bottom),
-            ("padding_left", self.ui.padding_left_input, int, self.padding_left),
-            ("padding_right", self.ui.padding_right_input, int, self.padding_right),
+            ("padding_top", self.ui.padding_top_input, self.padding_top),
+            ("padding_bottom", self.ui.padding_bottom_input, self.padding_bottom),
+            ("padding_left", self.ui.padding_left_input, self.padding_left),
+            ("padding_right", self.ui.padding_right_input, self.padding_right),
 
-            ("start_duration", self.ui.start_duration_input, int, self.start_duration),
-            ("end_duration", self.ui.end_duration_input, int, self.end_duration),
+            ("start_duration", self.ui.start_duration_input, self.start_duration),
+            ("end_duration", self.ui.end_duration_input, self.end_duration),
 
-            ("rendered_name", self.ui.rendered_file_name, str, self.rendered_name),
-            ("font_path", self.ui.font_path_input.layout.line_edit, str, self.font_path ),
-            ("font_size", self.ui.font_size_input, int, self.font_size),
+            ("rendered_name", self.ui.rendered_file_name, self.rendered_name),
+            ("font_path", self.ui.font_path_input.layout.line_edit, self.font_path ),
+            ("font_size", self.ui.font_size_input, self.font_size),
         ]
 
         # In __init__ or setup:

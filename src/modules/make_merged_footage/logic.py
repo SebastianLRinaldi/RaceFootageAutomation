@@ -94,17 +94,21 @@ class Logic:
 
         self.rendered_name = f"merged_footage.mp4"
 
-        self.footage_dirs = []
         self.last_footage_dir_selected = ""
+        self.combox_save = {"items": [""], "index": 0}
 
         SETTINGS_FIELDS = [
-            ("use_gpu", self.ui.use_gpu_checkbox, bool, self.use_gpu),
-            ("rendered_name", self.ui.rendered_file_name, str, self.rendered_name),
-            ("footage_dirs", self.ui.drive_selector_input.logic, list, self.footage_dirs),
-            ("last_footage_dir_selected",  self.ui.source_footage_view.logic, str, self.last_footage_dir_selected),
+            ("use_gpu", self.ui.use_gpu_checkbox, self.use_gpu),
+            ("rendered_name", self.ui.rendered_file_name, self.rendered_name),
+            ("last_footage_dir_selected",  self.ui.source_footage_view.logic, self.last_footage_dir_selected),
+            ("combox_save", self.ui.drive_selector_input.layout.drive_combo, self.combox_save),
         ]
+
+        self.ui.source_footage_view.layout.files_view.setContextMenuPolicy(
+                Qt.ContextMenuPolicy.CustomContextMenu
+            )
         
-        self.settings_handler = SettingsHandler(SETTINGS_FIELDS, target=self, app="merge_footage")
+        self.settings_handler = SettingsHandler(SETTINGS_FIELDS, self, app="merge_footage")
 
 
     def merge_footage(self):
@@ -131,28 +135,6 @@ class Logic:
     def handle_file_items(self, file_items: list[FileItem]):
         print("Got paths:", file_items)  # or do your custom stuff
         self.ui.choosen_footage_viewer.layout.files_widget.addTopLevelItems(file_items)
-        
-
-    def add_video_item(self, file_item: FileItem):
-        pass
-        # existing_paths = [self.ui.file_selector_input.layout.selected_files.item(i).data(Qt.ItemDataRole.UserRole) for i in range(self.ui.file_selector_input.layout.selected_files.count())]
-        # if file_path in existing_paths:
-        #     return  # skip duplicates
-
-        # thumb_path = self.create_thumbnail(file_path)
-        # item = QListWidgetItem(QIcon(thumb_path), os.path.basename(file_path))
-        # item.setData(Qt.ItemDataRole.UserRole, file_path)
-        # self.ui.file_selector_input.layout.selected_files.addItem(item)
-
-        # self.ui.file_selector_input.layout.selected_files.addTopLevelItems() addItem(file_item)
-
-    # def create_thumbnail(self, file_path):
-    #     thumb = file_path + "_thumb.png"
-    #     if not os.path.exists(thumb):
-    #         subprocess.run([
-    #             "ffmpeg", "-y", "-i", file_path, "-vf", "thumbnail,scale=128:72", "-frames:v", "1", thumb
-    #         ], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    #     return thumb
 
     def get_ffmpeg_cmd(self, concat_txt):
         base_cmd = [
@@ -202,8 +184,6 @@ class Logic:
                 item: FileItem = file_item_widget.topLevelItem(i)
                 files.append(item.filePath())
                 
-
-
             with open(concat_txt, "w") as f:
                 for file in files:
                     f.write(f"file '{file}'\n")

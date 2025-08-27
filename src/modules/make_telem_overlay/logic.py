@@ -69,16 +69,16 @@ class Logic:
         
 
         SETTINGS_FIELDS = [
-            ("width", self.ui.width_input, int, self.width),
-            ("height", self.ui.height_input, int, self.height),
-            ("fps", self.ui.fps_input, float, self.fps),
+            ("width", self.ui.width_input, self.width),
+            ("height", self.ui.height_input, self.height),
+            ("fps", self.ui.fps_input, self.fps),
 
-            ("rendered_name", self.ui.rendered_file_name, str, self.rendered_name),
+            ("rendered_name", self.ui.rendered_file_name, self.rendered_name),
             
-            ("radius", self.ui.radius_input, int, self.radius),
-            ("scale", self.ui.scale_input, int, self.scale),
+            ("radius", self.ui.radius_input, self.radius),
+            ("scale", self.ui.scale_input, self.scale),
 
-            ("max_val", self.ui.max_val_input, float, self.max_val),
+            ("max_val", self.ui.max_val_input, self.max_val),
         ]
 
         self.settings_handler = SettingsHandler(SETTINGS_FIELDS, target=self, app="make_telem_overlay")

@@ -13,7 +13,7 @@ from src.helper_classes import *
 
 
 class Logic(QObject):
-    valueChanged = pyqtSignal(str)
+    valueChanged = pyqtSignal(str)  # emits the directory path whenever it changes
     
     def __init__(self, ui: Layout):
         super().__init__()
@@ -27,7 +27,10 @@ class Logic(QObject):
         self.ui.files_view.setRootIndex(self.tree_model.index(self.tree_directory))
         self.tree_model.setIconProvider(ThumbnailProvider(self.ui.files_view))
 
+        self.tree_model.rootPathChanged.connect(self.valueChanged)
+
     def set_directory(self, path: str):
+        print(f"SET = {path} | self.tree_directory = {self.tree_directory} ")
         if path != self.tree_directory: 
             if not path.strip():  # ignore empty or whitespace-only
                 self.tree_directory = ""
@@ -37,7 +40,7 @@ class Logic(QObject):
 
             if not os.path.isdir(path):
                 QMessageBox.warning(
-                    self,
+                    self.ui,
                     "FILETREE: Invalid Directory",
                     f"The path does not exist:\n{path}"
                 )
@@ -46,7 +49,7 @@ class Logic(QObject):
             self.tree_directory = path
             self.tree_model.setRootPath(self.tree_directory)
             self.ui.files_view.setRootIndex(self.tree_model.index(self.tree_directory))
-            self.valueChanged.emit(self.tree_directory)
+
 
     def get_directory(self):
         return self.tree_directory 
@@ -81,6 +84,7 @@ class Logic(QObject):
 
     def setValue(self, path):
         self.set_directory(path)
+        self.valueChanged.emit(self.tree_directory)
 
     def collect_selected_items(self):
         tree = self.ui.files_view
@@ -95,12 +99,13 @@ class Logic(QObject):
             path = model.filePath(i)
             icon = model.fileIcon(i)
             selected_items.append(FileItem(path, icon))  # create a FileItem here
+            print("GIT ITEM")
         return selected_items
 
 
     # def open_menu(self, position):
-    #     tree = self.file_tree_loader.file_tree
-    #     model = self.file_tree_loader.tree_model
+    #     tree = self.ui.files_view
+    #     model =self.tree_model 
     #     indexes = [i for i in tree.selectionModel().selectedIndexes() if i.column() == 0]
 
     #     if not indexes:
