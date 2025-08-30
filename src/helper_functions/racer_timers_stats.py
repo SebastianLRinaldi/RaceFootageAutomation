@@ -71,7 +71,7 @@ def best_lap_deltas(times):
             delta_str = f"{delta:+.3f}"  # Format the delta with + or - and two decimal places
             time_formated = f"{time:.3f}"
             # print(f"Lap {i+1}: {time_formated} ({delta_str})")
-            lap_times_with_best_time_deltas.append((time_formated, delta_str))
+            lap_times_with_best_time_deltas.append([i + 1, time_formated, delta_str])
 
     return lap_times_with_best_time_deltas
 
