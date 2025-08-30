@@ -270,7 +270,7 @@ class SettingsHandler:
             try:
                 setting_val = self.settings.value(key, default)
                 attr_val = getattr(self.target, key, None) if self.target else None
-                lines.append(f"{key}: QSettings='{setting_val}' | target.{key}='{attr_val}'")
+                lines.append(f"{key}: QSettings='{setting_val}'[{type(setting_val)}] | target.{key}='{attr_val}':[{type(setting_val)}]")
             except Exception as e:
                 lines.append(f"{key}: ERROR reading values: {e}")
         return "<SettingsHandler>\n" + "\n".join(lines)
@@ -295,7 +295,7 @@ class SettingsHandler:
                 getter, setter, _ = self.widget_caps(widget)
                 val = self.settings.value(key, default)
                 setter(widget, val)
-                print(f"[DEBUG] [LOAD] | {key}={widget} | setter={setter} |  saved-val={val} |")
+                # print(f"[DEBUG] [LOAD] | {key}={widget} | setter={setter} |  saved-val={val} |")
                 setattr(self.target, key, val)
             except Exception as e:
                 self._raise_field_error(f"[Load error] {key}: {e}")
@@ -306,7 +306,7 @@ class SettingsHandler:
             try:
                 getter, _, signal = self.widget_caps(widget)
                 signal(widget).connect(lambda _, k=key, w=widget, g=getter: self._on_change(k, w, g))
-                print(f"[DEBUG] [AUTOSAVE CONNECTED] | {key}={widget} | SIGNAL={signal} |")
+                # print(f"[DEBUG] [AUTOSAVE CONNECTED] | {key}={widget} | SIGNAL={signal} |")
             except Exception as e:
                 self._raise_field_error(f"[Connect error] {key}: {e}")
 
@@ -316,7 +316,7 @@ class SettingsHandler:
             val = getter(widget)
             self.settings.setValue(key, val)
             setattr(self.target, key, val)
-            print(f"[DEBUG] [_on_change] '{key}' of object {widget} set to '{val}' with getter={getter}")
+            # print(f"[DEBUG] [_on_change] '{key}' of object {widget} set to '{val}' with getter={getter}")
         except Exception as e:
             self._raise_field_error(f"[_on_change failed] {key}: {e}")
 

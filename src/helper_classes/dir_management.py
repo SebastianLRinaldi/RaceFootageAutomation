@@ -1,9 +1,13 @@
 import os
 from src.helper_functions import *
+from PyQt6.QtCore import pyqtSignal, QObject
 
-class ProjectDirectory():
+class ProjectDirectory(QObject):
+    # Define a signal that will be emitted when changes are made
+    project_updated = pyqtSignal()
     
     def __init__(self):
+        super().__init__()
         self.project_name: str = ""
         self.project_path: str = ""
         self.module_path: str = ""
@@ -31,6 +35,7 @@ class ProjectDirectory():
         self.rendered_path = os.path.join(self.module_path, "rendered")
         
         self.asset_path: str = os.path.join(self.module_path, "assets")
+        self.project_updated.emit()
 
     def update_lap_times(self):
         self.lap_times_csv = get_config_value(self.config_path, "lap_time_csv")

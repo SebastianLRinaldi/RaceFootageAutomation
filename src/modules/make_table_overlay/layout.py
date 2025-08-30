@@ -33,6 +33,7 @@ class Layout(UiManager):
 
     status_label: QLabel
     generate_button: QPushButton
+    reset_table_settings: QPushButton
 
     file_tree: FilesView
     
@@ -56,6 +57,7 @@ class Layout(UiManager):
             self.box("vertical","Files", [self.file_tree.layout]),
 
             self.scroll([
+                self.reset_table_settings,
                     self.group("vertical", [
                         self.box("vertical", "Canvas Settings", [
                             self.form([

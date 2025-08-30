@@ -25,12 +25,11 @@ class Logic(QObject):
         self.tree_model.setRootPath(self.tree_directory)
         self.ui.files_view.setModel(self.tree_model)
         self.ui.files_view.setRootIndex(self.tree_model.index(self.tree_directory))
-        self.tree_model.setIconProvider(ThumbnailProvider(self.ui.files_view))
+        #self.tree_model.setIconProvider(ThumbnailProvider(self.ui.files_view))
 
         self.tree_model.rootPathChanged.connect(self.valueChanged)
 
     def set_directory(self, path: str):
-        print(f"SET = {path} | self.tree_directory = {self.tree_directory} ")
         if path != self.tree_directory: 
             if not path.strip():  # ignore empty or whitespace-only
                 self.tree_directory = ""
@@ -99,7 +98,6 @@ class Logic(QObject):
             path = model.filePath(i)
             icon = model.fileIcon(i)
             selected_items.append(FileItem(path, icon))  # create a FileItem here
-            print("GIT ITEM")
         return selected_items
 
 

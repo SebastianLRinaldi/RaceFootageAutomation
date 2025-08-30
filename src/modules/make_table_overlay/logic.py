@@ -136,13 +136,15 @@ class Logic:
         }
 
         # Computed constants
-        self.TOTAL_ROWS = len(self.project_directory.lap_times) + 1
+        
         self.TABLE_WIDTH = sum(self.COL_WIDTHS)
         self.FRAME_WIDTH = self.TABLE_WIDTH + self.PADDING['left'] + self.PADDING['right']
+        
+        self.TOTAL_ROWS = len(self.project_directory.lap_times) + 1
         self.FRAME_HEIGHT = (self.TOTAL_ROWS * self.ROW_HEIGHT_MAX) + self.PADDING['top'] + self.PADDING['bottom']
 
-        self.TABLE_X = self.PADDING['left']
-        self.TABLE_Y = self.PADDING['top']
+        self.TABLE_X = 0 #self.PADDING['left']
+        self.TABLE_Y = 0 #self.PADDING['top']
 
         self.WHITE = (255, 255, 255)
 
@@ -168,8 +170,24 @@ class Logic:
             ("font_size", self.ui.font_size_input, self.font_size),
         ]
 
-        # In __init__ or setup:
         self.settings_handler = SettingsHandler(SETTINGS_FIELDS, target=self, app="make_table_overlay")
+        print(f"TOTAL_ROWS (type: {type(self.TOTAL_ROWS)}): {self.TOTAL_ROWS}")
+        print(f"TABLE_WIDTH (type: {type(self.TABLE_WIDTH)}): {self.TABLE_WIDTH}")
+        print(f"FRAME_WIDTH (type: {type(self.FRAME_WIDTH)}): {self.FRAME_WIDTH}")
+        print(f"FRAME_HEIGHT (type: {type(self.FRAME_HEIGHT)}): {self.FRAME_HEIGHT}")
+        print(f"TABLE_X (type: {type(self.TABLE_X)}): {self.TABLE_X}")
+        print(f"TABLE_Y (type: {type(self.TABLE_Y)}): {self.TABLE_Y}")
+
+    def on_project_updated(self):
+        self.TABLE_WIDTH = sum(self.COL_WIDTHS)
+        self.FRAME_WIDTH = self.TABLE_WIDTH + self.PADDING['left'] + self.PADDING['right']
+        
+        self.TOTAL_ROWS = len(self.project_directory.lap_times) + 1
+        self.FRAME_HEIGHT = (self.TOTAL_ROWS * self.ROW_HEIGHT_MAX) + self.PADDING['top'] + self.PADDING['bottom']
+
+        # self.TABLE_X = self.PADDING['left']
+        # self.TABLE_Y = self.PADDING['top']
+
 
     def generate_overlay(self):
         self.ui.generate_button.setEnabled(False)
@@ -195,12 +213,58 @@ class Logic:
     def draw_centered_text_pil(self, img, text, x, y, font_size, color):
         pil_img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         draw = ImageDraw.Draw(pil_img)
-        font = self.font
-        bbox = draw.textbbox((0, 0), text, font=font)
-        text_w = bbox[2] - bbox[0]
-        text_h = bbox[3] - bbox[1]
-        position = (int(x - text_w / 2), int(y - text_h / 2))
-        draw.text(position, text, font=font, fill=color)
+        font = ImageFont.truetype(self.font_path, font_size)
+        bbox = draw.textbbox((x, y), text, anchor="mm", align="center", font=font)
+
+
+        draw.text((x, y), text, anchor="mm", align="center", font=font, fill=color)
+
+
+
+
+        
+        dot_radius = int(font_size / 4)  # Adjust the size of the dot relative to the font size
+        
+        # Calculate the bounding box for the dot
+        left = int(x - dot_radius)
+        top = int(y - dot_radius)
+        right = int(x + dot_radius)
+        bottom = int(y + dot_radius)
+
+        draw.ellipse([left, top, right, bottom], fill=(0, 255, 0))
+
+        left, top, right, bottom = bbox  # Unpack the bounding box coordinates
+
+        # Calculate center of bounding box for the red lines
+        center_x = (left + right) // 2  # Middle X of text box
+        center_y = (top + bottom) // 2  # Middle Y of text box
+
+        # Draw the vertical red line (center of text box)
+        draw.line([center_x, top, center_x, bottom], fill=(0, 0, 255), width=4)
+
+        # Draw the horizontal red line (center of text box)
+        draw.line([left, center_y, right, center_y], fill=(0, 0, 255), width=4)
+        draw.rectangle([left, top, right, bottom], outline=(0, 0, 255), width=1)  # Red rectangle
+        
+        # Draw the dot (ellipse with equal width and height)
+        # draw.text([left, top, right, bottom], text, font=font, fill=color)
+        # draw.text(position, text, font=font, fill=(255, 0, 255))
+
+
+        # left = int(position[0] - dot_radius)
+        # top = int(position[1] - dot_radius)
+        # right = int(position[0] + dot_radius)
+        # bottom = int(position[1] + dot_radius)
+        
+        # # Draw the dot at the text position
+        # draw.ellipse([left, top, right, bottom], fill=(255, 0, 255))  # Red dot
+
+
+        
+
+
+
+        
         return cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
 
     def draw_table(self, img, x, y, data_rows):
@@ -208,13 +272,14 @@ class Logic:
         available_height = img.shape[0] - y - self.PADDING['bottom']
         row_h = max(self.ROW_HEIGHT_MIN, min(self.ROW_HEIGHT_MAX, available_height // total_rows))
 
-        font_size_header = int(row_h * 0.8)
-        font_size_row = int(row_h * 0.7)
+        font_size_header = row_h#int(row_h * 0.7)
+        font_size_row = row_h#int(row_h * 0.7)
 
         # Draw header row
         col_x = x
         for i, header in enumerate(self.HEADERS):
             center_x = col_x + self.COL_WIDTHS[i] // 2
+            print(f"{center_x}, {y}, {row_h} | {row_h // 2} | {y + row_h // 2}")
             img = self.draw_centered_text_pil(img, header, center_x, y + row_h // 2, font_size_header, self.WHITE)
             col_x += self.COL_WIDTHS[i]
         cv2.rectangle(img, (x, y), (x + self.TABLE_WIDTH, y + row_h), self.WHITE, 1)
@@ -234,6 +299,14 @@ class Logic:
                 text = f"{cell}" if cell is not None else "N/A"
                 img = self.draw_centered_text_pil(img, text, center_x, top + row_h // 2, font_size_row, self.WHITE)
                 col_x += self.COL_WIDTHS[j]
+
+
+
+                # Draw two red lines through the center of the cell (both horizontal and vertical)
+                # Horizontal red line through the center
+                cv2.line(img, (x, top + row_h // 2), (x + self.TABLE_WIDTH, top + row_h // 2), (0, 0, 255), 2)
+                # Vertical red line through the center
+                cv2.line(img, (center_x, top), (center_x, top + row_h), (0, 0, 255), 2)
             # vertical lines
             col_x = x
             for width in self.COL_WIDTHS[:-1]:
@@ -244,12 +317,15 @@ class Logic:
 
     def create_blank_video(self, duration, filename):
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        writer = cv2.VideoWriter(filename, fourcc, self.fps, (self.FRAME_WIDTH, self.FRAME_HEIGHT))
+        writer = cv2.VideoWriter(filename, fourcc, self.fps, frameSize=(int(self.FRAME_WIDTH), int(self.FRAME_HEIGHT)))
         blank = np.zeros((self.FRAME_HEIGHT, self.FRAME_WIDTH, 3), dtype=np.uint8)
         frame_count = int(self.fps* duration)
-        for _ in range(frame_count):
-            writer.write(blank)
-        writer.release()
+        try:
+            for _ in range(frame_count):
+                writer.write(blank)
+        finally:
+            writer.release()  # Ensure it's always released
+            del writer
 
     def draw_headers(self):
         # Header only
@@ -265,7 +341,7 @@ class Logic:
     def create_headers_video(self, duration, filename):
         frame_count = int(duration * self.fps)
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        writer = cv2.VideoWriter(filename, fourcc, self.fps, (self.FRAME_WIDTH, self.FRAME_HEIGHT), True)
+        writer = cv2.VideoWriter(filename, fourcc, self.fps, frameSize=(self.FRAME_WIDTH, self.FRAME_HEIGHT))
 
         # Create a styled stats frame using PIL
         # img = Image.new("RGB", (WIDTH, HEIGHT), (0, 0, 0))
@@ -274,10 +350,11 @@ class Logic:
         
         frame_bgr = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
-        for _ in range(frame_count):
-            writer.write(frame_bgr)
-
-        writer.release()
+        try:
+            for _ in range(frame_count):
+                writer.write(frame_bgr)
+        finally:
+            writer.release()  # Ensure it's always released
 
     def get_ffmpeg_cmd(self, concat_txt):
         base_cmd = [
@@ -369,10 +446,11 @@ class Logic:
             current_data.append([lap, time_str, delta])
 
         # duration = float(target_lap[0])
-        frame_count = int(self.end_duration * self.fps)
+        fps_float = float(self.fps)
+        frame_count = int(self.end_duration * fps_float)
         filename = os.path.join(temp_dir, f"lap_{lap_number:02}.mp4")
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        writer = cv2.VideoWriter(filename, fourcc, self.fps, (self.FRAME_WIDTH, self.FRAME_HEIGHT))
+        writer = cv2.VideoWriter(filename, fourcc, fps_float, (self.FRAME_WIDTH, self.FRAME_HEIGHT))
 
 
         img = self.draw_table(
@@ -407,13 +485,13 @@ class Logic:
             # 2. Render laps in parallel
             lap_videos = [last_lap_video]
 
-            render_single = False
+            render_single = True
 
             # for i, target_lap in enumerate(LAP_TIMES):
             #     lap_videos.append(create_lap_table( i , target_lap, temp_dir))
             
             if render_single:
-                lap_video = self.create_lap_table( 1, self.project_directory.lap_time_deltas[1], temp_dir)
+                lap_video = self.create_lap_table( 23, self.project_directory.lap_time_deltas[23], temp_dir)
                 lap_videos.append(lap_video)
             else:
                 with ThreadPoolExecutor() as executor:
@@ -433,4 +511,5 @@ class Logic:
             self.concat_videos(lap_videos, self.rendered_name)
 
             # Temp files deleted automatically on context exit
-            print(f"✅ Timer Overlay Video saved as {self.rendered_name}")
+            print(f"✅ Timer Overlay Video saved as {self.project_directory.make_rendered_file_path(self.rendered_name)}")
+            print(f'File "{self.project_directory.make_rendered_file_path(self.rendered_name)}"')

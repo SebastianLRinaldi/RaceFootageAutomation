@@ -137,30 +137,6 @@ class Logic:
         
         self.settings_handler = SettingsHandler(SETTINGS_FIELDS, target=self, app="make_timer_overlay")
 
-    # def __str__(self):
-    #     attrs = vars(self)
-    #     return "\n".join(f"{key}: {value}" for key, value in attrs.items())
-
-    def __str__(self):
-        lines = []
-        for key, widget, cast, default in self.settings_handler.fields:
-            # Logic's attribute value
-            attr_val = getattr(self, key, "<no attr>")
-            
-            # Widget's current value
-            try:
-                getter_name = self.settings_handler._getter(widget)
-                widget_val = getattr(widget, getter_name)()
-            except Exception as e:
-                widget_val = f"<error: {e}>"
-            
-            lines.append(
-                f"{key}: Logic='{attr_val}' | Widget='{widget_val}'"
-            )
-        return "\n".join(lines)
-
-    
-
     def generate_overlay(self):
         self.ui.generate_button.setEnabled(False)
         self.ui.status_label.setText("Generating Timer Overlay...")

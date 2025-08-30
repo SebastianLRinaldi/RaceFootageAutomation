@@ -133,7 +133,6 @@ class Logic:
         self.ui.merge_btn.setEnabled(True)
 
     def handle_file_items(self, file_items: list[FileItem]):
-        print("Got paths:", file_items)  # or do your custom stuff
         self.ui.choosen_footage_viewer.layout.files_widget.addTopLevelItems(file_items)
 
     def get_ffmpeg_cmd(self, concat_txt):
@@ -173,7 +172,6 @@ class Logic:
         # Create concat text file for ffmpeg
         with tempfile.TemporaryDirectory() as temp_dir:
             concat_txt = os.path.join(os.path.dirname(temp_dir), "concat_list_merged_footage.txt")
-            print(f"concat_txt_path: {concat_txt} | self.rendered_name:{self.rendered_name} | self.project_directory.asset_path: {self.project_directory.asset_path}")
             if concat_txt is None:
                 raise AttributeError(f"EMPTY CONCAT TEXT")
 

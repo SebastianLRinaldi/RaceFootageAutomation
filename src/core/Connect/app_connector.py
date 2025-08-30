@@ -68,7 +68,7 @@ class AppConnector:
             if hasattr(module, "logic") and hasattr(module.logic, "project_directory"):
 
                 module.logic.project_directory.set_up_directory(project_name, project_path, module_path)
-                # print(f"AFTER-SETUP {module_name}: {module.logic.project_directory}")
+
 
         self.main.switch_to("project_editor")
 

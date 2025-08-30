@@ -6,6 +6,8 @@ class Connections:
         self.ui = ui
         self.logic = logic
 
+        
+
         self.ui.drive_selector_input.layout.drive_combo.currentTextChanged.connect(
             self.ui.source_footage_view.logic.set_directory
         )
