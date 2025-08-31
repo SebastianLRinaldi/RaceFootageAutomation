@@ -387,7 +387,7 @@ class Logic:
     # #     writer.release()
     # #     return filename
 
-    # # def create_last_lap_table(self, lap_number, temp_dir):
+    # def create_last_lap_table(self, lap_number, temp_dir):
     #     print(f"lap_number: {lap_number}")
     #     current_laps = self.project_directory.lap_time_deltas[:lap_number]
     #     current_data = []
@@ -529,18 +529,13 @@ class Logic:
     def draw_text_centered(self, draw:ImageDraw.ImageDraw, font, text, xy:tuple, color:tuple=(255,255,255)):
         x_frame_center, y_frame_center=xy
 
-        # print(f"x_center:{x_frame_center} y_center:{y_frame_center}")
-
-        # Calculate the text bounding box (RAW)
         x_old_bbox_center, y_old_bbox_center = self.get_text_center(draw, text, font, (x_frame_center, y_frame_center), color=color)
-        # print(f"Text center will be at: ({x_old_bbox_center}, {y_old_bbox_center})")    
 
         x_adjusted_frame_center = x_frame_center + (x_frame_center - x_old_bbox_center)
         y_adjusted_frame_center = y_frame_center + (y_frame_center - y_old_bbox_center )
         
         correct_center_x, correct_center_y = self.get_text_center(draw, text, font, (x_adjusted_frame_center, y_adjusted_frame_center), color=color, draw_text=True, draw_alignment=False)
 
-        # print(f"CORRECTEDTEXTCENTER: new_x:{correct_center_x} | new_y:{correct_center_y}")
 
     def draw_table(self, data_rows:list, draw_alignment=False):
         # Define starting position and padding
@@ -633,12 +628,48 @@ class Logic:
         # pil_img.show()  # This opens the image in the default image viewer
         return pil_img
 
-    def create_table_section(self, lap_number, target_lap, temp_dir):
-        print(f"lap_number: {lap_number}")
-        current_laps = self.project_directory.lap_time_deltas[:lap_number]
+    def create_table_section(self, lap_number, temp_dir):
+        """
+            # List of lap time deltas is 0-based
+            # If there are 24 laps, valid indexes are 0 to 23
+            # lap_number = 1-based external label (e.g., for display)
+            # index = lap_number - 1
 
-        duration = float(target_lap[1])
-        frame_count = int(duration * self.fps)
+            # Slicing with [:lap_number] returns first 'lap_number' items (indexes 0 to lap_number-1)
+            # So:
+            # self.project_directory.lap_time_deltas[:0] => returns [] (no laps) | HEADER DISPLAYED + no laps on table 
+            # self.project_directory.lap_time_deltas[:1] => returns first lap only (index 0) | Headers + lap 1 on table 
+            # self.project_directory.lap_time_deltas[:23] => returns 23 laps (indexes 0 to 22) | headers +  laps 1-23 on table 
+            # self.project_directory.lap_time_deltas[:24] => returns full 24 laps (indexes 0 to 23) | headers +  laps 1-24 on table 
+            
+            # self.project_directory.lap_time_deltas[0][1] => Duration of lap 1 | [LAP 1 DURATION]
+            # self.project_directory.lap_time_deltas[1][1] => Duration of lap 2 | Headers + lap 1 for [lap 2 duration]
+            # self.project_directory.lap_time_deltas[23][1] => Duration of lap 24 | Headers + lap 1-23 for [lap 24 duration]
+            # self.project_directory.lap_time_deltas[24][1] => IndexError (only 24 laps; valid indexes are 0 to 23) | Headers + lap 1-24 [for custom end duration - no lap time duration]
+
+            ----
+            interation 0 = HEADER DISPLAYED + no laps on table [LAP 1 DURATION]
+            interation 1 = HEADER DISPLAYED +  lap 1 on table [LAP 2 DURATION]
+            interation 23 = HEADER DISPLAYED +  lap 1-23 on table [LAP 24 DURATION]
+            interation 24 = HEADER DISPLAYED +  lap 1-24 on table [CUSTOM END DURATION]
+            ----
+            interation 0 =      lap_time_deltas[:0] | lap_time_deltas[0][1]
+            interation 1 =      lap_time_deltas[:1] |  lap_time_deltas[1][1]
+            interation 23 =    lap_time_deltas[:23] | lap_time_deltas[23][1]
+            interation 24 =    lap_time_deltas[:24] |  [CUSTOM END DURATION]
+        
+        """
+        current_laps = self.project_directory.lap_time_deltas[:lap_number]
+        
+        if lap_number == len(self.project_directory.lap_time_deltas):
+            # last lap
+            duration = self.end_duration
+        else:
+            target_duration = self.project_directory.lap_time_deltas[lap_number][1]
+            duration = target_duration
+        
+        print(f"lap_number: {lap_number} |  firstlap?: {lap_number == 0}   | lastlap?: {lap_number == len(self.project_directory.lap_time_deltas)} | duration: {duration} | current_laps {current_laps}\n")
+        frame_count = int(float(duration) * self.fps)
         filename = os.path.join(temp_dir, f"lap_{lap_number:02}.mp4")
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
         writer = cv2.VideoWriter(filename, fourcc, self.fps, (self.FRAME_WIDTH, self.FRAME_HEIGHT))
@@ -689,13 +720,13 @@ class Logic:
             #     lap_videos.append(create_lap_table( i , target_lap, temp_dir))
             lap_videos = []
             if render_single:
-                lap_video = self.create_table_section( 2, self.project_directory.lap_time_deltas[2], temp_dir)
+                lap_video = self.create_table_section( 2, temp_dir)
                 lap_videos.append(lap_video)
             else:
                 with ThreadPoolExecutor() as executor:
                     futures = {
-                                executor.submit(self.create_table_section, i , target_lap, temp_dir): i
-                                for i, target_lap in enumerate(self.project_directory.lap_time_deltas)
+                                executor.submit(self.create_table_section, i , temp_dir): i
+                                for i in range(len(self.project_directory.lap_time_deltas)+1)
                             }
 
                     for future in tqdm(as_completed(futures), total=len(futures), desc="Rendering laps in parallel"):
