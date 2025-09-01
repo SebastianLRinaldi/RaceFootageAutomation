@@ -15,8 +15,8 @@ class Logic:
     def update_modules_lap_times(self):
         targets = [
             "gatherracetimes",
-            "makestreamviewer",
-            "makemergedfootage",
+            # "makestreamviewer",
+            # "makemergedfootage",
             "makesegmentoverlay",
             "maketableoverlay",
             "maketelemoverlay",

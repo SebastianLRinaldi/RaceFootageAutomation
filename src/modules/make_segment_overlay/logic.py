@@ -369,15 +369,16 @@ class Logic():
 
         # cmd = [
         #     self.ffmpeg_bin, "-y",
-        #     "-i", self.project_directory.make_asset_path(self.bar_file_name),
-        #     "-i", self.project_directory.make_asset_path(self.dot_file_name),
-        #     "-filter_complex", filter_complex,
+        #     "-i", self.project_directory.make_asset_file_path(self.bar_file_name),
+        #     "-i", self.project_directory.make_asset_file_path(self.dot_file_name),
+        #     # "-filter_complex", filter_complex,
+        #     "-filter_complex", "[1:v]colorkey=0x000000:0.1:0.2[ckout];[0:v][ckout]overlay=shortest=1",
         #     "-c:v", "h264_nvenc",
         #     "-preset", "fast",
         #     "-rc", "vbr",
         #     "-cq", "18",
         #     "-pix_fmt", "yuv420p",
-        #     self.project_directory.make_rendered_path(self.rendered_name),
+        #     self.project_directory.make_rendered_file_path(self.rendered_name),
         # ]
 
 

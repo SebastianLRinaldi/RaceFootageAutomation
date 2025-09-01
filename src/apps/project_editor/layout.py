@@ -31,9 +31,9 @@ class Layout(UiManager):
 
     #######################
     gatherracetimes: GatherRaceTimes
-    makemergedfootage: MakeMergedFootage
+    # makemergedfootage: MakeMergedFootage
     makesegmentoverlay: MakeSegmentOverlay
-    makestreamviewer: MakeStreamViewer
+    # makestreamviewer: MakeStreamViewer
     maketableoverlay: MakeTableOverlay
     maketelemoverlay: MakeTelemOverlay
     maketimeroverlay: MakeTimerOverlay
@@ -51,17 +51,18 @@ class Layout(UiManager):
 
             self.tabs(
                 tab_labels=[
-                    "Data Grabber", "Stream Viewer", "Merge Footage", 
+                    "Data Grabber", 
                     "Segment Overlay", "Table Overlay", "Telemetry Overlay", "Timer Overlay", 
+                    # "Stream Viewer", "Merge Footage",
                 ],
                 children=[
                     self.gatherracetimes.layout,
-                    self.makestreamviewer.layout,
-                    self.makemergedfootage.layout,
                     self.makesegmentoverlay.layout,
                     self.maketableoverlay.layout,
                     self.maketelemoverlay.layout,
                     self.maketimeroverlay.layout,
+                    # self.makestreamviewer.layout,
+                    # self.makemergedfootage.layout,
                     
                 ]),
         ]

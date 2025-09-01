@@ -45,8 +45,8 @@ class AppConnector:
 
         targets = [
             ("gatherracetimes", "Race Times"),
-            ("makestreamviewer", "Raw Footage"),
-            ("makemergedfootage", "Raw Footage"),
+            # ("makestreamviewer", "Raw Footage"),
+            # ("makemergedfootage", "Raw Footage"),
             ("makesegmentoverlay", "Segment Overlay"),
             ("maketableoverlay", "Table Overlay"),
             ("maketelemoverlay", "Telemetry Overlay"),
