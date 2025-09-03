@@ -50,8 +50,8 @@ class Layout(UiManager):
             
             self.group(orientation="vertical", children=[
                 "status_label",
+                "progress",
                 "generate_button",
-                "progress"
             ]),
 
             self.box("vertical","Files", [self.file_tree.layout]),
@@ -129,9 +129,18 @@ class Layout(UiManager):
 
     def set_widgets(self):
         self.status_label.setText("Ready")
+        self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.generate_button.setText("Generate Overlay")
+        
+        self.progress.setFormat("Ready") 
         self.progress.setRange(0, 0)
-        self.progress.setVisible(False)
+        self.progress.setVisible(True)
+        self.progress.setMinimum(0)
+        self.progress.setMaximum(100)  # Percent scale
+        self.progress.setValue(0)
+        self.progress.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.progress.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        
 
         # self.canvas_width_input.setValue(1920)
         # self.canvas_height_input.setValue(1080)

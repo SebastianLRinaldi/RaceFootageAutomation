@@ -70,18 +70,18 @@ class OverlayWorker(QThread):
             self.error.emit(err_type, tb_str)
 
 class Logic(QObject):
-    lap_started = pyqtSignal(int)
-    lap_progress = pyqtSignal(int, int)  # lap_number, percent
-    lap_finished = pyqtSignal(int)
+    # lap_started = pyqtSignal(int)
+    # lap_progress = pyqtSignal(int, int)  # lap_number, percent
+    # lap_finished = pyqtSignal(int)
     
     def __init__(self, ui: Layout):
         super().__init__()
         self.ui = ui
         self.project_directory = ProjectDirectory()
         self.lap_labels = {}
-        self.lap_started.connect(self.create_lap_label)
-        self.lap_progress.connect(self.update_lap_label)
-        self.lap_finished.connect(self.remove_lap_label)
+        # self.lap_started.connect(self.create_lap_label)
+        # self.lap_progress.connect(self.update_lap_label)
+        # self.lap_finished.connect(self.remove_lap_label)
 
         self.width = 1920
         self.height = 1080
@@ -167,6 +167,7 @@ class Logic(QObject):
         self.ui.generate_button.setEnabled(False)
         self.ui.status_label.setText("Generating Table Overlay...")
         self.ui.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.ui.progress.setFormat("Rendering... 0%")
         self.worker = OverlayWorker(self)
         self.worker.finished.connect(self.on_finished)
         self.worker.error.connect(self.on_error)
@@ -175,6 +176,10 @@ class Logic(QObject):
     def on_finished(self):
         self.ui.status_label.setText(f"✅ Done: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
         self.ui.generate_button.setEnabled(True)
+        
+        print(f"✅ Table Overlay Video saved as {self.project_directory.make_rendered_file_path(self.rendered_name)}")
+        print(f'File "{self.project_directory.make_rendered_file_path(self.rendered_name)}"')
+        self.ui.progress.setFormat("Ready")
 
     def on_error(self, err_type: str, tb_str: str):
         msg = f"Exception type: {err_type}\n\nTraceback:\n{tb_str}"
@@ -183,6 +188,7 @@ class Logic(QObject):
         self.ui.status_label.setText(f"❌ Failed: {err_type}")
         self.ui.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.ui.generate_button.setEnabled(True)
+        self.ui.progress.setFormat("Ready")
 
     def get_ffmpeg_cmd(self, concat_txt):
         base_cmd = [
@@ -236,7 +242,6 @@ class Logic(QObject):
 
         process.wait()
 
-
     def draw_table(self, data_rows:list, draw_alignment=False):
         # Define starting position and padding
         rows = len(data_rows) + 1  # Number of rows based on your data + 1 for headers
@@ -252,10 +257,9 @@ class Logic(QObject):
 
         
         img = np.zeros((self.FRAME_HEIGHT, self.FRAME_WIDTH, 3), dtype=np.uint8)  # Initial image
-        
-        # pil_img = Image.fromarray(img)
         pil_img = Image.fromarray(cv2.cvtColor(img, cv2.COLOR_BGR2RGB))
         draw = ImageDraw.Draw(pil_img)
+
         header_font = ImageFont.truetype(self.font_path, cell_height * 1.05)
         row_font = ImageFont.truetype(self.font_path, cell_height * 0.8)
 
@@ -350,24 +354,23 @@ class Logic(QObject):
         try:
             # for _ in tqdm(range(frame_count), desc=f"Rendering Table for Lap {lap_number}"):
             #     writer.write(frame_bgr)
-            print(lap_number)
 
-            self.lap_started.emit(lap_number)
+            # self.lap_started.emit(lap_number)
 
             for i in range(frame_count):
                 writer.write(frame_bgr)
                 percent = int(((i + 1) / frame_count) * 100)
 
                 # update QLabel from worker thread safely
-                # QMetaObject.invokeMethod(
-                #     self.ui.status_label,
-                #     "setText",
-                #     Qt.ConnectionType.QueuedConnection,
-                #     Q_ARG(str, f"Rendering Table for Lap {lap_number}... {percent}%")
-                # )
-                self.lap_progress.emit(lap_number, percent)
+                QMetaObject.invokeMethod(
+                    self.ui.status_label,
+                    "setText",
+                    Qt.ConnectionType.QueuedConnection,
+                    Q_ARG(str, f"Rendering Table for Lap {lap_number}... {percent}%")
+                )
+                # self.lap_progress.emit(lap_number, percent)
 
-            self.lap_finished.emit(lap_number)
+            # self.lap_finished.emit(lap_number)
         finally:
             writer.release()  # Ensure it's always released
             del writer
@@ -381,7 +384,7 @@ class Logic(QObject):
             
             lap_videos = []
             if render_single:
-                lap_video = self.create_table_section( 2, temp_dir)
+                lap_video = self.create_table_section( 1, temp_dir)
                 lap_videos.append(lap_video)
             else:
                 with ThreadPoolExecutor() as executor:
@@ -390,35 +393,34 @@ class Logic(QObject):
                                 for i in range(len(self.project_directory.lap_time_deltas)+1)
                             }
 
-                    for future in tqdm(as_completed(futures), total=len(futures), desc="Rendering laps in parallel"):
-                        lap_number = futures[future]
-                        lap_videos.append(future.result())
-
-                    # total = len(futures)
-                    # done = 0
-                    # for future in as_completed(futures):
+                    # for future in tqdm(as_completed(futures), total=len(futures), desc="Rendering laps in parallel"):
                     #     lap_number = futures[future]
                     #     lap_videos.append(future.result())
-                    #     done += 1
-                    #     percent = int((done / total) * 100)
 
-                    #     # update QLabel from worker thread safely
-                    #     QMetaObject.invokeMethod(
-                    #         self.ui.status_label,
-                    #         "setText",
-                    #         Qt.ConnectionType.QueuedConnection,
-                    #         Q_ARG(str, f"Rendering... {percent}%")
-                    #     )
+                    total = len(futures)
+                    done = 0
+                    for future in as_completed(futures):
+                        lap_number = futures[future]
+                        lap_videos.append(future.result())
+                        done += 1
+                        percent = int((done / total) * 100)
+                        
+                        QMetaObject.invokeMethod(
+                            self,  # where `update_render_progress` is defined
+                            "update_render_progress",
+                            Qt.ConnectionType.QueuedConnection,
+                            Q_ARG(int, percent)
+                        )
 
             # Sort videos by lap number (they can complete out of order)
             lap_videos.sort(key=lambda x: int(os.path.basename(x).split('_')[1].split('.')[0]))
-
+            
             # 3. Concatenate all videos: start_blank + lap videos
             self.concat_videos(lap_videos, self.rendered_name)
 
             # Temp files deleted automatically on context exit
-            print(f"✅ Timer Overlay Video saved as {self.project_directory.make_rendered_file_path(self.rendered_name)}")
-            print(f'File "{self.project_directory.make_rendered_file_path(self.rendered_name)}"')
+
+
 
 
 
@@ -451,23 +453,26 @@ class Logic(QObject):
     #         label.deleteLater()
 
 
-    def create_lap_label(self, lap_number):
-        # print(f"MAKING LABEL LAP:{lap_number}")
-        progress = QProgressBar()
-        progress.setRange(0, 100)  # 0% to 100%
-        progress.setValue(0)
-        progress.setFormat(f"Rendering Table for Lap {lap_number}: %p%")
-        self.ui.layout().addWidget(progress)
-        self.lap_labels[lap_number] = progress
+    # def create_lap_label(self, lap_number):
+    #     progress = QProgressBar()
+    #     progress.setRange(0, 100)  # 0% to 100%
+    #     progress.setValue(0)
+    #     progress.setFormat(f"Rendering Table for Lap {lap_number}: %p%")
+    #     self.ui.layout().addWidget(progress)
+    #     self.lap_labels[lap_number] = progress
 
-    def update_lap_label(self, lap_number, percent):
-        progress = self.lap_labels.get(lap_number)
-        if progress:
-            progress.setValue(percent)
+    # def update_lap_label(self, lap_number, percent):
+    #     progress = self.lap_labels.get(lap_number)
+    #     if progress:
+    #         progress.setValue(percent)
 
-    def remove_lap_label(self, lap_number):
-        print(f"REMOVING LABEL LAP:{lap_number}")
-        progress = self.lap_labels.pop(lap_number, None)
-        if progress:
-            self.ui.layout().removeWidget(progress)
-            progress.deleteLater()
+    # def remove_lap_label(self, lap_number):
+    #     progress = self.lap_labels.pop(lap_number, None)
+    #     if progress:
+    #         self.ui.layout().removeWidget(progress)
+    #         progress.deleteLater()
+
+    @pyqtSlot(int)
+    def update_render_progress(self, percent:int):
+        self.ui.progress.setValue(percent)
+        self.ui.progress.setFormat(f"Rendering... {percent:>3d}%")

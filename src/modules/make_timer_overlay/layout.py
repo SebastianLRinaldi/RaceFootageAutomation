@@ -10,6 +10,7 @@ class Layout(UiManager):
 
     status_label: QLabel
     generate_button: QPushButton
+    progress: QProgressBar
 
     reset_settings_btn: QPushButton
 
@@ -53,6 +54,7 @@ class Layout(UiManager):
                 # Main tab
                 self.group("vertical", [
                     "status_label",
+                    "progress",
                     "generate_button"
                 ]),
 
@@ -132,6 +134,15 @@ class Layout(UiManager):
         self.status_label.setText("Click to generate timer overlay")
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.generate_button.setText("Generate Timer Overlay")
+        
+        self.progress.setFormat("Ready") 
+        self.progress.setRange(0, 0)
+        self.progress.setVisible(True)
+        self.progress.setMinimum(0)
+        self.progress.setMaximum(100)  # Percent scale
+        self.progress.setValue(0)
+        self.progress.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.progress.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # # Defaults from your logic
         # self.width_input.setValue(800)
