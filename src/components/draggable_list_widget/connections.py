@@ -1,7 +1,7 @@
 from .logic import Logic
-from .bundle import Bundle
+from .blueprint import Blueprint
 
-class Connections(Bundle):
+class Connections(Blueprint):
     def __init__(self, component, logic: Logic):
         super().__init__()
         self._map_widgets(component)

@@ -1,7 +1,7 @@
 from .logic import Logic
-from .bundle import Bundle
+from .blueprint import Blueprint
 
-class Connections(Bundle):
+class Connections(Blueprint):
     def __init__(self, component, logic: Logic):
         super().__init__()
         self._map_widgets(component)
@@ -9,23 +9,23 @@ class Connections(Bundle):
 
         
 
-        self.drive_selector_input.layout.drive_combo.currentTextChanged.connect(
+        self.drive_selector_input.drive_combo.currentTextChanged.connect(
             self.source_footage_view.logic.set_directory
         )
 
 
 
-        self.source_footage_view.layout.files_view.doubleClicked.connect(self.source_footage_view.logic.preview_file)
+        self.source_footage_view.files_view.doubleClicked.connect(self.source_footage_view.logic.preview_file)
 
 
 
-        # self.source_footage_view.layout.files_view.clicked.connect(      
+        # self.source_footage_view.files_view.clicked.connect(      
         #     lambda *_: self.logic.handle_file_items(
         #     self.source_footage_view.logic.collect_selected_items()
         #     )
         # )
 
-        self.source_footage_view.layout.files_view.customContextMenuRequested.connect(
+        self.source_footage_view.files_view.customContextMenuRequested.connect(
                         lambda *_: self.logic.handle_file_items(
             self.source_footage_view.logic.collect_selected_items()
             )

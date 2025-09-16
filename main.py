@@ -110,7 +110,7 @@ class Dashboard(QMainWindow):
         self.apps = load_apps()
 
         for name, widget in self.apps.items():
-            self.stack.addWidget(widget.layout)
+            self.stack.addWidget(widget)
 
         self.setup_menu()
 
@@ -132,7 +132,7 @@ class Dashboard(QMainWindow):
     def switch_to(self, app_name):
         widget = self.apps.get(app_name)
         if widget:
-            self.stack.setCurrentWidget(widget.layout)
+            self.stack.setCurrentWidget(widget)
         else:
             print(f"Invalid app name: {app_name}")
             print("Valid apps:", list(self.apps.keys()))

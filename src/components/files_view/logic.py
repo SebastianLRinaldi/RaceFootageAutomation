@@ -7,18 +7,18 @@ import sys
 import time
 import subprocess
 
-from .bundle import Bundle
+from .blueprint import Blueprint
 from src.helper_functions import *
 from src.helper_classes import *
 
 
-class Logic(QObject, Bundle):
+class Logic(QObject, Blueprint):
     valueChanged = pyqtSignal(str)  # emits the directory path whenever it changes
 
     def __init__(self, component):
         super().__init__()
         self._map_widgets(component)
-        self.component_window = component.layout
+        self.component = component
 
         self.tree_directory = ""
 

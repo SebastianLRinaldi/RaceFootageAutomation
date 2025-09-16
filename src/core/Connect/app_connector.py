@@ -18,22 +18,22 @@ class AppConnector:
         self.apps = apps
 
         self.init_connections()
-        self.project_base_screen.layout.open_project_btn.clicked.connect(self.load_project_into_editor)
-        self.project_editor.layout.gatherracetimes.layout.save_button.clicked.connect(self.load_project_into_editor)
+        self.project_base_screen.open_project_btn.clicked.connect(self.load_project_into_editor)
+        self.project_editor.gatherracetimes.save_button.clicked.connect(self.load_project_into_editor)
     
     def init_connections(self):
         for name, wrapper in self.apps.items():
             setattr(self, name.lower(), wrapper)
 
     def set_project_path_and_name_into_editor(self):
-        selected_items = self.project_base_screen.layout.project_list.selectedItems()
+        selected_items = self.project_base_screen.project_list.selectedItems()
         if not selected_items:
             return
         project_name = selected_items[0].text()
         project_path = os.path.join(self.project_base_screen.logic.directory, project_name)
 
-        self.project_editor.layout.project_name_label.setText(project_name)
-        self.project_editor.layout.project_path_label.setText(project_path)
+        self.project_editor.project_name_label.setText(project_name)
+        self.project_editor.project_path_label.setText(project_path)
 
         return project_name, project_path
 
@@ -54,11 +54,11 @@ class AppConnector:
         ]
 
         for name, module_name in targets:
-            module = getattr(self.project_editor.layout, name)
+            module = getattr(self.project_editor, name)
 
             module_path = os.path.join(project_path, module_name)
 
-            tree = getattr(module.layout, "file_tree")
+            tree = getattr(module, "file_tree")
             tree.logic.set_directory(module_path)
             tree.logic.set_med_icons()
 

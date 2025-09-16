@@ -18,7 +18,7 @@ import traceback
 import re
 import cProfile
 
-from .bundle import Bundle
+from .blueprint import Blueprint
 from src.components import *
 from src.helper_functions import *
 from src.helper_classes import *
@@ -43,7 +43,7 @@ class OverlayWorker(QThread):
             self.error.emit(err_type, tb_str)
 
 
-class Logic(QObject, Bundle):
+class Logic(QObject, Blueprint):
     # lap_started = pyqtSignal(int)
     # lap_progress = pyqtSignal(int, int)  # lap_number, percent
     # lap_finished = pyqtSignal(int)
@@ -51,7 +51,7 @@ class Logic(QObject, Bundle):
     def __init__(self, component):
         super().__init__()
         self._map_widgets(component)
-        self.component_window = component.layout
+        self.component = component
         self.project_directory = ProjectDirectory()
         self.lap_labels = {}
         # self.lap_started.connect(self.create_lap_label)
@@ -90,7 +90,7 @@ class Logic(QObject, Bundle):
 
             ("rendered_name", self.rendered_file_name, self.rendered_name),
             
-            ("font_path", self.font_path_input.layout.line_edit, self.font_path ),
+            ("font_path", self.font_path_input.line_edit, self.font_path ),
             ("font_size", self.font_size_input, self.font_size),
             
 
@@ -354,7 +354,7 @@ class Logic(QObject, Bundle):
     def create_lap_table(self, num_laps):
         table = QTableWidget(num_laps, 2)  # 2 columns now
         table.setHorizontalHeaderLabels(["Lap", "Progress"])
-        self.component_window.layout().addWidget(table)
+        self.component.layout().addWidget(table)
         self.lap_table = table
 
         # initialize rows
@@ -371,6 +371,6 @@ class Logic(QObject, Bundle):
     @pyqtSlot()
     def remove_lap_table(self):
         if hasattr(self, "lap_table") and self.lap_table is not None:
-            self.component_window.layout().removeWidget(self.lap_table)  # remove from layout
+            self.component.layout().removeWidget(self.lap_table)  # remove from layout
             self.lap_table.deleteLater()                    # schedule for deletion
             self.lap_table = None    

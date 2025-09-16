@@ -9,7 +9,7 @@ from pathlib import Path
 import traceback
 import tempfile
 
-from .bundle import Bundle
+from .blueprint import Blueprint
 from src.components import *
 from src.helper_functions import *
 from src.helper_classes import *
@@ -85,12 +85,12 @@ class MergeWorker(QThread):
 
 
 
-class Logic(Bundle):
+class Logic(Blueprint):
 
     def __init__(self, component):
         super().__init__()
         self._map_widgets(component)
-        self.component_window = component.layout
+        self.component = component
         self.project_directory = ProjectDirectory()
 
         self.use_gpu = True
@@ -104,10 +104,10 @@ class Logic(Bundle):
             ("use_gpu", self.use_gpu_checkbox, self.use_gpu),
             ("rendered_name", self.rendered_file_name, self.rendered_name),
             ("last_footage_dir_selected",  self.source_footage_view.logic, self.last_footage_dir_selected),
-            ("combox_save", self.drive_selector_input.layout.drive_combo, self.combox_save),
+            ("combox_save", self.drive_selector_input.drive_combo, self.combox_save),
         ]
 
-        self.source_footage_view.layout.files_view.setContextMenuPolicy(
+        self.source_footage_view.files_view.setContextMenuPolicy(
                 Qt.ContextMenuPolicy.CustomContextMenu
             )
         
@@ -130,13 +130,13 @@ class Logic(Bundle):
     def on_error(self, err_type: str, tb_str: str):
         msg = f"Exception type: {err_type}\n\nTraceback:\n{tb_str}"
         print(msg)
-        QMessageBox.critical(self.component_window, "Error", msg)
+        QMessageBox.critical(self.component, "Error", msg)
         self.status_label.setText(f"❌ Failed: {err_type}")
         self.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.merge_btn.setEnabled(True)
 
     def handle_file_items(self, file_items: list[FileItem]):
-        self.choosen_footage_viewer.layout.files_widget.addTopLevelItems(file_items)
+        self.choosen_footage_viewer.files_widget.addTopLevelItems(file_items)
 
     def get_ffmpeg_cmd(self, concat_txt):
         base_cmd = [
@@ -178,7 +178,7 @@ class Logic(Bundle):
             if concat_txt is None:
                 raise AttributeError(f"EMPTY CONCAT TEXT")
 
-            file_item_widget: QTreeWidget = self.choosen_footage_viewer.layout.files_widget
+            file_item_widget: QTreeWidget = self.choosen_footage_viewer.files_widget
 
             files = []
             for i in range(file_item_widget.topLevelItemCount()):

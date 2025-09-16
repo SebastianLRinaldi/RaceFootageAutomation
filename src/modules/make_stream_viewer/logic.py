@@ -5,22 +5,22 @@ from PyQt6.QtGui import *
 import sys
 import subprocess
 
-from .bundle import Bundle
+from .blueprint import Blueprint
 from src.components import *
 from src.helper_functions import *
 from src.helper_classes import *
 
-class Logic(Bundle):
+class Logic(Blueprint):
 
     def __init__(self, component):
         super().__init__()
         self._map_widgets(component)
-        self.component_window = component.layout
+        self.component = component
         self.project_directory = ProjectDirectory()
 
 
     def open_file_dialog(self):
-        file_path, _ = QFileDialog.getOpenFileName(self.component_window, "Open Video File", "", "Video Files (*.mp4 *.mov *.mkv)")
+        file_path, _ = QFileDialog.getOpenFileName(self.component, "Open Video File", "", "Video Files (*.mp4 *.mov *.mkv)")
         if file_path:
             self.run_ffprobe(file_path)
 

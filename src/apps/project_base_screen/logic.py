@@ -5,17 +5,18 @@ from PyQt6.QtGui import *
 import os
 import shutil
 
-from .bundle import Bundle
+from .blueprint import Blueprint
 from src.components import *
 from src.modules import *
 from src.helper_functions import *
 
-class Logic(Bundle):
+class Logic(Blueprint):
 
     def __init__(self, component):
         super().__init__()
+        self.component = component
         self._map_widgets(component)
-        self.component_window = component.layout
+        
 
         self.settings = QSettings("TrackFootage", "project_base_screen")
         self.directory = os.path.normpath(self.settings.value("last_dir", ""))  # fallback is empty string
@@ -135,7 +136,7 @@ class Logic(Bundle):
 
 
     def open_new_project_dialog(self):
-        dialog = NewProjectDialog().layout
+        dialog = NewProjectDialog()
         
         def on_create_clicked():
             date = dialog.date_input.text().strip()

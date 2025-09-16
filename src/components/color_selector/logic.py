@@ -3,18 +3,18 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 from src.helper_functions import *
-from .bundle import Bundle
+from .blueprint import Blueprint
 
-class Logic(QObject, Bundle):
+class Logic(QObject, Blueprint):
     valueChanged = pyqtSignal(tuple)  # Emits (R, G, B)
     
     def __init__(self, component):
         super().__init__()
-        self.component_window = component.layout
+        self.component = component
         self._map_widgets(component)
 
     def open_dialog(self):
-            dialog = QColorDialog(self.component_window)
+            dialog = QColorDialog(self.component)
             if self.rgb:  # if you have a saved color
                 dialog.setCurrentColor(QColor(*self.rgb))
             dialog.colorSelected.connect(self._color_selected)

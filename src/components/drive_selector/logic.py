@@ -2,20 +2,20 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import * 
 from PyQt6.QtGui import *
 
-from .bundle import Bundle
+from .blueprint import Blueprint
 from src.helper_functions import *
 
 import os
 
-class Logic(Bundle):
+class Logic(Blueprint):
 
     def __init__(self, component):
         super().__init__()
         self._map_widgets(component)
-        self.component_window = component.layout
+        self.component = component
 
     def browse_directory(self):
-        path = QFileDialog.getExistingDirectory(self.component_window, "Select Directory")
+        path = QFileDialog.getExistingDirectory(self.component, "Select Directory")
         if path:
             self.add_directory(path)
 
@@ -24,7 +24,7 @@ class Logic(Bundle):
             return
         
         if not os.path.isdir(path):
-            QMessageBox.warning(self.component_window, "Invalid Directory", f"Path does not exist:\n{path}")
+            QMessageBox.warning(self.component, "Invalid Directory", f"Path does not exist:\n{path}")
             return
 
         # avoid duplicates

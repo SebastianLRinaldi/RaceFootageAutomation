@@ -19,7 +19,7 @@ import os
 from multiprocessing import Process, Queue
 from lxml import etree
 
-from .bundle import Bundle
+from .blueprint import Blueprint
 from src.components import *
 from src.helper_functions import *
 from src.helper_classes import *
@@ -51,12 +51,12 @@ https://goprotelemetryextractor.com/free/#
 - Virb Edit
 - for generating the GPX file
 """
-class Logic(Bundle):
+class Logic(Blueprint):
 
     def __init__(self, component):
         super().__init__()
         self._map_widgets(component)
-        self.component_window = component.layout
+        self.component = component
         self.project_directory = ProjectDirectory()
 
         self.width = 640
@@ -211,7 +211,7 @@ class Logic(Bundle):
 
 
     def add_file(self):
-        files, _ = QFileDialog.getOpenFileNames(self.ui, "Select GPX Files - Will Move to Assets Folder", "", "GPX Files (*.gpx)")
+        files, _ = QFileDialog.getOpenFileNames(self.component, "Select GPX Files - Will Move to Assets Folder", "", "GPX Files (*.gpx)")
         target_dir = self.project_directory.asset_path
 
         for file in files:
@@ -224,7 +224,7 @@ class Logic(Bundle):
         # check if any GPX files exist in asset dir
         gpx_files = [f for f in os.listdir(self.project_directory.asset_path) if f.lower().endswith(".gpx")]
         if not gpx_files:
-            QMessageBox.warning(self.ui, "No .gpx Files", "Add some GPX files first to Telemetry Assets Folder.")
+            QMessageBox.warning(self.component, "No .gpx Files", "Add some GPX files first to Telemetry Assets Folder.")
             return
 
         for gpx_file in gpx_files:
@@ -237,7 +237,7 @@ class Logic(Bundle):
         self.generate_button.setEnabled(False)
 
     def on_finished(self):
-        QMessageBox.information(self.ui, "Overlay Done", f"Generated: {self.project_directory.make_asset_file_path(self.asset_name)}")
+        QMessageBox.information(self.component, "Overlay Done", f"Generated: {self.project_directory.make_asset_file_path(self.asset_name)}")
         self.status_label.setText(f"✅ Done: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
 
         if all(not t.isRunning() for t in self.threads):
@@ -247,7 +247,7 @@ class Logic(Bundle):
     def on_error(self, err_type: str, tb_str: str):
         msg = f"Exception type: {err_type}\n\nTraceback:\n{tb_str}"
         print(msg)
-        QMessageBox.critical(self.ui, "Error", msg)
+        QMessageBox.critical(self.component, "Error", msg)
         self.status_label.setText(f"❌ Failed: {err_type}")
         self.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.generate_button.setEnabled(True)

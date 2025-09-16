@@ -13,7 +13,7 @@ import traceback
 
 from src.helper_functions import *
 from src.helper_classes import *
-from .bundle import Bundle
+from .blueprint import Blueprint
 
 from src.components import *
 
@@ -36,12 +36,12 @@ class OverlayWorker(QThread):
             self.error.emit(err_type, tb_str)
 
 
-class Logic(Bundle):
+class Logic(Blueprint):
 
     def __init__(self, component):
         super().__init__()
         self._map_widgets(component)
-        self.component_window = component.layout
+        self.component = component
         self.project_directory = ProjectDirectory()
 
         self.width = 1920
@@ -104,7 +104,7 @@ class Logic(Bundle):
 
     def on_error(self, err_type: str, tb_str: str):
         msg = f"Exception type: {err_type}\n\nTraceback:\n{tb_str}"
-        QMessageBox.critical(self.ui, "Error", msg)
+        QMessageBox.critical(self.component, "Error", msg)
         self.status_label.setText(f"❌ Failed: {err_type}")
         self.generate_button.setEnabled(True)
 
@@ -179,7 +179,7 @@ class Logic(Bundle):
 
     def save_bar_video(self):
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        file_path = self.project_directory.make_asset_file_path(self.bar_file_name_input)
+        file_path = self.project_directory.make_asset_file_path(self.bar_file_name)
         
         writer = cv2.VideoWriter(file_path, fourcc, self.fps, (self.width, self.height))
         total_duration_sec = sum(self.project_directory.lap_times)+self.end_duration  # Total duration is sum of laps
@@ -220,7 +220,7 @@ class Logic(Bundle):
 
     def save_dot_video_trans(self):
         total_duration_sec = sum(self.project_directory.lap_times) + self.end_duration  # Total duration is sum of laps
-        file_path = self.project_directory.make_asset_file_path(self.dot_avi_file_name_input)
+        file_path = self.project_directory.make_asset_file_path(self.dot_avi_file_name)
         
         fourcc = cv2.VideoWriter_fourcc(*'RGBA')
         writer = cv2.VideoWriter(file_path, fourcc, self.fps, (self.width, self.height))
@@ -247,7 +247,7 @@ class Logic(Bundle):
 
     def save_dot_video_reg(self):
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        file_path = self.project_directory.make_asset_file_path(self.bar_file_name_input)
+        file_path = self.project_directory.make_asset_file_path(self.bar_file_name)
         
         writer = cv2.VideoWriter(file_path, fourcc, self.fps, (self.width, self.height))
         total_duration_sec = sum(self.project_directory.lap_times)+self.end_duration  # Total duration is sum of laps
@@ -306,7 +306,7 @@ class Logic(Bundle):
         return np.array(img)
 
     def save_dot_video_sync(self ):
-        file_path = self.project_directory.make_asset_file_path(self.dot_file_name_input)
+        file_path = self.project_directory.make_asset_file_path(self.dot_file_name)
         total_duration_sec = sum(self.project_directory.lap_times)+self.end_duration  # Total duration is sum of laps
         
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -320,8 +320,8 @@ class Logic(Bundle):
         writer.release()
 
     def make_dot_and_bar(self):
-        bar_file = self.project_directory.make_asset_file_path(self.bar_file_name_input)
-        dot_file = self.project_directory.make_asset_file_path(self.dot_file_name_input)
+        bar_file = self.project_directory.make_asset_file_path(self.bar_file_name)
+        dot_file = self.project_directory.make_asset_file_path(self.dot_file_name)
 
         if not os.path.isfile(bar_file):
             print("Creating bar overlay...")
@@ -352,8 +352,8 @@ class Logic(Bundle):
         """CPU ONLY"""
         cmd = [
             self.ffmpeg_bin, "-y",
-            "-i", self.project_directory.make_asset_file_path(self.bar_file_name_input),
-            "-i", self.project_directory.make_asset_file_path(self.dot_file_name_input),
+            "-i", self.project_directory.make_asset_file_path(self.bar_file_name),
+            "-i", self.project_directory.make_asset_file_path(self.dot_file_name),
             "-filter_complex", "[1:v]colorkey=0x000000:0.1:0.2[ckout];[0:v][ckout]overlay=shortest=1",
             "-c:v", "libx264",
             "-crf", "18",

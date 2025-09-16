@@ -17,7 +17,7 @@ from tqdm import tqdm
 import traceback
 
 
-from .bundle import Bundle
+from .blueprint import Blueprint
 from src.components import *
 from src.helper_functions import *
 from src.helper_classes import *
@@ -69,7 +69,7 @@ class OverlayWorker(QThread):
             tb_str = traceback.format_exc()
             self.error.emit(err_type, tb_str)
 
-class Logic(QObject, Bundle):
+class Logic(QObject, Blueprint):
 
     # lap_started = pyqtSignal(int)
     # lap_progress = pyqtSignal(int, int)  # lap_number, percent
@@ -78,7 +78,7 @@ class Logic(QObject, Bundle):
     def __init__(self, component):
         super().__init__()
         self._map_widgets(component)
-        self.component_window = component.layout
+        self.component = component
         self.project_directory = ProjectDirectory()
         self.lap_labels = {}
         # self.lap_started.connect(self.create_lap_label)
@@ -142,7 +142,7 @@ class Logic(QObject, Bundle):
             ("end_duration", self.end_duration_input, self.end_duration),
 
             ("rendered_name", self.rendered_file_name, self.rendered_name),
-            ("font_path", self.font_path_input.layout.line_edit, self.font_path ),
+            ("font_path", self.font_path_input.line_edit, self.font_path ),
             ("font_size", self.font_size_input, self.font_size),
         ]
 
@@ -186,7 +186,7 @@ class Logic(QObject, Bundle):
     def on_error(self, err_type: str, tb_str: str):
         msg = f"Exception type: {err_type}\n\nTraceback:\n{tb_str}"
         print(msg)
-        QMessageBox.critical(self.ui, "Error", msg)
+        QMessageBox.critical(self.component, "Error", msg)
         self.status_label.setText(f"❌ Failed: {err_type}")
         self.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.generate_button.setEnabled(True)
@@ -431,7 +431,7 @@ class Logic(QObject, Bundle):
     # def create_lap_label(self, lap_number):
     #     print(f"MAKING LABEL LAP:{lap_number}")
     #     label = QLabel(f"Rendering Table for Lap {lap_number}... 0%")
-    #     self.layout().addWidget(label)
+    #     self().addWidget(label)
     #     self.lap_labels[lap_number] = label
 
     # # def update_lap_label(self, lap_number, percent):
@@ -451,7 +451,7 @@ class Logic(QObject, Bundle):
     #     print(f"REMOVING LABEL LAP:{lap_number}")
     #     label = self.lap_labels.pop(lap_number, None)
     #     if label:
-    #         self.layout().removeWidget(label)
+    #         self().removeWidget(label)
     #         label.deleteLater()
 
 
@@ -460,7 +460,7 @@ class Logic(QObject, Bundle):
     #     progress.setRange(0, 100)  # 0% to 100%
     #     progress.setValue(0)
     #     progress.setFormat(f"Rendering Table for Lap {lap_number}: %p%")
-    #     self.layout().addWidget(progress)
+    #     self().addWidget(progress)
     #     self.lap_labels[lap_number] = progress
 
     # def update_lap_label(self, lap_number, percent):
@@ -471,7 +471,7 @@ class Logic(QObject, Bundle):
     # def remove_lap_label(self, lap_number):
     #     progress = self.lap_labels.pop(lap_number, None)
     #     if progress:
-    #         self.layout().removeWidget(progress)
+    #         self().removeWidget(progress)
     #         progress.deleteLater()
 
     @pyqtSlot(int)

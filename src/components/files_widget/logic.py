@@ -4,19 +4,19 @@ from PyQt6.QtGui import *
 
 import os
 
-from .bundle import Bundle
+from .blueprint import Blueprint
 from src.helper_functions import *
 from src.helper_classes import *
 
 
 
 
-class Logic(Bundle):
+class Logic(Blueprint):
 
     def __init__(self, component):
         super().__init__()
+        self.component = component
         self._map_widgets(component)
-        self.component_window = component.layout
 
 
 
