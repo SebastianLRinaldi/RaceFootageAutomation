@@ -3,31 +3,17 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 from src.core.gui.ui_manager import *
-from src.components import *
+from .bundle import Bundle
 
-class Layout(UiManager):
-    # Main interactions
-    drive_selector_input: DriveSelector
-    source_footage_view:FilesView
-    choosen_footage_viewer:FilesWidget
-    merge_btn: QPushButton
+class Layout(UiManager, Bundle):
+    """
+    Where you arrange and decorate the widgets
+    """
 
-    # # Indicators
-    status_label: QLabel
-    progress_bar: QProgressBar
-
-    # Files 
-    file_tree: FilesView
-
-    # Settings
-    reset_settings_btn: QPushButton
-    use_gpu_checkbox: QCheckBox
-    rendered_file_name: QLineEdit
-
-    def __init__(self):
+    def __init__(self, component):
         super().__init__()
-        self.init_widgets()
-        self.setup_stylesheets()
+        
+        self._map_widgets(component)
         self.set_widgets()
 
         layout_data = [
@@ -74,18 +60,8 @@ class Layout(UiManager):
 
         self.apply_layout(layout_data)
 
-    def init_widgets(self):
-        annotations = getattr(self.__class__, "__annotations__", {})
-        for name, widget_type in annotations.items():
-            widget = widget_type()
-            setattr(self, name, widget)
-            
-    def setup_stylesheets(self):
-        self.setStyleSheet(""" """)
-
     def set_widgets(self):
         self.status_label.setText("Drag MP4 files here in the order to merge")
-
         self.merge_btn.setText("Merge")
         self.progress_bar.setRange(0, 0)
         self.progress_bar.setVisible(False)

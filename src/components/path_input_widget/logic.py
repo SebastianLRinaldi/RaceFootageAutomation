@@ -4,22 +4,25 @@ from PyQt6.QtGui import *
 
 import os
 
-from .layout import Layout
+from .bundle import Bundle
 from src.helper_functions import *
 
-class Logic:
-    def __init__(self, ui: Layout):
-        self.ui = ui
+class Logic(Bundle):
+
+    def __init__(self, component):
+        super().__init__()
+        self._map_widgets(component)
+        self.component_window = component.layout
         
     def browse(self):
         # Customize filter as needed
-        path, _ = os.path.normpath(QFileDialog.getExistingDirectory(self.ui, "Select Directory") ) 
+        path, _ = os.path.normpath(QFileDialog.getExistingDirectory(self.component_window, "Select Directory") ) 
         # or QFileDialog.getOpenFileName for files
         if path:
-            self.ui.line_edit.setText(path)
+            self.line_edit.setText(path)
 
     def text(self):
-        return self.ui.line_edit.text()
+        return self.line_edit.text()
 
     def setText(self, text):
-        self.ui.line_edit.setText(text)
+        self.line_edit.setText(text)

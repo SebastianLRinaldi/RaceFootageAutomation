@@ -9,7 +9,7 @@ from pathlib import Path
 import traceback
 import tempfile
 
-from .layout import Layout
+from .bundle import Bundle
 from src.components import *
 from src.helper_functions import *
 from src.helper_classes import *
@@ -60,9 +60,9 @@ Some code from streamer view for viewing progress
                 text=True,
                 check=True
             )
-            self.ui.output.setPlainText(result.stdout)
+            self.output.setPlainText(result.stdout)
         except subprocess.CalledProcessError as e:
-            self.ui.output.setPlainText(f"ffprobe error:\n{e.stderr}")
+            self.output.setPlainText(f"ffprobe error:\n{e.stderr}")
 """
 
 
@@ -85,9 +85,12 @@ class MergeWorker(QThread):
 
 
 
-class Logic:
-    def __init__(self, ui: Layout):
-        self.ui = ui
+class Logic(Bundle):
+
+    def __init__(self, component):
+        super().__init__()
+        self._map_widgets(component)
+        self.component_window = component.layout
         self.project_directory = ProjectDirectory()
 
         self.use_gpu = True
@@ -98,13 +101,13 @@ class Logic:
         self.combox_save = {"items": [""], "index": 0}
 
         SETTINGS_FIELDS = [
-            ("use_gpu", self.ui.use_gpu_checkbox, self.use_gpu),
-            ("rendered_name", self.ui.rendered_file_name, self.rendered_name),
-            ("last_footage_dir_selected",  self.ui.source_footage_view.logic, self.last_footage_dir_selected),
-            ("combox_save", self.ui.drive_selector_input.layout.drive_combo, self.combox_save),
+            ("use_gpu", self.use_gpu_checkbox, self.use_gpu),
+            ("rendered_name", self.rendered_file_name, self.rendered_name),
+            ("last_footage_dir_selected",  self.source_footage_view.logic, self.last_footage_dir_selected),
+            ("combox_save", self.drive_selector_input.layout.drive_combo, self.combox_save),
         ]
 
-        self.ui.source_footage_view.layout.files_view.setContextMenuPolicy(
+        self.source_footage_view.layout.files_view.setContextMenuPolicy(
                 Qt.ContextMenuPolicy.CustomContextMenu
             )
         
@@ -112,28 +115,28 @@ class Logic:
 
 
     def merge_footage(self):
-        self.ui.merge_btn.setEnabled(False)
-        self.ui.status_label.setText("Merging Footage...")
-        self.ui.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.merge_btn.setEnabled(False)
+        self.status_label.setText("Merging Footage...")
+        self.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.worker = MergeWorker(self)
         self.worker.finished.connect(self.on_finished)
         self.worker.error.connect(self.on_error)
         self.worker.start()
 
     def on_finished(self):
-        self.ui.status_label.setText(f"✅ Done: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
-        self.ui.merge_btn.setEnabled(True)
+        self.status_label.setText(f"✅ Done: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
+        self.merge_btn.setEnabled(True)
 
     def on_error(self, err_type: str, tb_str: str):
         msg = f"Exception type: {err_type}\n\nTraceback:\n{tb_str}"
         print(msg)
-        QMessageBox.critical(self.ui, "Error", msg)
-        self.ui.status_label.setText(f"❌ Failed: {err_type}")
-        self.ui.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        self.ui.merge_btn.setEnabled(True)
+        QMessageBox.critical(self.component_window, "Error", msg)
+        self.status_label.setText(f"❌ Failed: {err_type}")
+        self.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.merge_btn.setEnabled(True)
 
     def handle_file_items(self, file_items: list[FileItem]):
-        self.ui.choosen_footage_viewer.layout.files_widget.addTopLevelItems(file_items)
+        self.choosen_footage_viewer.layout.files_widget.addTopLevelItems(file_items)
 
     def get_ffmpeg_cmd(self, concat_txt):
         base_cmd = [
@@ -175,7 +178,7 @@ class Logic:
             if concat_txt is None:
                 raise AttributeError(f"EMPTY CONCAT TEXT")
 
-            file_item_widget: QTreeWidget = self.ui.choosen_footage_viewer.layout.files_widget
+            file_item_widget: QTreeWidget = self.choosen_footage_viewer.layout.files_widget
 
             files = []
             for i in range(file_item_widget.topLevelItemCount()):
@@ -219,7 +222,7 @@ class Logic:
         
 
     # def pick_files(self):
-    #     files, _ = QFileDialog.getOpenFileNames(self.ui, "Select MP4 Files", "", "Video Files (*.mp4)")
+    #     files, _ = QFileDialog.getOpenFileNames(self, "Select MP4 Files", "", "Video Files (*.mp4)")
     #     for path in files:
     #         self.add_video_item(path)
     #     self.update_default_output_path()
@@ -231,7 +234,7 @@ class Logic:
     #     #     base_path = Path.home()  # fallback
 
     #     # default_name = self.output_file_path.name if self.output_file_path else "merged(MM-DD-YY)-R#.mp4"
-    #     # file_dialog = QFileDialog(self.ui, "Select Output File")
+    #     # file_dialog = QFileDialog(self, "Select Output File")
     #     # file_dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptSave)
     #     # file_dialog.setNameFilter("MP4 Video (*.mp4)")
     #     # file_dialog.setDirectory(str(base_path))
@@ -244,22 +247,22 @@ class Logic:
     #             if selected.suffix.lower() != ".mp4":
     #                 selected = selected.with_suffix(".mp4")
     #             self.output_file_path = selected
-    #             self.ui.output_label.setText(f"Output file: {self.output_file_path}")
+    #             self.output_label.setText(f"Output file: {self.output_file_path}")
 
     # def merge_files(self):
-    #     count = self.ui.list_widget.count()
+    #     count = self.list_widget.count()
     #     if count < 2:
-    #         QMessageBox.warning(self.ui, "Error", "Add at least 2 videos to merge.")
+    #         QMessageBox.warning(self, "Error", "Add at least 2 videos to merge.")
     #         return
 
 
     #     file_paths = [
-    #         self.ui.list_widget.item(i).data(Qt.ItemDataRole.UserRole)
+    #         self.list_widget.item(i).data(Qt.ItemDataRole.UserRole)
     #         for i in range(count)
     #     ]
 
-    #     self.ui.merge_btn.setEnabled(False)
-    #     self.ui.progress_bar.setVisible(True)
+    #     self.merge_btn.setEnabled(False)
+    #     self.progress_bar.setVisible(True)
 
     #     # self.merge_thread = MergeThread(file_paths, str(self.output_file_path))
     #     # self.merge_thread.finished.connect(self.merge_done)
@@ -267,25 +270,25 @@ class Logic:
     #     # self.merge_thread.start()
 
     # def merge_done(self, output_file):
-    #     self.ui.progress_bar.setVisible(False)
-    #     self.ui.merge_btn.setEnabled(True)
+    #     self.progress_bar.setVisible(False)
+    #     self.merge_btn.setEnabled(True)
     #     QMessageBox.information(self, "Done", f"Merged video saved as:\n{output_file}")
 
     # def merge_error(self, error_msg):
-    #     self.ui.progress_bar.setVisible(False)
-    #     self.ui.merge_btn.setEnabled(True)
+    #     self.progress_bar.setVisible(False)
+    #     self.merge_btn.setEnabled(True)
     #     QMessageBox.critical(self, "Merge Error", error_msg)
 
 
     # def update_default_output_path(self):
-    #     count = self.ui.list_widget.count()
+    #     count = self.list_widget.count()
     #     if count == 0:
     #         self.output_file_path = None
-    #         self.ui.output_label.setText("Output file: (none)")
+    #         self.output_label.setText("Output file: (none)")
     #         return
 
     #     file_paths = [
-    #         self.ui.list_widget.item(i).data(Qt.ItemDataRole.UserRole)
+    #         self.list_widget.item(i).data(Qt.ItemDataRole.UserRole)
     #         for i in range(count)
     #     ]
 
@@ -296,7 +299,7 @@ class Logic:
     #     # Only update if user hasn't set a custom output path
     #     if self.output_file_path is None or not self.output_file_path.exists():
     #         self.output_file_path = default_path
-    #         self.ui.output_label.setText(f"Output file: {self.output_file_path}")
+    #         self.output_label.setText(f"Output file: {self.output_file_path}")
 
     def dragEnterEvent(self, event):
         if event.mimeData().hasUrls():

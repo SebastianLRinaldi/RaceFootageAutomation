@@ -4,50 +4,19 @@ from PyQt6.QtGui import *
 
 from src.core.gui.ui_manager import *
 from src.components import *
+from .bundle import Bundle
 
+class Layout(UiManager, Bundle):
+    """
+    Where you arrange and decorate the widgets
+    """
 
-class Layout(UiManager):
-
-    status_label: QLabel
-    generate_button: QPushButton
-    progress: QProgressBar
-
-    reset_settings_btn: QPushButton
-
-    # Video settings
-    width_input: QSpinBox
-    height_input: QSpinBox
-    fps_input: QDoubleSpinBox
-    use_gpu_checkbox: QCheckBox
-    
-
-    # Timing settings
-    start_duration_input: QDoubleSpinBox
-    end_duration_input: QDoubleSpinBox
-
-    rendered_file_name: QLineEdit
-
-    # Font/text settings
-    font_path_input: PathInputWidget
-    font_size_input: QSpinBox
-    
-
-    max_time_input: QDoubleSpinBox
-    center_offset_input: QSpinBox
-    spacing_input : QSpinBox
-    lap_fill_color_input : ColorSelector
-    timer_fill_color_input : ColorSelector
-    stats_fill_color_input : ColorSelector
-
-    file_tree: FilesView
-    
-    def __init__(self):
+    def __init__(self, component):
         super().__init__()
-        self.init_widgets()
-        self.setup_stylesheets()
+        
+        self._map_widgets(component)
         self.set_properties()
         self.set_widgets()
-
 
         layout_data = [
             self.tabs(tab_labels=["Timer Creation", "Files", "Settings"], children=[
@@ -107,15 +76,6 @@ class Layout(UiManager):
         ]
 
         self.apply_layout(layout_data)
-
-    def init_widgets(self):
-        annotations = getattr(self.__class__, "__annotations__", {})
-        for name, widget_type in annotations.items():
-            widget = widget_type()
-            setattr(self, name, widget)
-            
-    def setup_stylesheets(self):
-        self.setStyleSheet(""" """)
 
     def set_properties(self):
         self.width_input.setRange(1, 10000)

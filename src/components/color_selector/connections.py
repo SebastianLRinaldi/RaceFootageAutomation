@@ -1,12 +1,12 @@
 from .logic import Logic
-from .layout import Layout
+from .bundle import Bundle
 
-class Connections:
-    def __init__(self, ui: Layout, logic: Logic):
-        self.ui = ui
+class Connections(Bundle):
+    def __init__(self, component, logic: Logic):
+        self._map_widgets(component)
         self.logic = logic
 
         
         self.logic.valueChanged.connect(self.logic.update_label_color)
-        self.ui.button.clicked.connect(self.logic.open_dialog)
+        self.button.clicked.connect(self.logic.open_dialog)
 

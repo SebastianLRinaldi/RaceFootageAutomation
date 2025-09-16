@@ -2,11 +2,12 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import * 
 from PyQt6.QtGui import *
 
-from .layout import Layout
+from .bundle import Bundle
 from src.helper_functions import *
 
-class Logic:
-    def __init__(self, ui: Layout):
-        self.ui = ui
+class Logic(Bundle):
 
-        
+    def __init__(self, component):
+        super().__init__()
+        self._map_widgets(component)
+        self.component_window = component.layout

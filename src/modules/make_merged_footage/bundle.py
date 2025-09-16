@@ -1,0 +1,40 @@
+from PyQt6.QtCore import *
+from PyQt6.QtWidgets import * 
+from PyQt6.QtGui import *
+
+from src.components import *
+
+class Bundle:
+    # Main interactions
+    drive_selector_input: DriveSelector
+    source_footage_view:FilesView
+    choosen_footage_viewer:FilesWidget
+    merge_btn: QPushButton
+
+    # # Indicators
+    status_label: QLabel
+    progress_bar: QProgressBar
+
+    # Files 
+    file_tree: FilesView
+
+    # Settings
+    reset_settings_btn: QPushButton
+    use_gpu_checkbox: QCheckBox
+    rendered_file_name: QLineEdit
+
+    def _map_widgets(self, source):
+        """
+        Copy existing widget instances from source to self.
+        """
+        # source is some object that already has the widgets as attributes
+        for name in self.__annotations__:
+            setattr(self, name, getattr(source, name))
+
+    def _init_widgets(self):
+        """
+        Instantiate all widgets defined in type hints.
+        Call this manually when you want actual widget instances.
+        """
+        for name, typ in self.__annotations__.items():
+            setattr(self, name, typ())

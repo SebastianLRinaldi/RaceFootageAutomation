@@ -1,11 +1,12 @@
 from .logic import Logic
-from .layout import Layout
+from .bundle import Bundle
 
-class Connections:
-    def __init__(self, ui: Layout, logic: Logic):
-        self.ui = ui
+class Connections(Bundle):
+    def __init__(self, component, logic: Logic):
+        super().__init__()
+        self._map_widgets(component)
         self.logic = logic
         
-        self.ui.reset_settings_btn.clicked.connect(self.logic.settings_handler.reset_settings)
+        self.reset_settings_btn.clicked.connect(self.logic.settings_handler.reset_settings)
 
-        self.ui.generate_button.clicked.connect(self.logic.generate_overlay)
+        self.generate_button.clicked.connect(self.logic.generate_overlay)

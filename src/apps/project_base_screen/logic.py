@@ -5,14 +5,17 @@ from PyQt6.QtGui import *
 import os
 import shutil
 
-from .layout import Layout
+from .bundle import Bundle
 from src.components import *
 from src.modules import *
 from src.helper_functions import *
 
-class Logic:
-    def __init__(self, ui: Layout):
-        self.ui = ui
+class Logic(Bundle):
+
+    def __init__(self, component):
+        super().__init__()
+        self._map_widgets(component)
+        self.component_window = component.layout
 
         self.settings = QSettings("TrackFootage", "project_base_screen")
         self.directory = os.path.normpath(self.settings.value("last_dir", ""))  # fallback is empty string
@@ -20,13 +23,13 @@ class Logic:
         self.tree_model = QFileSystemModel()
         self.tree_model.setReadOnly(False)
         self.tree_model.setRootPath(os.path.normpath("C:/"))  # Or whatever folder you want
-        self.ui.project_tree.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop )
-        self.ui.project_tree.setDefaultDropAction(Qt.DropAction.MoveAction)
-        self.ui.project_tree.setDragEnabled(True)
-        self.ui.project_tree.setAcceptDrops(True)
+        self.project_tree.setDragDropMode(QAbstractItemView.DragDropMode.DragDrop )
+        self.project_tree.setDefaultDropAction(Qt.DropAction.MoveAction)
+        self.project_tree.setDragEnabled(True)
+        self.project_tree.setAcceptDrops(True)
         
         self.load_folders()
-        self.ui.project_list.setCurrentRow(0)
+        self.project_list.setCurrentRow(0)
         self.display_project_folder()
 
     def on_double_click(self, index):
@@ -37,7 +40,7 @@ class Logic:
 
     # Delete currently selected file/folder
     def delete_selected(self):
-        index = self.ui.project_tree.currentIndex()
+        index = self.project_tree.currentIndex()
         if not index.isValid():
             return
         path = os.path.normpath(self.tree_model.filePath(index))
@@ -49,7 +52,7 @@ class Logic:
 
     # Create new file inside selected directory
     def create_file(self, filename="new_file.txt"):
-        index = self.ui.project_tree.currentIndex()
+        index = self.project_tree.currentIndex()
         dir_path = os.path.normpath(self.tree_model.filePath(index))
         if not os.path.isdir(dir_path):
             dir_path = os.path.normpath(os.path.dirname(dir_path))
@@ -60,7 +63,7 @@ class Logic:
 
     # Create new folder inside selected directory
     def create_folder(self, foldername="New Folder"):
-        index = self.ui.project_tree.currentIndex()
+        index = self.project_tree.currentIndex()
         dir_path = os.path.normpath(self.tree_model.filePath(index))
         if not os.path.isdir(dir_path):
             dir_path = os.path.normpath(os.path.dirname(dir_path))
@@ -82,15 +85,15 @@ class Logic:
 
 
     def load_folders(self):
-        self.ui.directory_search.logic.setText(self.directory)
+        self.directory_search.logic.setText(self.directory)
         self.settings.setValue("last_dir", self.directory)
         
-        self.ui.project_list.clear()
+        self.project_list.clear()
         try:
             for name in os.listdir(self.directory):
                 path = os.path.normpath(os.path.join(self.directory, name))
                 if os.path.isdir(path):
-                    self.ui.project_list.addItem(name)
+                    self.project_list.addItem(name)
         except Exception as e:
             print(f"Error reading directory: {e}")
 
@@ -158,7 +161,7 @@ class Logic:
         return False
 
     def display_project_folder(self):
-        selected_items = self.ui.project_list.selectedItems()
+        selected_items = self.project_list.selectedItems()
         if not selected_items:
             return
         project_name = selected_items[0].text()
@@ -166,5 +169,5 @@ class Logic:
         full_path = os.path.normpath(os.path.join(self.directory, project_name))
 
 
-        self.ui.project_tree.setModel(self.tree_model)
-        self.ui.project_tree.setRootIndex(self.tree_model.index(full_path))  # Or any folder path
+        self.project_tree.setModel(self.tree_model)
+        self.project_tree.setRootIndex(self.tree_model.index(full_path))  # Or any folder path

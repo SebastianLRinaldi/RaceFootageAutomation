@@ -15,32 +15,29 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 from src.core.gui.ui_manager import *
+from .bundle import Bundle
 
-# class Layout(QWidget):
-#     def __init__(self):
-#         super().__init__()
-#         self.button = QPushButton("Select Color", self)
+class Layout(UiManager, Bundle):
+    """
+    Where you arrange and decorate the widgets
+    """
 
+    def __init__(self, component):
+        super().__init__()
+        
+        self._map_widgets(component)
+        self.set_widgets()
+        
+        layout_data = [
+            self.group("vertical", 
+                [
+                    self.button,
+                    self.label
+                    ]),
+        ]
 
-# class Layout(QWidget):
-#     def __init__(self, parent=None):
-#         super().__init__(parent)
-#         self.layout = QHBoxLayout(self)
-
-#         self.button = QPushButton("Select Color", self)
-#         self.layout.addWidget(self.button)
-
-class Layout(QWidget):
-    def __init__(self, parent=None):
-        super().__init__(parent)
-
-        self.button = QPushButton("Pick Color")
-
-        self.label = QLabel()
-
-        layout = QHBoxLayout(self)
-        layout.addWidget(self.button)
-        layout.addWidget(self.label)
-        self.setLayout(layout)
+        self.apply_layout(layout_data)
 
 
+    def set_widgets(self):
+        self.button.setText("Pick Color")

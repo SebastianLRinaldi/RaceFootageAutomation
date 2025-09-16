@@ -18,7 +18,7 @@ import traceback
 import re
 import cProfile
 
-from .layout import Layout
+from .bundle import Bundle
 from src.components import *
 from src.helper_functions import *
 from src.helper_classes import *
@@ -43,14 +43,15 @@ class OverlayWorker(QThread):
             self.error.emit(err_type, tb_str)
 
 
-class Logic(QObject):
+class Logic(QObject, Bundle):
     # lap_started = pyqtSignal(int)
     # lap_progress = pyqtSignal(int, int)  # lap_number, percent
     # lap_finished = pyqtSignal(int)
     
-    def __init__(self, ui: Layout):
+    def __init__(self, component):
         super().__init__()
-        self.ui = ui
+        self._map_widgets(component)
+        self.component_window = component.layout
         self.project_directory = ProjectDirectory()
         self.lap_labels = {}
         # self.lap_started.connect(self.create_lap_label)
@@ -80,56 +81,56 @@ class Logic(QObject):
 
 
         SETTINGS_FIELDS = [
-            ("width", self.ui.width_input, self.FRAME_WIDTH),
-            ("height", self.ui.height_input, self.FRAME_HEIGHT),
-            ("fps", self.ui.fps_input, self.fps),
-            ("use_gpu", self.ui.use_gpu_checkbox,self.use_gpu),
+            ("width", self.width_input, self.FRAME_WIDTH),
+            ("height", self.height_input, self.FRAME_HEIGHT),
+            ("fps", self.fps_input, self.fps),
+            ("use_gpu", self.use_gpu_checkbox,self.use_gpu),
 
-            ("end_duration", self.ui.end_duration_input, self.end_duration),
+            ("end_duration", self.end_duration_input, self.end_duration),
 
-            ("rendered_name", self.ui.rendered_file_name, self.rendered_name),
+            ("rendered_name", self.rendered_file_name, self.rendered_name),
             
-            ("font_path", self.ui.font_path_input.layout.line_edit, self.font_path ),
-            ("font_size", self.ui.font_size_input, self.font_size),
+            ("font_path", self.font_path_input.layout.line_edit, self.font_path ),
+            ("font_size", self.font_size_input, self.font_size),
             
 
-            # ("max_time", self.ui.max_time_input, self.max_time),
-            # ("distance_from_center", self.ui.center_offset_input, self.distance_from_center),
-            # ("spacing", self.ui.spacing_input, self.spacing),
-            ("lap_fill_color", self.ui.lap_fill_color_input.logic, self.lap_fill_color),
-            ("timer_fill_color", self.ui.timer_fill_color_input.logic, self.timer_fill_color),
-            ("stats_fill_color", self.ui.stats_fill_color_input.logic, self.stats_fill_color),
+            # ("max_time", self.max_time_input, self.max_time),
+            # ("distance_from_center", self.center_offset_input, self.distance_from_center),
+            # ("spacing", self.spacing_input, self.spacing),
+            ("lap_fill_color", self.lap_fill_color_input.logic, self.lap_fill_color),
+            ("timer_fill_color", self.timer_fill_color_input.logic, self.timer_fill_color),
+            ("stats_fill_color", self.stats_fill_color_input.logic, self.stats_fill_color),
         ]
         
         self.settings_handler = SettingsHandler(SETTINGS_FIELDS, target=self, app="make_timer_overlay")
 
     def generate_overlay(self):
-        self.ui.generate_button.setEnabled(False)
-        self.ui.status_label.setText("Generating Timer Overlay...")
-        self.ui.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        self.ui.progress.setFormat("Rendering... 0%")
+        self.generate_button.setEnabled(False)
+        self.status_label.setText("Generating Timer Overlay...")
+        self.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.progress.setFormat("Rendering... 0%")
         self.worker = OverlayWorker(self)
         self.worker.finished.connect(self.on_finished)
         self.worker.error.connect(self.on_error)
         self.worker.start()
 
     def on_finished(self):
-        self.ui.status_label.setText(f"✅ Done: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
-        self.ui.generate_button.setEnabled(True)
+        self.status_label.setText(f"✅ Done: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
+        self.generate_button.setEnabled(True)
 
         print(f"✅ Timer Overlay Video saved as {self.project_directory.make_rendered_file_path(self.rendered_name)}")
         print(f'File "{self.project_directory.make_rendered_file_path(self.rendered_name)}"')
-        self.ui.progress.setFormat("Ready")
-        self.ui.progress.setValue(0)
+        self.progress.setFormat("Ready")
+        self.progress.setValue(0)
 
     def on_error(self, err_type: str, tb_str: str):
         msg = f"Exception type: {err_type}\n\nTraceback:\n{tb_str}"
         print(msg)
         QMessageBox.critical(self.ui, "Error", msg)
-        self.ui.status_label.setText(f"❌ Failed: {err_type}")
-        self.ui.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        self.ui.generate_button.setEnabled(True)
-        self.ui.progress.setValue(0)
+        self.status_label.setText(f"❌ Failed: {err_type}")
+        self.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.generate_button.setEnabled(True)
+        self.progress.setValue(0)
 
     def get_ffmpeg_cmd(self, concat_txt):
         base_cmd = [
@@ -337,23 +338,23 @@ class Logic(QObject):
     @pyqtSlot(int, int)
     def update_frame_progress(self, current:int, total:int):
         percent = int((current / total) * 100)
-        self.ui.progress.setValue(percent)
-        self.ui.progress.setFormat(f"Frame {current}/{total}")
+        self.progress.setValue(percent)
+        self.progress.setFormat(f"Frame {current}/{total}")
 
     @pyqtSlot(str)
     def update_frame_status(self, text:str):
-        self.ui.status_label.setText(text)
+        self.status_label.setText(text)
             
     @pyqtSlot(int)
     def update_render_progress(self, percent:int):
-        self.ui.progress.setValue(percent)
-        self.ui.progress.setFormat(f"Rendering... {percent:>3d}%")
+        self.progress.setValue(percent)
+        self.progress.setFormat(f"Rendering... {percent:>3d}%")
 
     @pyqtSlot(int)
     def create_lap_table(self, num_laps):
         table = QTableWidget(num_laps, 2)  # 2 columns now
         table.setHorizontalHeaderLabels(["Lap", "Progress"])
-        self.ui.layout().addWidget(table)
+        self.component_window.layout().addWidget(table)
         self.lap_table = table
 
         # initialize rows
@@ -370,6 +371,6 @@ class Logic(QObject):
     @pyqtSlot()
     def remove_lap_table(self):
         if hasattr(self, "lap_table") and self.lap_table is not None:
-            self.ui.layout().removeWidget(self.lap_table)  # remove from layout
+            self.component_window.layout().removeWidget(self.lap_table)  # remove from layout
             self.lap_table.deleteLater()                    # schedule for deletion
             self.lap_table = None    

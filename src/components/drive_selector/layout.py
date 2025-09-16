@@ -15,20 +15,15 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 from src.core.gui.ui_manager import *
+from .bundle import Bundle
 
-class Layout(UiManager):
-    drive_combo: QComboBox
-    browse_btn: QPushButton
-    delete_btn: QPushButton
+class Layout(UiManager, Bundle):
 
-    
-    def __init__(self):
+    def __init__(self, component):
         super().__init__()
-        self.init_widgets()
-        self.setup_stylesheets()
-        self.set_widgets()
         
-
+        self._map_widgets(component)
+        self.set_widgets()
         layout_data = [
             # Drive selector row
             self.box("vertical", "Drive Selection", [
@@ -42,15 +37,6 @@ class Layout(UiManager):
         ]
 
         self.apply_layout(layout_data)
-
-    def init_widgets(self):
-        annotations = getattr(self.__class__, "__annotations__", {})
-        for name, widget_type in annotations.items():
-            widget = widget_type()
-            setattr(self, name, widget)
-            
-    def setup_stylesheets(self):
-        self.setStyleSheet(""" """)
         
     def set_widgets(self):
         self.drive_combo.setEditable(True)

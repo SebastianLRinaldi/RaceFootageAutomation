@@ -7,37 +7,18 @@ from src.components import *
 
 
 
-class Layout(UiManager):
+from src.core.gui.ui_manager import *
+from .bundle import Bundle
 
-    reset_segment_settings: QPushButton
+class Layout(UiManager, Bundle):
+    """
+    Where you arrange and decorate the widgets
+    """
 
-    width_input: QSpinBox  # set max > config WIDTH (e.g. 10000)
-    height_input: QSpinBox  # set max > config HEIGHT (e.g. 10000)
-    fps_input: QDoubleSpinBox  # range 0.1–120.0, decimals=2
-
-    end_duration_input: QSpinBox  # range 1–600 seconds
-
-    font_path_input: PathInputWidget  # file browse with font file filter (.ttf, .otf)
-    font_size_input: QSpinBox  # range 8–72
-
-    bar_file_name: QLineEdit  # custom widget with QLineEdit + file browse button (filter for video)
-    dot_file_name: QLineEdit   # same as above
-    dot_avi_file_name: QLineEdit   # same
-    rendered_file_name: QLineEdit   # same
-
-    ffmpeg_bin_input: PathInputWidget  # file browse for executable
-
-    
-
-    status_label: QLabel
-    generate_button: QPushButton
-
-    file_tree: FilesView
-    
-    def __init__(self):
+    def __init__(self, component):
         super().__init__()
-        self.init_widgets()
-        self.setup_stylesheets()
+        
+        self._map_widgets(component)
         self.set_properties()
         self.set_widgets()
 
@@ -67,10 +48,10 @@ class Layout(UiManager):
                             
                             self.box("vertical", "File Paths", [
                                     self.form([
-                                        ("Bar File Name", self.bar_file_name),
-                                        ("Dot File Name", self.dot_file_name),
-                                        ("Dot AVI File Name", self.dot_avi_file_name),
-                                        ("Segment Overlay File Name", self.rendered_file_name),
+                                        ("Bar File Name", self.bar_file_name_input),
+                                        ("Dot File Name", self.dot_file_name_input),
+                                        ("Dot AVI File Name", self.dot_avi_file_name_input),
+                                        ("Segment Overlay File Name", self.rendered_file_name_input),
                                     ])
                                 ]),
                             
@@ -93,15 +74,6 @@ class Layout(UiManager):
         ]
 
         self.apply_layout(layout_data)
-
-    def init_widgets(self):
-        annotations = getattr(self.__class__, "__annotations__", {})
-        for name, widget_type in annotations.items():
-            widget = widget_type()
-            setattr(self, name, widget)
-            
-    def setup_stylesheets(self):
-        self.setStyleSheet(""" """)
 
     def set_properties(self):
         self.width_input.setMaximum(10000)

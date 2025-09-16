@@ -37,6 +37,9 @@ def load_apps():
         full_path = os.path.join(path, name)
         if not os.path.isdir(full_path):
             continue
+        
+        comp = importlib.import_module(f"{base}.{name}").Component()
+        widgets[name] = comp
 
         # try:
         #     comp = importlib.import_module(f"{base}.{name}").Component()
@@ -44,20 +47,20 @@ def load_apps():
         #         if not hasattr(comp, attr):
         #             raise AttributeError(f"{base}.{name}.Component missing '{attr}'")
         #     widgets[name] = comp
-        # except Exception as e:
+        # 
         #     raise RuntimeError(f"Error in {base}.{name}: {e}")
 
-        try:
-            comp = importlib.import_module(f"{base}.{name}").Component()
-            # Check all annotated attributes
-            for attr in getattr(comp.__class__, "__annotations__", {}):
-                if not hasattr(comp, attr):
-                    # Minimal error with file info
-                    raise AttributeError(
-                        f"{name}.Component missing attribute '{attr}' "
-                        f"(defined in {__file__})"
-                    )
-            widgets[name] = comp
+        # try:
+        #     comp = importlib.import_module(f"{base}.{name}").Component()
+        #     # Check all annotated attributes
+        #     for attr in getattr(comp.__class__, "__annotations__", {}):
+        #         if not hasattr(comp, attr):
+        #             # Minimal error with file info
+        #             raise AttributeError(
+        #                 f"{name}.Component missing attribute '{attr}' "
+        #                 f"(defined in {__file__})"
+        #             )
+        #     widgets[name] = comp
 
         # except Exception as e:
         # #     # Wrap in concise RuntimeError
@@ -77,15 +80,18 @@ def load_apps():
         #         f'  File "{exc_file}", line {exc_line}'
         #     ) from None
             # Grab frame of the exception itself (no tb navigation)
-        except Exception as e:
-            exc_file = e.__traceback__.tb_frame.f_code.co_filename
-            exc_line = e.__traceback__.tb_lineno
 
-            raise RuntimeError(
-                f"{base}.{name} failed to load: \n"
-                f'  File "{exc_file}", line {exc_line}\n'
-                f'{e}'
-            ) from None
+
+            
+        # except Exception as e:
+        #     exc_file = e.__traceback__.tb_frame.f_code.co_filename
+        #     exc_line = e.__traceback__.tb_lineno
+
+        #     raise RuntimeError(
+        #         f"{base}.{name} failed to load: \n"
+        #         f'  File "{exc_file}", line {exc_line}\n'
+        #         f'{e}'
+        #     ) from None
 
     return widgets
 

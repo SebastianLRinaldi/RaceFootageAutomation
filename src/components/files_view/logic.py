@@ -7,25 +7,26 @@ import sys
 import time
 import subprocess
 
-from .layout import Layout
+from .bundle import Bundle
 from src.helper_functions import *
 from src.helper_classes import *
 
 
-class Logic(QObject):
+class Logic(QObject, Bundle):
     valueChanged = pyqtSignal(str)  # emits the directory path whenever it changes
-    
-    def __init__(self, ui: Layout):
+
+    def __init__(self, component):
         super().__init__()
-        self.ui = ui
+        self._map_widgets(component)
+        self.component_window = component.layout
 
         self.tree_directory = ""
 
         self.tree_model = QFileSystemModel()
         self.tree_model.setRootPath(self.tree_directory)
-        self.ui.files_view.setModel(self.tree_model)
-        self.ui.files_view.setRootIndex(self.tree_model.index(self.tree_directory))
-        #self.tree_model.setIconProvider(ThumbnailProvider(self.ui.files_view))
+        self.files_view.setModel(self.tree_model)
+        self.files_view.setRootIndex(self.tree_model.index(self.tree_directory))
+        #self.tree_model.setIconProvider(ThumbnailProvider(self.files_view))
 
         self.tree_model.rootPathChanged.connect(self.valueChanged)
 
@@ -34,12 +35,12 @@ class Logic(QObject):
             if not path.strip():  # ignore empty or whitespace-only
                 self.tree_directory = ""
                 self.tree_model.setRootPath(self.tree_directory)
-                self.ui.files_view.setRootIndex(self.tree_model.index(self.tree_directory))
+                self.files_view.setRootIndex(self.tree_model.index(self.tree_directory))
                 return
 
             if not os.path.isdir(path):
                 QMessageBox.warning(
-                    self.ui,
+                    self,
                     "FILETREE: Invalid Directory",
                     f"The path does not exist:\n{path}"
                 )
@@ -47,26 +48,26 @@ class Logic(QObject):
 
             self.tree_directory = path
             self.tree_model.setRootPath(self.tree_directory)
-            self.ui.files_view.setRootIndex(self.tree_model.index(self.tree_directory))
+            self.files_view.setRootIndex(self.tree_model.index(self.tree_directory))
 
 
     def get_directory(self):
         return self.tree_directory 
 
     def set_large_icons(self):
-        self.ui.files_view.setIconSize(QSize(256, 144))
+        self.files_view.setIconSize(QSize(256, 144))
         
     def set_med_icons(self):
-        self.ui.files_view.setIconSize(QSize(128, 72))
+        self.files_view.setIconSize(QSize(128, 72))
         
     def set_small_icons(self):
-        self.ui.files_view.setIconSize(QSize(64, 36))
+        self.files_view.setIconSize(QSize(64, 36))
 
     def set_tiny_icons(self):
-        self.ui.files_view.setIconSize(QSize(32, 18))
+        self.files_view.setIconSize(QSize(32, 18))
 
     def preview_file(self, index):
-        path = self.ui.files_view.model().filePath(index)
+        path = self.files_view.model().filePath(index)
         if os.path.isfile(path):
             QDesktopServices.openUrl(QUrl.fromLocalFile(path))
 
@@ -86,7 +87,7 @@ class Logic(QObject):
         self.valueChanged.emit(self.tree_directory)
 
     def collect_selected_items(self):
-        tree = self.ui.files_view
+        tree = self.files_view
         model = self.tree_model
         indexes = [i for i in tree.selectionModel().selectedIndexes() if i.column() == 0]
 
@@ -102,7 +103,7 @@ class Logic(QObject):
 
 
     # def open_menu(self, position):
-    #     tree = self.ui.files_view
+    #     tree = self.files_view
     #     model =self.tree_model 
     #     indexes = [i for i in tree.selectionModel().selectedIndexes() if i.column() == 0]
 
@@ -116,7 +117,7 @@ class Logic(QObject):
     #         items.append(FileItem(path, icon))  # create a FileItem here
 
     #     menu = QMenu()
-    #     act_send = QAction("Send Items", self.ui)
+    #     act_send = QAction("Send Items", self)
     #     act_send.triggered.connect(lambda: self.filesItemsSelected.emit(items))  # send the objects
     #     menu.addAction(act_send)
     #     menu.exec(tree.viewport().mapToGlobal(position))

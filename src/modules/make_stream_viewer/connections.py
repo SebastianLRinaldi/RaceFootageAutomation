@@ -1,9 +1,10 @@
 from .logic import Logic
-from .layout import Layout
+from .bundle import Bundle
 
-class Connections:
-    def __init__(self, ui: Layout, logic: Logic):
-        self.ui = ui
+class Connections(Bundle):
+    def __init__(self, component, logic: Logic):
+        super().__init__()
+        self._map_widgets(component)
         self.logic = logic
 
-        self.ui.btn.clicked.connect(self.logic.open_file_dialog)
+        self.btn.clicked.connect(self.logic.open_file_dialog)

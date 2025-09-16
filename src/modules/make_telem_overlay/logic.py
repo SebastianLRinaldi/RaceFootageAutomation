@@ -19,7 +19,7 @@ import os
 from multiprocessing import Process, Queue
 from lxml import etree
 
-from .layout import Layout
+from .bundle import Bundle
 from src.components import *
 from src.helper_functions import *
 from src.helper_classes import *
@@ -51,9 +51,12 @@ https://goprotelemetryextractor.com/free/#
 - Virb Edit
 - for generating the GPX file
 """
-class Logic:
-    def __init__(self, ui: Layout):
-        self.ui = ui
+class Logic(Bundle):
+
+    def __init__(self, component):
+        super().__init__()
+        self._map_widgets(component)
+        self.component_window = component.layout
         self.project_directory = ProjectDirectory()
 
         self.width = 640
@@ -69,16 +72,16 @@ class Logic:
         
 
         SETTINGS_FIELDS = [
-            ("width", self.ui.width_input, self.width),
-            ("height", self.ui.height_input, self.height),
-            ("fps", self.ui.fps_input, self.fps),
+            ("width", self.width_input, self.width),
+            ("height", self.height_input, self.height),
+            ("fps", self.fps_input, self.fps),
 
-            ("rendered_name", self.ui.rendered_file_name, self.rendered_name),
+            ("rendered_name", self.rendered_file_name, self.rendered_name),
             
-            ("radius", self.ui.radius_input, self.radius),
-            ("scale", self.ui.scale_input, self.scale),
+            ("radius", self.radius_input, self.radius),
+            ("scale", self.scale_input, self.scale),
 
-            ("max_val", self.ui.max_val_input, self.max_val),
+            ("max_val", self.max_val_input, self.max_val),
         ]
 
         self.settings_handler = SettingsHandler(SETTINGS_FIELDS, target=self, app="make_telem_overlay")
@@ -231,20 +234,20 @@ class Logic:
             thread.start()
             self.threads.append(thread)
 
-        self.ui.generate_button.setEnabled(False)
+        self.generate_button.setEnabled(False)
 
     def on_finished(self):
         QMessageBox.information(self.ui, "Overlay Done", f"Generated: {self.project_directory.make_asset_file_path(self.asset_name)}")
-        self.ui.status_label.setText(f"✅ Done: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
+        self.status_label.setText(f"✅ Done: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
 
         if all(not t.isRunning() for t in self.threads):
-            self.ui.generate_button.setEnabled(True)
+            self.generate_button.setEnabled(True)
 
 
     def on_error(self, err_type: str, tb_str: str):
         msg = f"Exception type: {err_type}\n\nTraceback:\n{tb_str}"
         print(msg)
         QMessageBox.critical(self.ui, "Error", msg)
-        self.ui.status_label.setText(f"❌ Failed: {err_type}")
-        self.ui.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
-        self.ui.generate_button.setEnabled(True)
+        self.status_label.setText(f"❌ Failed: {err_type}")
+        self.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
+        self.generate_button.setEnabled(True)

@@ -3,41 +3,27 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 from src.core.gui.ui_manager import *
+from .bundle import Bundle
 
-class Layout():
-    def __init__(self):
+class Layout(UiManager, Bundle):
+    """
+    Where you arrange and decorate the widgets
+    """
+
+    def __init__(self, component):
         super().__init__()
-
-
-class Layout(UiManager):
-    files_view : QTreeView
-    
-    def __init__(self):
-        super().__init__()
-        self.init_widgets()
-        self.setup_stylesheets()
+        
+        self._map_widgets(component)
         self.set_widgets()
 
         layout_data = [
-                
             # Selected / Ordered files
             self.box("vertical", "Footage Files", [
                 self.files_view,
             ]),
-
         ]
 
-
         self.apply_layout(layout_data)
-
-    def init_widgets(self):
-        annotations = getattr(self.__class__, "__annotations__", {})
-        for name, widget_type in annotations.items():
-            widget = widget_type()
-            setattr(self, name, widget)
-            
-    def setup_stylesheets(self):
-        self.setStyleSheet(""" """)
         
     def set_widgets(self):
         self.files_view.setSelectionMode(QAbstractItemView.SelectionMode.ExtendedSelection)

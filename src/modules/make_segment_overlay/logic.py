@@ -13,7 +13,7 @@ import traceback
 
 from src.helper_functions import *
 from src.helper_classes import *
-from .layout import Layout
+from .bundle import Bundle
 
 from src.components import *
 
@@ -36,9 +36,12 @@ class OverlayWorker(QThread):
             self.error.emit(err_type, tb_str)
 
 
-class Logic():
-    def __init__(self, ui: Layout):
-        self.ui = ui
+class Logic(Bundle):
+
+    def __init__(self, component):
+        super().__init__()
+        self._map_widgets(component)
+        self.component_window = component.layout
         self.project_directory = ProjectDirectory()
 
         self.width = 1920
@@ -61,20 +64,20 @@ class Logic():
 
         
         SETTINGS_FIELDS = [
-            ("width", self.ui.width_input, self.width),
-            ("height", self.ui.height_input, self.height),
-            ("fps", self.ui.fps_input, self.fps),
+            ("width", self.width_input, self.width),
+            ("height", self.height_input, self.height),
+            ("fps", self.fps_input, self.fps),
 
-            ("end_duration", self.ui.end_duration_input, self.end_duration),
-            ("font_path", self.ui.font_path_input.layout.line_edit, self.font_path ),
-            ("font_size", self.ui.font_size_input, self.font_size),
+            ("end_duration", self.end_duration_input, self.end_duration),
+            ("font_path", self.font_path_input.line_edit, self.font_path ),
+            ("font_size", self.font_size_input, self.font_size),
             
-            ("bar_file_name", self.ui.bar_file_name, self.bar_file_name),
-            ("dot_file_name", self.ui.dot_file_name, self.dot_file_name),
-            ("dot_avi_file_name", self.ui.dot_avi_file_name, self.dot_avi_file_name),
-            ("rendered_name", self.ui.rendered_file_name, self.rendered_name),
+            ("bar_file_name", self.bar_file_name_input, self.bar_file_name),
+            ("dot_file_name", self.dot_file_name_input, self.dot_file_name),
+            ("dot_avi_file_name", self.dot_avi_file_name_input, self.dot_avi_file_name),
+            ("rendered_name", self.rendered_file_name_input, self.rendered_name),
 
-            ("ffmpeg_bin", self.ui.ffmpeg_bin_input.layout.line_edit, self.ffmpeg_bin),
+            ("ffmpeg_bin", self.ffmpeg_bin_input.line_edit, self.ffmpeg_bin),
         ]
 
 
@@ -87,8 +90,8 @@ class Logic():
         self.project_directory.module_path = path
         
     def generate_overlay(self):
-        self.ui.generate_button.setEnabled(False)
-        self.ui.status_label.setText("Generating Segment Overlay...")
+        self.generate_button.setEnabled(False)
+        self.status_label.setText("Generating Segment Overlay...")
 
         self.worker = OverlayWorker(self)
         self.worker.finished.connect(self.on_finished)
@@ -96,14 +99,14 @@ class Logic():
         self.worker.start()
 
     def on_finished(self):
-        self.ui.status_label.setText(f"✅ Done: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
-        self.ui.generate_button.setEnabled(True)
+        self.status_label.setText(f"✅ Done: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
+        self.generate_button.setEnabled(True)
 
     def on_error(self, err_type: str, tb_str: str):
         msg = f"Exception type: {err_type}\n\nTraceback:\n{tb_str}"
         QMessageBox.critical(self.ui, "Error", msg)
-        self.ui.status_label.setText(f"❌ Failed: {err_type}")
-        self.ui.generate_button.setEnabled(True)
+        self.status_label.setText(f"❌ Failed: {err_type}")
+        self.generate_button.setEnabled(True)
 
 
     # --- Bar Overlay ---
@@ -176,7 +179,7 @@ class Logic():
 
     def save_bar_video(self):
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        file_path = self.project_directory.make_asset_file_path(self.bar_file_name)
+        file_path = self.project_directory.make_asset_file_path(self.bar_file_name_input)
         
         writer = cv2.VideoWriter(file_path, fourcc, self.fps, (self.width, self.height))
         total_duration_sec = sum(self.project_directory.lap_times)+self.end_duration  # Total duration is sum of laps
@@ -217,7 +220,7 @@ class Logic():
 
     def save_dot_video_trans(self):
         total_duration_sec = sum(self.project_directory.lap_times) + self.end_duration  # Total duration is sum of laps
-        file_path = self.project_directory.make_asset_file_path(self.dot_avi_file_name)
+        file_path = self.project_directory.make_asset_file_path(self.dot_avi_file_name_input)
         
         fourcc = cv2.VideoWriter_fourcc(*'RGBA')
         writer = cv2.VideoWriter(file_path, fourcc, self.fps, (self.width, self.height))
@@ -244,7 +247,7 @@ class Logic():
 
     def save_dot_video_reg(self):
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-        file_path = self.project_directory.make_asset_file_path(self.bar_file_name)
+        file_path = self.project_directory.make_asset_file_path(self.bar_file_name_input)
         
         writer = cv2.VideoWriter(file_path, fourcc, self.fps, (self.width, self.height))
         total_duration_sec = sum(self.project_directory.lap_times)+self.end_duration  # Total duration is sum of laps
@@ -303,7 +306,7 @@ class Logic():
         return np.array(img)
 
     def save_dot_video_sync(self ):
-        file_path = self.project_directory.make_asset_file_path(self.dot_file_name)
+        file_path = self.project_directory.make_asset_file_path(self.dot_file_name_input)
         total_duration_sec = sum(self.project_directory.lap_times)+self.end_duration  # Total duration is sum of laps
         
         fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -317,8 +320,8 @@ class Logic():
         writer.release()
 
     def make_dot_and_bar(self):
-        bar_file = self.project_directory.make_asset_file_path(self.bar_file_name)
-        dot_file = self.project_directory.make_asset_file_path(self.dot_file_name)
+        bar_file = self.project_directory.make_asset_file_path(self.bar_file_name_input)
+        dot_file = self.project_directory.make_asset_file_path(self.dot_file_name_input)
 
         if not os.path.isfile(bar_file):
             print("Creating bar overlay...")
@@ -349,8 +352,8 @@ class Logic():
         """CPU ONLY"""
         cmd = [
             self.ffmpeg_bin, "-y",
-            "-i", self.project_directory.make_asset_file_path(self.bar_file_name),
-            "-i", self.project_directory.make_asset_file_path(self.dot_file_name),
+            "-i", self.project_directory.make_asset_file_path(self.bar_file_name_input),
+            "-i", self.project_directory.make_asset_file_path(self.dot_file_name_input),
             "-filter_complex", "[1:v]colorkey=0x000000:0.1:0.2[ckout];[0:v][ckout]overlay=shortest=1",
             "-c:v", "libx264",
             "-crf", "18",

@@ -1,12 +1,12 @@
 from .logic import Logic
-from .layout import Layout
+from .bundle import Bundle
 
-class Connections:
-    def __init__(self, ui: Layout, logic: Logic):
-        self.ui = ui
+class Connections(Bundle):
+    def __init__(self, component, logic: Logic):
+        super().__init__()
+        self._map_widgets(component)
         self.logic = logic
 
         # connections
-        self.ui.browse_btn.clicked.connect(self.logic.browse_directory)
-        self.ui.delete_btn.clicked.connect(self.logic.delete_selected)
-       
+        self.browse_btn.clicked.connect(self.logic.browse_directory)
+        self.delete_btn.clicked.connect(self.logic.delete_selected)

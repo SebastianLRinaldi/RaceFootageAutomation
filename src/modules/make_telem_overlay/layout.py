@@ -4,36 +4,17 @@ from PyQt6.QtGui import *
 
 from src.core.gui.ui_manager import *
 from src.components import *
+from .bundle import Bundle
 
+class Layout(UiManager, Bundle):
+    """
+    Where you arrange and decorate the widgets
+    """
 
-
-class Layout(UiManager):
-
-
-    fps_input: QDoubleSpinBox
-
-    # Overlay appearance
-    width_input: QSpinBox
-    height_input: QSpinBox
-
-    rendered_file_name: QLineEdit
-    scale_input: QSpinBox
-    radius_input: QSpinBox
-
-    max_val_input: QDoubleSpinBox
-
-    # UI
-    status_label: QLabel
-
-    button_add: QPushButton
-    generate_button: QPushButton
-
-    file_tree: FilesView
-    
-    def __init__(self):
+    def __init__(self, component):
         super().__init__()
-        self.init_widgets()
-        self.setup_stylesheets()
+        
+        self._map_widgets(component)
         self.set_properties()
         self.set_widgets()
 
@@ -82,15 +63,6 @@ class Layout(UiManager):
         ]
 
         self.apply_layout(layout_data)
-
-    def init_widgets(self):
-        annotations = getattr(self.__class__, "__annotations__", {})
-        for name, widget_type in annotations.items():
-            widget = widget_type()
-            setattr(self, name, widget)
-            
-    def setup_stylesheets(self):
-        self.setStyleSheet(""" """)
 
     def set_properties(self):
         self.fps_input.setRange(0.1, 240.0)

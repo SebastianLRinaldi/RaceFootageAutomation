@@ -5,19 +5,22 @@ from PyQt6.QtGui import *
 import sys
 import subprocess
 
-from .layout import Layout
+from .bundle import Bundle
 from src.components import *
 from src.helper_functions import *
 from src.helper_classes import *
 
-class Logic:
-    def __init__(self, ui: Layout):
-        self.ui = ui
+class Logic(Bundle):
+
+    def __init__(self, component):
+        super().__init__()
+        self._map_widgets(component)
+        self.component_window = component.layout
         self.project_directory = ProjectDirectory()
 
 
     def open_file_dialog(self):
-        file_path, _ = QFileDialog.getOpenFileName(self.ui, "Open Video File", "", "Video Files (*.mp4 *.mov *.mkv)")
+        file_path, _ = QFileDialog.getOpenFileName(self.component_window, "Open Video File", "", "Video Files (*.mp4 *.mov *.mkv)")
         if file_path:
             self.run_ffprobe(file_path)
 
@@ -30,6 +33,6 @@ class Logic:
                 text=True,
                 check=True
             )
-            self.ui.output.setPlainText(result.stdout)
+            self.output.setPlainText(result.stdout)
         except subprocess.CalledProcessError as e:
-            self.ui.output.setPlainText(f"ffprobe error:\n{e.stderr}")
+            self.output.setPlainText(f"ffprobe error:\n{e.stderr}")

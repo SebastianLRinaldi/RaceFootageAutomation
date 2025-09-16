@@ -6,8 +6,7 @@ import os
 import sys
 import csv
 
-from .layout import Layout
-# from src.components import YourNeededLayoutLogicConnection
+from .bundle import Bundle
 from src.helper_functions import *
 from src.helper_classes import *
 
@@ -22,9 +21,12 @@ keyframes - https://www.youtube.com/watch?v=vcnsA38xDx4
 """
 
 
-class Logic:
-    def __init__(self, ui: Layout):
-        self.ui = ui
+class Logic(Bundle):
+
+    def __init__(self, component):
+        super().__init__()
+        self._map_widgets(component)
+        self.component_window = component.layout
         self.project_directory = ProjectDirectory()
         self.raw_lap_times = None
         self.processed_lap_times = None
@@ -34,12 +36,12 @@ class Logic:
     
 
     def process_lap_times(self): 
-        self.raw_lap_times = self.ui.text_area.toHtml()
+        self.raw_lap_times = self.text_area.toHtml()
         if isinstance(self.raw_lap_times, str):
             parser = LapDataParser()
             self.processed_lap_times = parser.process_raw_html(self.raw_lap_times)
         else:
-            QMessageBox.warning(self.ui, "Bad Data", f"{type(self.raw_lap_times)}")
+            QMessageBox.warning(self.component_window, "Bad Data", f"{type(self.raw_lap_times)}")
             
     def save_to_lap_times_to_csv(self):
         self.lap_time_csv_path = os.path.join(
@@ -48,7 +50,7 @@ class Logic:
         )
 
         filename, _ = QFileDialog.getSaveFileName(
-            self.ui,
+            self.component_window,
             "Save Lap Times",
             self.lap_time_csv_path,
             "CSV Files (*.csv);;All Files (*)"

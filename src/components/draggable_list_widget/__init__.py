@@ -1,12 +1,12 @@
 from .layout import Layout
 from .logic import Logic
 from .connections import Connections
+from .bundle import Bundle
 
-class Component():
+class Component(Bundle):
     def __init__(self):
-        super().__init__()
-        self.layout = Layout()
-        self.logic = Logic(self.layout)
-        self.connection = Connections(self.layout, self.logic)
+        self._init_widgets()
 
-
+        self.layout = Layout(self)
+        self.logic = Logic(self)
+        self.connection = Connections(self, self.logic)
