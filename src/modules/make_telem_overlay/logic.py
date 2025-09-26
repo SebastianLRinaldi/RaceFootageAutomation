@@ -243,7 +243,6 @@ class Logic(Blueprint):
         if all(not t.isRunning() for t in self.threads):
             self.generate_button.setEnabled(True)
 
-
     def on_error(self, err_type: str, tb_str: str):
         msg = f"Exception type: {err_type}\n\nTraceback:\n{tb_str}"
         print(msg)
@@ -251,3 +250,43 @@ class Logic(Blueprint):
         self.status_label.setText(f"❌ Failed: {err_type}")
         self.status_label.setTextInteractionFlags(Qt.TextInteractionFlag.TextSelectableByMouse)
         self.generate_button.setEnabled(True)
+
+    @pyqtSlot(int, int)
+    def update_frame_progress(self, current:int, total:int):
+        percent = int((current / total) * 100)
+        self.progress.setValue(percent)
+        self.progress.setFormat(f"Frame {current}/{total}")
+
+    @pyqtSlot(str)
+    def update_frame_status(self, text:str):
+        self.status_label.setText(text)
+            
+    @pyqtSlot(int)
+    def update_render_progress(self, percent:int):
+        self.progress.setValue(percent)
+        self.progress.setFormat(f"Rendering... {percent:>3d}%")
+
+    @pyqtSlot(int)
+    def create_lap_table(self, num_laps):
+        table = QTableWidget(num_laps, 2)  # 2 columns now
+        table.setHorizontalHeaderLabels(["Lap", "Progress"])
+        self.component.layout().addWidget(table)
+        self.lap_table = table
+
+        # initialize rows
+        for i in range(num_laps):
+            table.setItem(i, 0, QTableWidgetItem(f"Lap {i+1}"))   # name column
+            table.setItem(i, 1, QTableWidgetItem("0%"))            # progress column
+
+    @pyqtSlot(int, int)
+    def update_lap_table(self, lap_number, percent):
+        item = self.lap_table.item(lap_number, 1)  # second column
+        if item:
+            item.setText(f"{percent}%")
+
+    @pyqtSlot()
+    def remove_lap_table(self):
+        if hasattr(self, "lap_table") and self.lap_table is not None:
+            self.component.layout().removeWidget(self.lap_table)  # remove from layout
+            self.lap_table.deleteLater()                    # schedule for deletion
+            self.lap_table = None    

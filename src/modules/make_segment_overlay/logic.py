@@ -10,6 +10,8 @@ import math
 from PIL import ImageFont, ImageDraw, Image
 from tqdm import tqdm
 import traceback
+import re
+
 
 from src.helper_functions import *
 from src.helper_classes import *
@@ -36,13 +38,26 @@ class OverlayWorker(QThread):
             self.error.emit(err_type, tb_str)
 
 
-class Logic(Blueprint):
+class Logic(QObject, Blueprint):
+    frame_status = pyqtSignal(str)
+    frame_progress = pyqtSignal(int, int)
+    render_progress = pyqtSignal(int)
+    lap_table_create = pyqtSignal(int)
+    lap_table_update = pyqtSignal(int, int)
+    lap_table_remove = pyqtSignal()
 
     def __init__(self, component):
         super().__init__()
         self._map_widgets(component)
         self.component = component
         self.project_directory = ProjectDirectory()
+
+        self.frame_status.connect(self.update_frame_status)
+        self.frame_progress.connect(self.update_frame_progress)
+        self.render_progress.connect(self.update_render_progress)
+        self.lap_table_create.connect(self.create_lap_table)
+        self.lap_table_update.connect(self.update_lap_table)
+        self.lap_table_remove.connect(self.remove_lap_table)
 
         self.width = 1920
         self.height = 120
@@ -55,14 +70,12 @@ class Logic(Blueprint):
         self.dot_avi_file_name = "dot_overlay.avi"
         self.rendered_name = f"Segment_Overlay.mp4"
 
-
         self.ffmpeg_bin = "ffmpeg"
 
         self.font_path = "C:\\Users\\epics\\AppData\\Local\\Microsoft\\Windows\\Fonts\\NIS-Heisei-Mincho-W9-Condensed.TTF"
         self.font_size = 24
         self.font = ImageFont.truetype(self.font_path, self.font_size)
 
-        
         SETTINGS_FIELDS = [
             ("width", self.width_input, self.width),
             ("height", self.height_input, self.height),
@@ -79,7 +92,6 @@ class Logic(Blueprint):
 
             ("ffmpeg_bin", self.ffmpeg_bin_input.line_edit, self.ffmpeg_bin),
         ]
-
 
         self.settings_handler = SettingsHandler(SETTINGS_FIELDS, target=self, app="SegmentOverlayApp")
 
@@ -101,6 +113,10 @@ class Logic(Blueprint):
     def on_finished(self):
         self.status_label.setText(f"✅ Done: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
         self.generate_button.setEnabled(True)
+
+        self.progress.setFormat("Ready")
+        self.progress.setValue(0)
+        self.lap_table_remove.emit()
 
     def on_error(self, err_type: str, tb_str: str):
         msg = f"Exception type: {err_type}\n\nTraceback:\n{tb_str}"
@@ -146,7 +162,6 @@ class Logic(Blueprint):
 
             draw.rectangle([start_x, y_top, end_x, y_bottom], fill=color)
 
-
             if i >= lap_done_idx:
                 # Draw seperator lines
                 draw.line([(start_x, y_top), (start_x, y_bottom)], fill=(255, 255, 0), width=2)
@@ -171,8 +186,6 @@ class Logic(Blueprint):
 
                 draw.text((text_x, text_y), diff_text, fill=text_color, font=self.font)
 
-
-
             accum_length += segment_length[i]
 
         return cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
@@ -192,7 +205,9 @@ class Logic(Blueprint):
         frame_count = int(self.fps * total_duration_sec)
         lap_cumulative_times = np.cumsum(self.project_directory.lap_times)
 
-        for frame_idx in tqdm(range(frame_count), desc="Saving bar overlay video"):
+        # for frame_idx in tqdm(range(frame_count), desc="Saving bar overlay video"):
+        for frame_idx in range(frame_count):
+
             current_time_sec = frame_idx / self.fps
 
             # Find current lap index (number of laps finished)
@@ -203,6 +218,8 @@ class Logic(Blueprint):
 
             # Write correct overlay image
             writer.write(bar_overlay_imgs[lap_done_idx])
+
+            self.frame_progress.emit(frame_idx, frame_count)
 
         writer.release()
 
@@ -313,10 +330,12 @@ class Logic(Blueprint):
         writer = cv2.VideoWriter(file_path, fourcc, self.fps, (self.width, self.height))
 
         frame_count = int(self.fps * total_duration_sec)
-        for frame_idx in tqdm(range(frame_count), desc="Saving dot overlay reg video"):
+        # for frame_idx in tqdm(range(frame_count), desc="Saving dot overlay reg video"):
+        for frame_idx in range(frame_count):
             current_time_sec = frame_idx / self.fps  # exact current time
             frame_rgb = self.vertical_line_overlay(current_time_sec)
             writer.write(frame_rgb)
+            self.frame_progress.emit(frame_idx, frame_count)
         writer.release()
 
     def make_dot_and_bar(self):
@@ -325,15 +344,16 @@ class Logic(Blueprint):
 
         if not os.path.isfile(bar_file):
             print("Creating bar overlay...")
+            self.frame_status.emit("Creating bar overlay...")
             self.save_bar_video()
         if not os.path.isfile(dot_file):
             print("Creating dot overlay...")
+            self.frame_status.emit("Creating dot overlay...")
             self.save_dot_video_sync()
 
 
     def run_ffmpeg_overlay(self):
         self.make_dot_and_bar()
-
 
         # cmd = [
         #     self.ffmpeg_bin, "-y",
@@ -384,10 +404,76 @@ class Logic(Blueprint):
         #     self.project_directory.make_rendered_file_path(self.rendered_name),
         # ]
 
+        # print("Running ffmpeg overlay...")
+        # subprocess.run(cmd, check=True)
+        # print(f"✅ Overlay done: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
 
-
+        # Usage example:
+        # cmd = self.get_ffmpeg_cmd(concat_txt=concat_txt)
         
-        print("Running ffmpeg overlay...")
-        subprocess.run(cmd, check=True)
-        print(f"✅ Overlay done: {self.project_directory.make_rendered_file_path(self.rendered_name)}")
+        # subprocess.run(cmd, check=True)
 
+        process = subprocess.Popen(cmd, stderr=subprocess.PIPE, text=True)
+
+        total_duration = sum(float(lap[1]) for lap in self.project_directory.lap_time_deltas)
+
+        total_frames = int(float(total_duration) * self.fps)
+
+        for line in process.stderr:
+            self.frame_status.emit(line.strip())
+
+            frame_pattern = re.compile(r"frame=\s*(\d+)")  # matches "frame=12345"
+            match = frame_pattern.search(line)
+            if match:
+                current_frame = int(match.group(1))
+                self.frame_progress.emit(current_frame, total_frames)
+            
+            QApplication.processEvents()  # make sure QLabel updates immediately
+
+        process.wait()
+
+
+
+
+
+
+
+    @pyqtSlot(int, int)
+    def update_frame_progress(self, current:int, total:int):
+        percent = int((current / total) * 100)
+        self.progress.setValue(percent)
+        self.progress.setFormat(f"Frame {current}/{total}")
+
+    @pyqtSlot(str)
+    def update_frame_status(self, text:str):
+        self.status_label.setText(text)
+            
+    @pyqtSlot(int)
+    def update_render_progress(self, percent:int):
+        self.progress.setValue(percent)
+        self.progress.setFormat(f"Rendering... {percent:>3d}%")
+
+    @pyqtSlot(int)
+    def create_lap_table(self, num_laps):
+        table = QTableWidget(num_laps, 2)  # 2 columns now
+        table.setHorizontalHeaderLabels(["Lap", "Progress"])
+        self.component.layout().addWidget(table)
+        self.lap_table = table
+
+        # initialize rows
+        for i in range(num_laps):
+            table.setItem(i, 0, QTableWidgetItem(f"Lap {i+1}"))   # name column
+            table.setItem(i, 1, QTableWidgetItem("0%"))            # progress column
+
+    @pyqtSlot(int, int)
+    def update_lap_table(self, lap_number, percent):
+        item = self.lap_table.item(lap_number, 1)  # second column
+        if item:
+            item.setText(f"{percent}%")
+
+    @pyqtSlot()
+    def remove_lap_table(self):
+        if hasattr(self, "lap_table") and self.lap_table is not None:
+            self.component.layout().removeWidget(self.lap_table)  # remove from layout
+            self.lap_table.deleteLater()                    # schedule for deletion
+            self.lap_table = None    

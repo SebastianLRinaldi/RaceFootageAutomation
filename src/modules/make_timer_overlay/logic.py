@@ -44,9 +44,12 @@ class OverlayWorker(QThread):
 
 
 class Logic(QObject, Blueprint):
-    # lap_started = pyqtSignal(int)
-    # lap_progress = pyqtSignal(int, int)  # lap_number, percent
-    # lap_finished = pyqtSignal(int)
+    frame_status = pyqtSignal(str)
+    frame_progress = pyqtSignal(int, int)
+    render_progress = pyqtSignal(int)
+    lap_table_create = pyqtSignal(int)
+    lap_table_update = pyqtSignal(int, int)
+    lap_table_remove = pyqtSignal()
     
     def __init__(self, component):
         super().__init__()
@@ -54,9 +57,13 @@ class Logic(QObject, Blueprint):
         self.component = component
         self.project_directory = ProjectDirectory()
         self.lap_labels = {}
-        # self.lap_started.connect(self.create_lap_label)
-        # self.lap_progress.connect(self.update_lap_table)
-        # self.lap_finished.connect(self.remove_lap_label)
+        
+        self.frame_status.connect(self.update_frame_status)
+        self.frame_progress.connect(self.update_frame_progress)
+        self.render_progress.connect(self.update_render_progress)
+        self.lap_table_create.connect(self.create_lap_table)
+        self.lap_table_update.connect(self.update_lap_table)
+        self.lap_table_remove.connect(self.remove_lap_table)
 
         self.FRAME_WIDTH = 310
         self.FRAME_HEIGHT = 150
@@ -122,6 +129,7 @@ class Logic(QObject, Blueprint):
         print(f'File "{self.project_directory.make_rendered_file_path(self.rendered_name)}"')
         self.progress.setFormat("Ready")
         self.progress.setValue(0)
+        self.lap_table_remove.emit()
 
     def on_error(self, err_type: str, tb_str: str):
         msg = f"Exception type: {err_type}\n\nTraceback:\n{tb_str}"
@@ -177,30 +185,18 @@ class Logic(QObject, Blueprint):
 
         process = subprocess.Popen(cmd, stderr=subprocess.PIPE, text=True)
 
-
         total_duration = sum(float(lap[1]) for lap in self.project_directory.lap_time_deltas)
 
         total_frames = int(float(total_duration) * self.fps)
 
         for line in process.stderr:
-            QMetaObject.invokeMethod(
-                self,
-                "update_frame_status",
-                Qt.ConnectionType.QueuedConnection,
-                Q_ARG(str, line.strip())
-            )
+            self.frame_status.emit(line.strip())
 
             frame_pattern = re.compile(r"frame=\s*(\d+)")  # matches "frame=12345"
             match = frame_pattern.search(line)
             if match:
                 current_frame = int(match.group(1))
-                QMetaObject.invokeMethod(
-                    self,
-                    "update_frame_progress",
-                    Qt.ConnectionType.QueuedConnection,
-                    Q_ARG(int, current_frame),
-                    Q_ARG(int, total_frames)
-                )
+                self.frame_progress.emit(current_frame, total_frames)
             
             QApplication.processEvents()  # make sure QLabel updates immediately
 
@@ -210,10 +206,10 @@ class Logic(QObject, Blueprint):
 
     def create_timer_section(self, lap_number, temp_dir):
         """
-                # time_elapsed = frame / self.fps
-                # frame_idx = int(time_elapsed * self.fps)
-                # if frame_idx >= len(timer_frames):
-                #     frame_idx = len(timer_frames) - 1
+            # time_elapsed = frame / self.fps
+            # frame_idx = int(time_elapsed * self.fps)
+            # if frame_idx >= len(timer_frames):
+            #     frame_idx = len(timer_frames) - 1
 
 
             for frame in tqdm(range(total_frames), desc="Rendering timer video"):
@@ -234,8 +230,6 @@ class Logic(QObject, Blueprint):
         center_y = self.FRAME_HEIGHT // 2
         
         try:
-            # for frame in tqdm(range(frame_count), desc="Rendering timer video"):
-
             for frame in range(frame_count):
                 time_elapsed = frame / self.fps
                 text1 = f"Lap:{lap_number+1}"
@@ -249,25 +243,17 @@ class Logic(QObject, Blueprint):
                 draw.text((center_x, center_y), text1 , font=font, fill=text_color, anchor="md")
                 draw.text((center_x, center_y), text2, font=font, fill=text_color, anchor="ma")
 
-
                 # Write frame to video
                 frame_bgr = cv2.cvtColor(np.array(pil_img), cv2.COLOR_RGB2BGR)
                 writer.write(frame_bgr)
                 
                 percent = int(((frame + 1) / frame_count) * 100)
 
-                QMetaObject.invokeMethod(
-                    self,
-                    "update_lap_table",
-                    Qt.ConnectionType.QueuedConnection,
-                    Q_ARG(int, lap_number),
-                    Q_ARG(int, percent)
-                )
+                self.lap_table_update.emit(lap_number, percent)
 
         finally:
             writer.release()  # Ensure it's always released
             del writer
-
 
         return filename
 
@@ -283,12 +269,7 @@ class Logic(QObject, Blueprint):
             num_laps = len(self.project_directory.lap_time_deltas)
 
             # --- CREATE LAP TABLE ONCE ---
-            QMetaObject.invokeMethod(
-                self,
-                "create_lap_table",
-                Qt.ConnectionType.QueuedConnection,
-                Q_ARG(int, num_laps)
-            )
+            self.lap_table_create.emit(num_laps)
 
             
             if render_single:
@@ -305,7 +286,6 @@ class Logic(QObject, Blueprint):
                     #     lap_number = futures[future]
                     #     lap_videos.append(future.result())
                     
-
                     total = len(futures)
                     done = 0
                     for future in as_completed(futures):
@@ -314,26 +294,13 @@ class Logic(QObject, Blueprint):
                         done += 1
                         percent = int((done / total) * 100)
                         
-                        # # update QWidgets from worker thread safely
-                        QMetaObject.invokeMethod(
-                            self,  # where `update_render_progress` is defined
-                            "update_render_progress",
-                            Qt.ConnectionType.QueuedConnection,
-                            Q_ARG(int, percent)
-                        )
+                        self.render_progress.emit(percent)
 
             # Sort videos by lap number (they can complete out of order)
             lap_videos.sort(key=lambda x: int(os.path.basename(x).split('_')[1].split('.')[0]))
 
             # 3. Concatenate all videos: start_blank + lap videos
             self.concat_videos(lap_videos, self.rendered_name)
-
-            # --- REMOVE LAP TABLE ---
-            QMetaObject.invokeMethod(
-                self,
-                "remove_lap_table",
-                Qt.ConnectionType.QueuedConnection
-            )
 
     @pyqtSlot(int, int)
     def update_frame_progress(self, current:int, total:int):

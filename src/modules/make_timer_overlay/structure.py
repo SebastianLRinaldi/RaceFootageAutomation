@@ -91,9 +91,9 @@ class Structure(LayoutBuilder, Blueprint):
         self.center_offset_input.setRange(0, 1000)
 
     def set_widgets(self):
-        self.status_label.setText("Click to generate timer overlay")
+        self.status_label.setText("Ready")
         self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
-        self.generate_button.setText("Generate Timer Overlay")
+        self.generate_button.setText("Generate Overlay")
         
         self.progress.setFormat("Ready") 
         self.progress.setRange(0, 0)

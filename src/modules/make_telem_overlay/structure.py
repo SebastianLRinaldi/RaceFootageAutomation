@@ -20,8 +20,10 @@ class Structure(LayoutBuilder, Blueprint):
 
         self.layout_data = [
             self.tabs(tab_labels=["GPX Generator", "Files", "Settings"], children=[
+                
                 self.group("vertical", [
                     "status_label",
+                    "progress",
                     "button_add",
                     "generate_button"
                 ]),
@@ -29,8 +31,8 @@ class Structure(LayoutBuilder, Blueprint):
                 self.box("vertical","Files", [self.file_tree]),
 
                 self.scroll([
+                    self.reset_telem_settings,
                     self.group("vertical", [
-
                         self.box("vertical", "General", [
                             self.form([
                                 ("FPS", "fps_input"),
@@ -78,10 +80,20 @@ class Structure(LayoutBuilder, Blueprint):
         self.max_val_input.setDecimals(2)
 
     def set_widgets(self):
-        # Main UI
-        self.status_label.setText("Queued files:")
+        self.status_label.setText("Ready")
+        self.status_label.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        self.generate_button.setText("Generate Overlay")
+        
         self.button_add.setText("Add GPX File")
-        self.generate_button.setText("Generate All Overlays")
+
+        self.progress.setFormat("Ready") 
+        self.progress.setRange(0, 0)
+        self.progress.setVisible(True)
+        self.progress.setMinimum(0)
+        self.progress.setMaximum(100)  # Percent scale
+        self.progress.setValue(0)
+        self.progress.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.progress.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # # Config values from your logic
         # self.gpx_dir_input.logic.setText("F:/_Small/344 School Python/TrackFootageEditor/RaceStorage/(6-20-25)-R2")

@@ -8,6 +8,7 @@ class Blueprint:
     status_label: QLabel
     generate_button: QPushButton
     progress: QProgressBar
+    reset_table_settings: QPushButton
 
     width_input: QSpinBox
     height_input: QSpinBox
@@ -27,11 +28,7 @@ class Blueprint:
 
     font_path_input: PathInputWidget
     font_size_input: QSpinBox
-
-    status_label: QLabel
-    generate_button: QPushButton
-    reset_table_settings: QPushButton
-
+    
     file_tree: FilesView
 
     def _map_widgets(self, source):

@@ -5,6 +5,9 @@ from PyQt6.QtGui import *
 from src.components import *
 
 class Blueprint:
+    status_label: QLabel
+    generate_button: QPushButton
+    progress: QProgressBar
     reset_segment_settings: QPushButton
 
     width_input: QSpinBox  # set max > config WIDTH (e.g. 10000)
@@ -22,9 +25,6 @@ class Blueprint:
     rendered_file_name_input: QLineEdit   # same
 
     ffmpeg_bin_input: PathInputWidget  # file browse for executable
-
-    status_label: QLabel
-    generate_button: QPushButton
 
     file_tree: FilesView
 

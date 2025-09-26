@@ -22,17 +22,16 @@ class Structure(LayoutBuilder, Blueprint):
         self.layout_data = [
             self.tabs(tab_labels=["Table Creation", "Files","Settings"], children=[
 
-            
-            self.group(orientation="vertical", children=[
-                "status_label",
-                "progress",
-                "generate_button",
-            ]),
+                self.group(orientation="vertical", children=[
+                    "status_label",
+                    "progress",
+                    "generate_button",
+                ]),
 
-            self.box("vertical","Files", [self.file_tree]),
+                self.box("vertical","Files", [self.file_tree]),
 
-            self.scroll([
-                self.reset_table_settings,
+                self.scroll([
+                    self.reset_table_settings,
                     self.group("vertical", [
                         self.box("vertical", "Canvas Settings", [
                             self.form([

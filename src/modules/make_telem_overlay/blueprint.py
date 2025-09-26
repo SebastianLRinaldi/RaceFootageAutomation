@@ -5,6 +5,11 @@ from PyQt6.QtGui import *
 from src.components import *
 
 class Blueprint:
+    status_label: QLabel
+    generate_button: QPushButton
+    progress: QProgressBar
+    reset_telem_settings: QPushButton
+    
     fps_input: QDoubleSpinBox
 
     # Overlay appearance
@@ -18,10 +23,7 @@ class Blueprint:
     max_val_input: QDoubleSpinBox
 
     # UI
-    status_label: QLabel
-
     button_add: QPushButton
-    generate_button: QPushButton
 
     file_tree: FilesView
 
