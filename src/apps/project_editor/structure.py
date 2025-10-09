@@ -25,7 +25,8 @@ class Structure(LayoutBuilder, Blueprint):
             self.tabs(
                 tab_labels=[
                     "Data Grabber", 
-                    "Segment Overlay", "Table Overlay", "Telemetry Overlay", "Timer Overlay", 
+                    "Segment Overlay", "Table Overlay", "Telemetry Overlay", "Timer Overlay", "End Stats",
+                    "Chapters"
                     # "Stream Viewer", "Merge Footage",
                 ],
                 children=[
@@ -34,6 +35,8 @@ class Structure(LayoutBuilder, Blueprint):
                     self.maketableoverlay,
                     self.maketelemoverlay,
                     self.maketimeroverlay,
+                    self.makeendstats,
+                    self.makechapters,
                     # self.makestreamviewer,
                     # self.makemergedfootage,
                     

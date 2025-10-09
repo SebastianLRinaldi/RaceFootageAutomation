@@ -1,3 +1,29 @@
+from PyQt6.QtCore import *
+from PyQt6.QtWidgets import * 
+from PyQt6.QtGui import *
+
+
+import os
+import subprocess
+import tempfile
+import cv2
+import numpy as np
+import math
+from math import ceil
+
+from PIL import ImageFont, ImageDraw, Image
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from tqdm import tqdm
+import traceback
+import re
+
+
+from .blueprint import Blueprint
+from src.components import *
+from src.helper_functions import *
+from src.helper_classes import *
+
+
 def create_end_stats(self, duration, filename):
     frame_count = int(duration * self.fps)
     fourcc = cv2.VideoWriter_fourcc(*'mp4v')
@@ -10,8 +36,9 @@ def create_end_stats(self, duration, filename):
 
     frame_bgr = cv2.cvtColor(np.array(img), cv2.COLOR_RGB2BGR)
 
-    for _ in range(frame_count):
+    for frame in range(frame_count):
         writer.write(frame_bgr)
+
 
     writer.release()
 

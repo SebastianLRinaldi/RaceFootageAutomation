@@ -46,5 +46,6 @@ class Structure(LayoutBuilder, Blueprint):
 
 
     def set_widgets(self):
+
         self.line_edit.setText("")
         self.browse_button.setText("Browse")

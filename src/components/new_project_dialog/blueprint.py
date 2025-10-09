@@ -3,8 +3,12 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 class Blueprint:
-    # label1: QLabel
-    # btn1: QPushButton
+    date_format_label: QLabel
+    race_format_label: QLabel
+    date_input: QLineEdit
+    race_format_input: QLineEdit
+    create_btn: QPushButton
+    cancel_btn: QPushButton
 
     def _map_widgets(self, source):
         """

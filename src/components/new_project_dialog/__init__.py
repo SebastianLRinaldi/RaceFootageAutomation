@@ -1,11 +1,11 @@
-from PyQt6.QtWidgets import QWidget
+from PyQt6.QtWidgets import QDialog
 
 from .structure import Structure
 from .logic import Logic
 from .connections import Connections
 from .blueprint import Blueprint
 
-class Component(QWidget, Blueprint):
+class Component(QDialog, Blueprint):
     def __init__(self):
         super().__init__()
         self._init_widgets()

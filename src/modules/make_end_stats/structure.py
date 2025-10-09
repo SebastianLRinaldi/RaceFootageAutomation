@@ -21,7 +21,7 @@ class Structure(LayoutBuilder, Blueprint):
 
                 self.group("vertical", [
                     "status_label",
-                    self.text_area,
+                    "progress",
                     "generate_button",
                 ]),
 
@@ -34,13 +34,19 @@ class Structure(LayoutBuilder, Blueprint):
                     self.group("vertical", [
                             self.box("vertical", "Video Settings", [
                                     self.form([
-                                        ("Start Duration", "start_duration_input"),
-          
+                                        ("Width", "width_input"),
+                                        ("Height", "height_input"),
+                                        ("FPS", "fps_input"),
                                         ("End Duration", "end_duration_input"),
                                     ])
                                 ]),
                             
-       
+                            self.box("vertical", "Font Settings", [
+                                    self.form([
+                                        ("Font Path", self.font_path_input),
+                                        ("Font Size", "font_size_input"),
+                                    ])
+                                ]),
                             
                         ])
                     ])
@@ -51,11 +57,12 @@ class Structure(LayoutBuilder, Blueprint):
         self.apply_layout(component, self)
 
     def set_properties(self):
+        self.width_input.setMaximum(10000)
+        self.height_input.setMaximum(10000)
         self.fps_input.setRange(0.1, 240.0)
         self.fps_input.setDecimals(2)
-        self.start_duration_input.setRange(1, 600)
         self.end_duration_input.setRange(1, 600)
-
+        self.font_size_input.setRange(1, 256)
 
     def set_widgets(self):
         self.status_label.setText("Ready")
@@ -63,8 +70,14 @@ class Structure(LayoutBuilder, Blueprint):
         self.generate_button.setText("Generate Overlay")
 
 
-
-
+        self.progress.setFormat("Ready") 
+        self.progress.setRange(0, 0)
+        self.progress.setVisible(True)
+        self.progress.setMinimum(0)
+        self.progress.setMaximum(100)  # Percent scale
+        self.progress.setValue(0)
+        self.progress.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        self.progress.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
 
 

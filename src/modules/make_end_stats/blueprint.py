@@ -3,27 +3,41 @@ from PyQt6.QtWidgets import *
 from PyQt6.QtGui import *
 
 from src.components import *
-from src.modules import *
 
 class Blueprint:
-    project_name_label: QLabel
-    project_path_label: QLabel
+    status_label: QLabel
+    generate_button: QPushButton
+    progress: QProgressBar
+
+    reset_settings_btn: QPushButton
+
+    # Video settings
+    width_input: QSpinBox
+    height_input: QSpinBox
+    fps_input: QDoubleSpinBox
+    use_gpu_checkbox: QCheckBox
+    
+
+    # Timing settings
+    start_duration_input: QDoubleSpinBox
+    end_duration_input: QDoubleSpinBox
+
+    rendered_file_name: QLineEdit
+
+    # Font/text settings
+    font_path_input: PathInputWidget
+    font_size_input: QSpinBox
+    
+
+    max_time_input: QDoubleSpinBox
+    center_offset_input: QSpinBox
+    spacing_input : QSpinBox
+
+    stats_fill_color_input : ColorSelector
+
+    file_tree: FilesView
 
 
-    # Export button
-    export_btn: QPushButton
-
-    #######################
-    gatherracetimes: GatherRaceTimes
-    # makemergedfootage: MakeMergedFootage
-    makesegmentoverlay: MakeSegmentOverlay
-    # makestreamviewer: MakeStreamViewer
-    maketableoverlay: MakeTableOverlay
-    maketelemoverlay: MakeTelemOverlay
-    maketimeroverlay: MakeTimerOverlay
-
-    makeendstats: MakeEndStats
-    makechapters: YoutubeChapters
 
 
     def _map_widgets(self, source):

@@ -2,9 +2,24 @@ from PyQt6.QtCore import *
 from PyQt6.QtWidgets import * 
 from PyQt6.QtGui import *
 
+
+from src.components import *
+
 class Blueprint:
-    # label1: QLabel
-    # btn1: QPushButton
+    status_label: QLabel
+    generate_button: QPushButton
+
+    reset_settings_btn: QPushButton
+
+    fps_input: QDoubleSpinBox
+    start_duration_input: QDoubleSpinBox
+    end_duration_input: QDoubleSpinBox
+
+    text_area: QTextEdit
+
+    rendered_file_name: QLineEdit
+
+    file_tree: FilesView
 
     def _map_widgets(self, source):
         """

@@ -21,6 +21,8 @@ class Logic(Blueprint):
             "gatherracetimes",
             # "makestreamviewer",
             # "makemergedfootage",
+            "makeendstats"
+            "makechapters"
             "makesegmentoverlay",
             "maketableoverlay",
             "maketelemoverlay",

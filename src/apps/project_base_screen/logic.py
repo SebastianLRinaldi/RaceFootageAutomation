@@ -140,10 +140,10 @@ class Logic(Blueprint):
         
         def on_create_clicked():
             date = dialog.date_input.text().strip()
-            run = dialog.run_input.text().strip()
+            run = dialog.race_format_input.text().strip()
 
             if not date or not run:
-                QMessageBox.warning(dialog, "Missing Info", "Date and Run ID are required.")
+                QMessageBox.warning(dialog, "Missing Info", "Date AND Run ID are required.")
                 return
 
             path, error = self.create_project_structure( date, run)

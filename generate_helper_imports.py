@@ -1,8 +1,8 @@
 import os
 import ast
 
-HELPERS_DIR = os.path.join("src", "helper_functions")
-# HELPERS_DIR = os.path.join("src", "helper_classes")
+# HELPERS_DIR = os.path.join("src", "helper_functions")
+HELPERS_DIR = os.path.join("src", "helper_classes")
 INIT_FILE = os.path.join(HELPERS_DIR, "__init__.py")
 
 def get_exported_names(file_path):

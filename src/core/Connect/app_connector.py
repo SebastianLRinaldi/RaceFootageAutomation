@@ -42,9 +42,10 @@ class AppConnector:
     def load_project_into_editor(self):
         project_name, project_path = self.set_project_path_and_name_into_editor()
 
-
         targets = [
             ("gatherracetimes", "Race Times"),
+            ("makeendstats", "End Stats"),
+            ("makechapters", "Chapters"),
             # ("makestreamviewer", "Raw Footage"),
             # ("makemergedfootage", "Raw Footage"),
             ("makesegmentoverlay", "Segment Overlay"),

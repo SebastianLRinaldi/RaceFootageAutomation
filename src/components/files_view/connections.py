@@ -7,3 +7,6 @@ class Connections(Blueprint):
         self._map_widgets(component)
         self.logic = logic
 
+
+        self.files_view.doubleClicked.connect(self.logic.preview_file)
+

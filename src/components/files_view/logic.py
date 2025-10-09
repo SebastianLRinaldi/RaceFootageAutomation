@@ -40,7 +40,7 @@ class Logic(QObject, Blueprint):
 
             if not os.path.isdir(path):
                 QMessageBox.warning(
-                    self,
+                    self.component,
                     "FILETREE: Invalid Directory",
                     f"The path does not exist:\n{path}"
                 )

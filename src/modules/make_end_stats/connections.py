@@ -6,4 +6,6 @@ class Connections(Blueprint):
         super().__init__()
         self._map_widgets(component)
         self.logic = logic
-
+        
+        self.generate_button.clicked.connect(self.logic.generate_overlay)
+        self.reset_settings_btn.clicked.connect(self.logic.settings_handler.reset_settings)
