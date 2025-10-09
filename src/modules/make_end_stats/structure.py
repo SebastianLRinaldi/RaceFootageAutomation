@@ -17,7 +17,7 @@ class Structure(LayoutBuilder, Blueprint):
         self.set_widgets()
         
         self.layout_data = [
-            self.tabs(tab_labels=["Segment Creation", "Files", "Settings"], children=[
+            self.tabs(tab_labels=["End Stats Creation", "Files", "Settings"], children=[
 
                 self.group("vertical", [
                     "status_label",

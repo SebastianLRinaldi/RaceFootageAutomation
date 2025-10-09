@@ -17,7 +17,7 @@ class Structure(LayoutBuilder, Blueprint):
         self.set_widgets()
         
         self.layout_data = [
-            self.tabs(tab_labels=["Segment Creation", "Files", "Settings"], children=[
+            self.tabs(tab_labels=["Chapter Creation", "Settings"], children=[
 
                 self.group("vertical", [
                     "status_label",
@@ -25,9 +25,6 @@ class Structure(LayoutBuilder, Blueprint):
                     "generate_button",
                 ]),
 
-                self.box("vertical","Files", [self.file_tree]),
-
-                
                 self.scroll([
                     self.reset_settings_btn,
                     
